@@ -7,7 +7,7 @@ zip_state_map = function(dataframe, state, palettevalue = 1, legend = "Truckers"
   p$render()
 }
 
-clean_data = function(dataframe) {
+clean_data = function(fleets) {
 # str(fleets)
 # 
 # UniquePhyscialCountry = levels(fleets$PHY_COUNTRY)
