@@ -2,7 +2,7 @@
 title: "An analysis of movies by ratings"
 author: "Thomas Boulenger"
 date: "22 Jan 2016"
-output: pdf_document
+output: html_document
 ---
 
 Through Google Docs and from 'BoxOfficeMojo.com', I have first obtained a table 'adj_gross.csv' for the top 200 selling tickets movies, adjusted to the inflation in the US. The dataset needs some cleaning work to get rid of some special characters, which for instance make budget/profits appear as factors rather than numeric value.
