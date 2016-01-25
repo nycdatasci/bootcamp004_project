@@ -1,0 +1,45 @@
+---
+title: "Trucking Companies"
+author: "Satish"
+date: "January 25, 2016"
+output:
+  ioslides_presentation:
+    css: assets/css/ioslides.css
+    logo: assets/img/logo.png
+---
+# Trucking
+
+## The trucking industry is the lifeblood of the U.S. economy. 
+<div class="columns-3">
+<img src="images/truck1.jpeg" alt="output_option" width="150" height="150">
+<img src="images/truck2.jpeg" alt="output_option" width="150" height="150">
+<img src="images/truck3.jpeg" alt="output_option" width="150" height="150">
+<img src="images/truck4.jpeg" alt="output_option" width="150" height="150">
+</div>
+
+# Why
+
+### **Nearly 70% of all the freight tonnage moved in the U.S. goes on trucks**
+### **Without the industry and our truck drivers, the economy would come to a standstill**
+
+- Move 9.2 billion tons of freight annually 
+- Requires nearly 3 million heavy-duty Class 8 trucks and 
+- Over 3 million truck drivers 
+- Takes over 37 billion gallons of diesel fuel to move all of that freight 
+
+### **Simply – without trucks, America stops**
+
+### **Trucking is leading indicator of the economy**
+
+
+# R Code
+
+hello world
+\newpage
+```{r, echo=FALSE}
+1+1
+```
+\pagebreak
+```{r, echo=FALSE}
+plot(1:10)
+```
