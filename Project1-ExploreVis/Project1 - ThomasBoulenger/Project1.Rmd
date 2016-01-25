@@ -1,6 +1,6 @@
 ---
-title: "Visualization project"
-author: "ashtom"
+title: "An analysis of movies by ratings"
+author: "Thomas Boulenger"
 date: "22 Jan 2016"
 output: pdf_document
 ---
@@ -197,7 +197,7 @@ dat = data.table(x = temp$Year, y = temp$value, grp = temp$variable)
 dat[, list(intercept = coef(lm(y ~ x))[1], slope = coef(lm(y ~ x))[2]), by = grp]
 ````
 
-Indeed, the slope for the adjusted gross is roughly -3.3 $ Million per year, while the unadjusted slope goes up by roughly 5.5 $ Million per year. This suggests an acceleration of inflation. Adding the rescaled average of tickets price, we find a hint that the inflation was indeed much faster than the decrease of the attendance for US audience, hence the appearance that tickets sales increase, when they actually decrease when tickets prices are adjusted to inflation.
+Although we better be cautious regarding the interpretation for the above linear regression, it is tempting to summarize the result as a decrease of roughly -3.3 $ Million per year for the adjusted gross, and an increase of roughly 5.5 $ Million per year for the unadjusted gross. This suggests an acceleration of inflation. Adding the rescaled average of tickets price, we find a hint that the inflation was indeed much faster than the decrease of the attendance for US audience, hence the appearance that tickets sales increase, when they actually decrease when tickets prices are adjusted to inflation.
 
 
 ```{r, echo = TRUE, message = TRUE, warning = FALSE, comment = FALSE}
