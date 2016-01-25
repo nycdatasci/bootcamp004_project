@@ -180,9 +180,14 @@ fleet_unit_plot
 
 #fleets_outlier = subset(fleets, (NBR_POWER_UNIT > 200000) | (DRIVER_TOTAL > 100000))
 #fleets_subset = subset(fleets, (NBR_POWER_UNIT < 200000) & (DRIVER_TOTAL < 100000))
-p = ggplot(fleets_subset, aes(NBR_POWER_UNIT, DRIVER_TOTAL ))
-p + geom_point(aes(color=PHY_STATE))
-p
+
+fleets_try = subset(fleets, (NBR_POWER_UNIT < 2000) & (DRIVER_TOTAL < 1000))
+driver_unit_plot = ggplot(fleets_try, aes(NBR_POWER_UNIT, DRIVER_TOTAL )) +
+  geom_point(aes(color=CARRIER_OPERATION)) +
+  xlab("Number of Units") + ylab("Number of Drivers") +
+  ggtitle("Number of Drivers to Units relationship") 
+  
+driver_unit_plot
 
 
 # min.mean.sd.max <- function(x) {
