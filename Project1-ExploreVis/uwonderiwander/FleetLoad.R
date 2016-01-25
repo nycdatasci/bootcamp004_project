@@ -65,6 +65,9 @@ category = data_frame(numbers, labels)
 fleets = mutate(fleets, driver_category = cut(fleets$DRIVER_TOTAL, category$numbers,right=FALSE, labels=category$labels[1:14]))
 fleets = mutate(fleets, unit_category = cut(fleets$NBR_POWER_UNIT, category$numbers,right=FALSE, labels=category$labels[1:14]))
 
+fleets_outlier = subset(fleets, (NBR_POWER_UNIT > 200000) | (DRIVER_TOTAL > 100000))
+fleets = subset(fleets, (NBR_POWER_UNIT < 200000) & (DRIVER_TOTAL < 100000))
+
 fleets_tbl = tbl_df(fleets)
 fleets_tbl = select(fleets_tbl, op_type = CARRIER_OPERATION, domicile_state = PHY_STATE, units_total = NBR_POWER_UNIT,
                       driver_total = DRIVER_TOTAL, driver_category, unit_category)
@@ -77,22 +80,23 @@ by_state = merge(by_state,fleets_tbl %>% group_by(domicile_state, op_type) %>% s
 by_state = merge(by_state, fleets_tbl %>% group_by(domicile_state, op_type) %>% summarise(unit_total_phy_state = sum(units_total)))
 by_state = mutate(by_state, state_population = df_pop_state$value[match(by_state$domicile_state, df_pop_state$region)])
 
-state_drivers_plot = ggplot(data=by_state, aes(x=domicile_state, y=driver_total_phy_state, fill = op_type)) +
+state_drivers_plot = ggplot(data=by_state, aes(x=reorder(domicile_state, driver_total_phy_state), y=driver_total_phy_state, fill = op_type)) +
    geom_bar(stat="identity") +
    xlab("State") + ylab("Drivers") +
    scale_fill_discrete(name = "Type of Operation", labels = c("Interstate", "Intrastate Hazmat", "Intrastate Non-Hazmat")) +
 #   scale_fill_brewer(palette = 'Blues') +
    theme(axis.text.x = element_text(angle = 90)) +
-   ggtitle("Number of Drivers by State") 
-#+ scale_x_continuous(limit = c(0, 70000)) #, breaks = 1:5000)
+   ggtitle("Number of Drivers by State") +
+    scale_y_continuous(labels = comma)
 state_drivers_plot
 
-state_units_plot = ggplot(data=by_state, aes(x=domicile_state, y=unit_total_phy_state, fill = op_type)) +
+state_units_plot = ggplot(data=by_state, aes(x=reorder(domicile_state, unit_total_phy_state), y=unit_total_phy_state, fill = op_type)) +
   geom_bar(stat="identity") +
   xlab("State") + ylab("Units") +
   scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9"),name = "Type of Operation", labels = c("Interstate", "Intrastate Hazmat", "Intrastate Non-Hazmat")) +
   theme(axis.text.x = element_text(angle = 90)) +
-  ggtitle("Number of Units by State") 
+  ggtitle("Number of Units by State")  +
+  scale_y_continuous(labels = comma)
 state_units_plot
 
 
@@ -153,12 +157,14 @@ zip_state_map(drivers_by_zip,"new york", title="New York Truck Driver Population
 #   geom_point(aes(color = domicile_state)) +
 #   xlab("Number of Fleets") + ylab("Number of Drivers") 
 
+
 fleet_driver_plot = ggplot(data=by_state, aes(x=fleets_count_phy_state, y=driver_total_phy_state)) + 
   geom_point(aes(color = op_type)) +
   xlab("Number of Fleets") + ylab("Number of Drivers") +
   ggtitle("Number of Fleets to Drivers relationship") +
   scale_color_manual(name = "Type of Operation", labels = c("Interstate", "Intrastate Hazmat", "Intrastate Non-Hazmat"), 
                      values = c("dark blue", "dark red", "dark green")) +
+  scale_y_continuous(labels = comma) +
   facet_grid(~op_type)
 fleet_driver_plot
 
@@ -168,12 +174,15 @@ fleet_unit_plot = ggplot(data=by_state, aes(x=fleets_count_phy_state, y=unit_tot
   ggtitle("Number of Fleets to Vehicles relationship") +
   scale_color_manual(name = "Type of Operation", labels = c("Interstate", "Intrastate Hazmat", "Intrastate Non-Hazmat"), 
                     values = c("blue", "red", "green")) +
+  scale_y_continuous(labels = comma) +
   facet_grid(~op_type)
 fleet_unit_plot
 
-# p = ggplot(fleets, aes(NBR_POWER_UNIT, DRIVER_TOTAL))
-# p + geom_point(aes(color=PHY_STATE))
-# p
+#fleets_outlier = subset(fleets, (NBR_POWER_UNIT > 200000) | (DRIVER_TOTAL > 100000))
+#fleets_subset = subset(fleets, (NBR_POWER_UNIT < 200000) & (DRIVER_TOTAL < 100000))
+p = ggplot(fleets_subset, aes(NBR_POWER_UNIT, DRIVER_TOTAL ))
+p + geom_point(aes(color=PHY_STATE))
+p
 
 
 # min.mean.sd.max <- function(x) {
