@@ -327,6 +327,9 @@ ggplot(movie_votes, aes(x = Year, y = Adjusted.Gross, colour = cat)) + geom_poin
   ylab('Profits ($ Million)') +
   labs(colour = 'category')
   
+  ## movies in both Top 200 best selling and the 'bad' category
+filter(movie_votes, cat == 'bad') %>% select(., Title)
+  
 
 ggplot(movie_votes, aes(Year)) +
   geom_area(aes(fill = cat, group = cat), stat = 'bin', bins = 10) +
