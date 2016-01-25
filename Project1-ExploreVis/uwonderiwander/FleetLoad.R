@@ -52,10 +52,11 @@ nrow(fleets) #1394055 - 1442254
 write.csv(fleets, file = "data/USOnlyFleets.csv", row.names = TRUE)
 
 summary(fleets)
-summary = c('DRIVER_TOTAL',summarise(fleets, min(DRIVER_TOTAL), max(DRIVER_TOTAL), mean(DRIVER_TOTAL), median(DRIVER_TOTAL), sd(DRIVER_TOTAL), IQR(DRIVER_TOTAL)))
-summary2 = c('NBR_POWER_UNIT', summarise(fleets, min(NBR_POWER_UNIT), max(NBR_POWER_UNIT), mean(NBR_POWER_UNIT), median(NBR_POWER_UNIT), sd(NBR_POWER_UNIT), IQR(NBR_POWER_UNIT)))
-summary3 = c('MCS150_MILEAGE', summarise(fleets, min(MCS150_MILEAGE), max(MCS150_MILEAGE), mean(MCS150_MILEAGE), median(MCS150_MILEAGE), sd(MCS150_MILEAGE), IQR(MCS150_MILEAGE)))
-
+summary = c(type = 'DRIVER_TOTAL',summarise(fleets, sum = sum(DRIVER_TOTAL), min = min(DRIVER_TOTAL), max = max(DRIVER_TOTAL), mean = mean(DRIVER_TOTAL), median = median(DRIVER_TOTAL), sd = sd(DRIVER_TOTAL), IQR = IQR(DRIVER_TOTAL)))
+summary2 = c('NBR_POWER_UNIT', summarise(fleets, sum(NBR_POWER_UNIT), min(NBR_POWER_UNIT), max(NBR_POWER_UNIT), mean(NBR_POWER_UNIT), median(NBR_POWER_UNIT), sd(NBR_POWER_UNIT), IQR(NBR_POWER_UNIT)))
+summary3 = c('MCS150_MILEAGE', summarise(fleets, sum(MCS150_MILEAGE), min(MCS150_MILEAGE), max(MCS150_MILEAGE), mean(MCS150_MILEAGE), median(MCS150_MILEAGE), sd(MCS150_MILEAGE), IQR(MCS150_MILEAGE)))
+summary4 = as.data.frame(cbind(summary, summary2, summary3))
+str(summary4)
 #categorise the unit and driver counts
 numbers = c(0,1,2,6,11,51,101,501, 1001, 2001, 5001, 10001, 20001, 50001, 100001)
 labels = c('0','1','2-5','6-10','11-50','51-100','101-500', '501-1000', '1001-2000', 
@@ -169,4 +170,26 @@ fleet_unit_plot = ggplot(data=by_state, aes(x=fleets_count_phy_state, y=unit_tot
                     values = c("blue", "red", "green")) +
   facet_grid(~op_type)
 fleet_unit_plot
+
+# p = ggplot(fleets, aes(NBR_POWER_UNIT, DRIVER_TOTAL))
+# p + geom_point(aes(color=PHY_STATE))
+# p
+
+
+# min.mean.sd.max <- function(x) {
+#   r <- c(min(x), mean(x) - sd(x), mean(x), mean(x) + sd(x), max(x))
+#   names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+#   r
+# }
+
+# p1 = ggplot(aes(y = NBR_POWER_UNIT, x = factor(PHY_STATE)), data = fleets)
+# p1 = p1 + stat_summary(fun.data = min.mean.sd.max, geom = "boxplot") + 
+#   geom_jitter(position=position_jitter(width=.2), size=3) + 
+#   ggtitle("Boxplot con media, 95%CI, valore min. e max.") + 
+#   xlab("Gruppi") + ylab("Valori")
+# p1
+# 
+# 
+# xport_data=read.csv("data/transportation_value.csv",  stringsAsFactors=FALSE)
+# str(xport_data)
 
