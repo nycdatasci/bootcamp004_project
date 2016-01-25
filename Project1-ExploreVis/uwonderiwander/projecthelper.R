@@ -7,7 +7,7 @@ zip_state_map = function(dataframe, state, palettevalue = 1, legend = "Truckers"
   p$render()
 }
 
-clean_data = function(dataframe) {
+clean_data = function(fleets) {
 # str(fleets)
 # 
 # UniquePhyscialCountry = levels(fleets$PHY_COUNTRY)
@@ -49,6 +49,7 @@ clean_data = function(dataframe) {
 
 #Decided to eliminate every country except for the North American Countries after initial analysis of the data
 not_considered_fleets = fleets[!fleets$PHY_COUNTRY == 'US',] 
+not_considered_fleets = mutate(not_considered_fleets, reason = 'Non-US Fleets')
 nrow(not_considered_fleets) #36837
 
 not_considered_fleets2 =  fleets[!fleets$MAILING_COUNTRY == 'US',]

@@ -14,6 +14,7 @@ library(choroplethrZip)
 library(Hmisc)
 library(corrplot)
 
+data(df_pop_state)
 setwd("/Users/satishjoshi/DataBootcamp/bootcamp004_project/Project1-ExploreVis/uwonderiwander")
 
 source("projecthelper.R")
@@ -25,9 +26,35 @@ suppressPackageStartupMessages(library(googleVis))
 fleet_data=read.csv("data/2015Dec_Census.txt",  stringsAsFactors=FALSE)
 nrow(fleet_data) #1643373
 
+fleet_data$MCS150_MILEAGE[is.na(fleet_data$MCS150_MILEAGE)] = 0
+fleet_data$NBR_POWER_UNIT[is.na(fleet_data$NBR_POWER_UNIT)] = 0
+fleet_data$DRIVER_TOTAL[is.na(fleet_data$DRIVER_TOTAL)] = 0
+
+#Summary of mean, median, min, max, sd of miles, units, drivers
+#p <- ggplot(fleet_data) 
+#p + geom_boxplot(aes(x=PHY_COUNTRY, y=DRIVER_TOTAL, color='red'))
+#p + geom_boxplot(aes(x=PHY_COUNTRY, y=NBR_POWER_UNIT, color='green'))
+#p + geom_boxplot(aes(x=PHY_COUNTRY, y=MCS150_MILEAGE, color='yello'))
+
+fleet_summary = merge(fleet_summary, by_country)
+by_country = fleet_data %>% group_by(PHY_COUNTRY) %>% summarise(country_count = n())
+fleet_summary = by_country
+by_country = fleet_data %>% group_by(PHY_COUNTRY) %>% summarise(unit_total = sum(NBR_POWER_UNIT))
+fleet_summary = merge(fleet_summary, by_country)
+by_country = fleet_data %>% group_by(PHY_COUNTRY) %>% summarise(driver_total = sum(DRIVER_TOTAL))
+fleet_summary = merge(fleet_summary, by_country)
+by_country = fleet_data %>% group_by(PHY_COUNTRY) %>% summarise(mileage_total = sum(MCS150_MILEAGE))
+fleet_summary = merge(fleet_summary, by_country)
+
+
 fleets = clean_data(fleet_data)
-nrow(fleets) #1394055
+nrow(fleets) #1394055 - 1442254
 write.csv(fleets, file = "data/USOnlyFleets.csv", row.names = TRUE)
+
+summary(fleets)
+summary = c('DRIVER_TOTAL',summarise(fleets, min(DRIVER_TOTAL), max(DRIVER_TOTAL), mean(DRIVER_TOTAL), median(DRIVER_TOTAL), sd(DRIVER_TOTAL), IQR(DRIVER_TOTAL)))
+summary2 = c('NBR_POWER_UNIT', summarise(fleets, min(NBR_POWER_UNIT), max(NBR_POWER_UNIT), mean(NBR_POWER_UNIT), median(NBR_POWER_UNIT), sd(NBR_POWER_UNIT), IQR(NBR_POWER_UNIT)))
+summary3 = c('MCS150_MILEAGE', summarise(fleets, min(MCS150_MILEAGE), max(MCS150_MILEAGE), mean(MCS150_MILEAGE), median(MCS150_MILEAGE), sd(MCS150_MILEAGE), IQR(MCS150_MILEAGE)))
 
 #categorise the unit and driver counts
 numbers = c(0,1,2,6,11,51,101,501, 1001, 2001, 5001, 10001, 20001, 50001, 100001)
@@ -80,9 +107,9 @@ STATE_DRIVERS = state_choropleth(by_state_only, title = "Trucker Population", le
 
 STATE_DRIVERS
 
-STATE_DRIVERS = state_choropleth(by_state_only, title = "Trucker Population by top 5 states", legend = "Trcukers", num_colors = 9, 
+STATE_DRIVERS_TOP5 = state_choropleth(by_state_only, title = "Trucker Population by top 5 states", legend = "Trcukers", num_colors = 9, 
                                  zoom = c("california","texas", "georgia", "florida", "pennsylvania"))
-
+STATE_DRIVERS_TOP5
 #Warning message:
 #  In self$bind() :
 #  The following regions were missing and are being set to NA: district of columbia
@@ -99,9 +126,10 @@ STATE_UNITS = state_choropleth(by_state_only, title = "Vehicle Population", lege
 
 STATE_UNITS
 
-STATE_UNITS = state_choropleth(by_state_only, title = "Vehicle Population by top 5 states", legend = "Trcukers", num_colors = 1, 
+STATE_UNITS_TOP5 = state_choropleth(by_state_only, title = "Vehicle Population by top 5 states", legend = "Trcukers", num_colors = 1, 
                                  zoom = c("california","texas", "georgia", "new york", "pennsylvania"))
 
+STATE_UNITS_TOP5
 #state population 
 
 STATE_POPULATION = state_choropleth(df_pop_state, title = "Total Population", legend = "Population")
