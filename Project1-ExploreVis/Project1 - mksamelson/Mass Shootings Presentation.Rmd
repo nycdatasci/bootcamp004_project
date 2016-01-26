@@ -6,6 +6,7 @@ subtitle:  "Mother Jones Magazine Data"
 author: "Matt Samelson"
 date: "January 27, 2016"
 output: ioslides_presentation
+  
 ---
 
 
@@ -276,14 +277,50 @@ mosaic(table(race.new, age.new), shade = TRUE, legend = TRUE,
 
 ## Mass Shootings 1982 - 2015
 
-Top Events
+<center>
 
-```{r echo=FALSE}
+```{r, echo=FALSE}
+ggplot(shootings,aes(age,total.victims))+
+  geom_point()+
+  xlab("Age")+
+  ylab("Victims (Fatalities + Wounded)")+
+  ggtitle("Perpetrator Age vs. Total Victims")
+```
+</center>
 
-head(arrange(select(shootings, 1:5, 7:9),desc(total.victims)),5)
+## Mass Shootings 1982 - 2015
+
+<center>
+
+```{r, echo=FALSE}
+#weapons obtained legally
+
+weapons.legally = ggplot(shootings,aes(weapons.obtained.legally))+
+  geom_bar(color='black', fill='blue')  +
+  ggtitle("Weapons Obtained Legally") + 
+  xlab("")
+
+#Mental Health Issues (advanced warning) - Bar Chart
+
+mental.issues = ggplot(shootings,aes(mental.health.issues))+
+  geom_bar(fill="green",colour="black")+ 
+  ylab("Count") +
+  xlab("")+
+  ggtitle("Demonstrated Mental Health Issues")
+
+grid.arrange(weapons.legally, mental.issues,ncol=1, nrow=2)
 
 ```
 </center>
+
+
+## Mass Shootings 1982 - 2015 {.smaller}
+
+Top Events
+
+<center><img src="Top5List.png" alt="output_option" height="175", width="700"></center>
+
+
 
 ## Mass Shootings 1982 - 2015
 

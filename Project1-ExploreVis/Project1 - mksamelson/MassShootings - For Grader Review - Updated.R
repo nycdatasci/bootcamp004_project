@@ -51,6 +51,8 @@ for (i in 1:nrow(shootings_m)){
   } 
 }
 
+summary(shootings)
+
 #Counts of events by State
 
 shootings_tbl = tbl_df(shootings)
@@ -88,8 +90,10 @@ top_victims
 
 #weapons obtained legally
 
-ggplot(shootings,aes(Weapons.obtained.legally))+geom_bar(color='black', fill='blue')  +
-  ggtitle("Weapons Obtained Legally") + xlab("")
+weapons.legally = ggplot(shootings,aes(weapons.obtained.legally))+
+  geom_bar(color='black', fill='blue')  +
+  ggtitle("Weapons Obtained Legally") + 
+  xlab("")
 
 #total victims by weapon legality
 
@@ -158,7 +162,9 @@ wounded.year = ggplot(shootings,aes(year,injured))+
 
 #Mental Health Issues (advanced warning) - Bar Chart
 
-ggplot(shootings,aes(Mental.Health.Issues))+geom_bar(fill="grey",colour="black")+theme_bw() + ylab("Count") +
+mental.health = ggplot(shootings,aes(mental.health.issues))+
+  geom_bar(fill="green",colour="black")+theme_bw() + 
+  ylab("Count") +
   ggtitle("Mass Shootings in the US: 1982 - 2015")
 
 
@@ -242,7 +248,6 @@ ggplot(shootings,aes(priorsignsmentalillness))+geom_bar()+theme_bw() + ylab("Cou
 #Scatterplot - Age vs. Total Victims
 
 ggplot(shootings,aes(age,total.victims))+
-  theme_bw()+
   geom_point()+
   xlab("Age")+
   ylab("Victims (Fatalities + Wounded)")+
