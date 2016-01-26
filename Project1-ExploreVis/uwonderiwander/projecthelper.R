@@ -49,7 +49,6 @@ clean_data = function(fleets) {
 
 #Decided to eliminate every country except for the North American Countries after initial analysis of the data
 not_considered_fleets = fleets[!fleets$PHY_COUNTRY == 'US',] 
-not_considered_fleets = mutate(not_considered_fleets, reason = 'Non-US Fleets')
 nrow(not_considered_fleets) #36837
 
 not_considered_fleets2 =  fleets[!fleets$MAILING_COUNTRY == 'US',]
