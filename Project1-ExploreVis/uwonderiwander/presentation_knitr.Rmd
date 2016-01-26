@@ -1,0 +1,50 @@
+---
+title: "Trucking Companies"
+author: "Satish"
+date: "January 25, 2016"
+output:
+  ioslides_presentation:
+    css: assets/css/ioslides.css
+    logo: assets/img/logo.png
+---
+# Trucking
+
+## The trucking industry is the lifeline of the U.S. economy. 
+<div class="columns-3">
+<img src="images/truck6.jpeg" alt="output_option" width="250" height="200">
+<img src="images/truck1.jpg" alt="output_option" width="250" height="200">
+<img src="images/truck2.gif" alt="output_option" width="250" height="200">
+<img src="images/truck3.png" alt="output_option" width="250" height="200">
+<img src="images/truck4.jpg" alt="output_option" width="250" height="200">
+<img src="images/truck5.jpg" alt="output_option" width="250" height="200">
+</div>
+
+
+
+## Why
+
+#### **Nearly 70% of all the freight tonnage moved in the U.S. goes on trucks**
+<br>
+
+
+#### **Without the industry and our truck drivers, the economy would come to a standstill**
+<br>
+
+- Move 9.2 billion tons of freight annually 
+- Requires nearly 3 million heavy-duty Class 8 trucks and 
+- Over 3 million truck drivers 
+- Takes over 37 billion gallons of diesel fuel to move all of that freight 
+
+## And
+#### **Simply – without trucks, America stops**
+
+<img src="images/leadingindicator.png"  STYLE="position:absolute; TOP:200px; LEFT:270px; width="500" height="500">
+
+## FMCSA 
+<img src="images/FMCSA.png"  STYLE="position:absolute; TOP:100px; LEFT:200px;  width="600" height="600">
+
+## Data Will Come on CD-ROM in 4-6 weeks
+
+<img src="images/FMCSAForm.JPG"  STYLE="position:absolute; TOP:100px; LEFT:200px;  width="400" height="400">
+<img src="images/Letter.JPG"  STYLE="position:absolute; TOP:400px; LEFT:400px;  width="300" height="300">
+

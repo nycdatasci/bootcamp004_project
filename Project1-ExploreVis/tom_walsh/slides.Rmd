@@ -1,0 +1,410 @@
+---
+title: "NBA Lineup Data"
+author: "Tom Walsh"
+date: "January 22, 2016"
+output: 
+  ioslides_presentation:
+    css: assets/css/ioslides.css
+    logo: assets/img/logo.png
+---
+
+# Getting NBA Data
+Lots of code, so we'll just skim through this.
+
+```{r, include=FALSE}
+library(rjson)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+require(gridExtra)
+# If you need to recalculate everything, set this to true,
+# otherwise, it'll just use the stored values in /data
+recalculate=FALSE
+```
+
+## Getting data from stats.nba.com into R
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+df_from_url = function(url, ncol, number_columns) {
+  json = fromJSON(file=url, method='C')
+  df = data.frame(
+    matrix(
+      unlist(json$resultSets[[1]][[3]]), 
+      ncol=ncol, 
+      byrow = TRUE
+    ), 
+    stringsAsFactors = FALSE
+  )
+  colnames(df) = json$resultSets[[1]][[2]]
+  df[,number_columns] = apply(
+    df[,number_columns], 
+    2, 
+    function(x) as.numeric(as.character(x))
+  )
+  return(df)
+}
+```
+## Some Setup
+### Years
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+years = sapply(2007:2015, function(year) sprintf('%4d-%02d', year, (year+1)%%100))
+```
+### Team Ids
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+team_fmt = 'http://stats.nba.com/stats/leaguedashteamstats?Conference=&DateFrom=&DateTo=&Division=&GameScope=&GameSegment=&LastNGames=0&LeagueID=00&Location=&MeasureType=Base&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Per100Plays&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season=%s&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision='
+team_urls = sapply(years, function(year) sprintf(team_fmt, year))
+team_dfs = sapply(team_urls, function(url) df_from_url(url, 30, c(1,3:29)))
+team_ids = Reduce(union, team_dfs[1,])
+```
+```{r, include=FALSE}
+team_ids = c(
+  1610612737,1610612738,1610612766,1610612741,1610612739,1610612742,1610612743,1610612765,1610612744,
+  1610612745,1610612754,1610612746,1610612747,1610612763,1610612748,1610612749,1610612750,1610612751,
+  1610612740,1610612752,1610612753,1610612755,1610612756,1610612757,1610612758,1610612759,1610612760,
+  1610612761,1610612762,1610612764
+)
+```
+## Player Data
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+columns = c(35,32,24,27,30)
+stat_types = c('Base', 'Advanced', 'Misc', 'Scoring', 'Usage')
+player_fmt = 'http://stats.nba.com/stats/leaguedashplayerstats?College=&Conference=&Country=&DateFrom=&DateTo=&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&LastNGames=0&LeagueID=00&Location=&MeasureType=%s&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Per100Plays&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season=%s&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+```
+
+##
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+players = NULL
+for (year in years) {
+  season_df = NULL
+  for (i in 1:length(stat_types)) {
+    stat_type = stat_types[i]
+    c = columns[i]
+    numeric_columns = c(1,3,5:(c-1))
+    url = sprintf(player_fmt, stat_type, year)
+    df = df_from_url(url, c, numeric_columns)
+    if (is.null(season_df)) {
+      season_df = df
+    } else {
+      season_df = merge(
+        season_df, df, by=1, all.x=TRUE, suffixes=c('', sprintf('_%s', stat_type))
+      )
+    }
+  }
+```
+
+## 
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+  season_df$SEASON = factor(year)
+  if (is.null(players)) {
+    players = season_df
+  } else {
+    players = rbind(players, season_df)
+  }
+}
+```
+## Lineup Data
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+stat_types = c('Base', 'Advanced', 'Four+Factors', 'Misc', 'Scoring', 'Opponent')
+columns = c(31,24,18,18,25,31)
+lineup_fmt = 'http://stats.nba.com/stats/leaguedashlineups?Conference=&DateFrom=&DateTo=&Division=&GameID=&GameSegment=&GroupQuantity=5&LastNGames=0&LeagueID=00&Location=&MeasureType=%s&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Per100Plays&Period=0&PlusMinus=N&Rank=N&Season=%s&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&TeamID=%d&VsConference=&VsDivision='
+```
+
+## 
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+lineups = NULL
+for (year in years) {
+  for (team in team_ids) {
+    season_df = NULL
+    for (i in 1:length(stat_types)) {
+      stat_type = stat_types[i]
+      c = columns[i]
+      numeric_columns = c(4,6:c)
+      url = sprintf(lineup_fmt, stat_type, year, team)
+      df = df_from_url(url, c, numeric_columns)
+      if (is.null(season_df)) {
+        season_df = df
+      } else {
+        season_df = merge(
+          season_df, df, by=2, all.x=TRUE, suffixes=c('', sprintf('_%s', stat_type))
+          )
+      }
+    }
+```
+
+## 
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+    season_df$SEASON = factor(year)
+    if (is.null(lineups)) {
+      lineups = season_df
+    } else {
+      lineups = rbind(lineups, season_df)
+    }
+  }
+}
+```
+
+## Player Cleanup
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+players = mutate(players, MIN_TOTAL=MIN_Usage, MIN_GAME=MIN_Advanced)
+players = select(players, -X, -matches('CFID|CFPARAMS|_[A-Z][a-z]', FALSE))
+```
+
+## Lineup Cleanup
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+lineups = tbl_df(lineups)
+lineups = mutate(lineups, MIN_TOTAL=MIN_Advanced)
+lineups = select(
+  lineups, -X, -matches('GROUP_SET|CFID|CFPARAMS|_[A-Z][a-z]', FALSE)
+)
+lineups = Filter(function(x)!all(is.na(x)), lineups)
+```
+
+## Identifying players
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+lineups$PLAYERS = t(
+  sapply(
+    lineups$GROUP_ID, 
+    function(x) {
+        as.integer(unlist(strsplit(as.character(x), split=' - ')))
+    }
+  )
+)
+```
+
+## Calculating Player Averages for a Lineup
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+season_col = grep('SEASON', colnames(lineups))
+player_col = grep('PLAYERS', colnames(lineups))
+numeric_player_columns = as.vector(which(sapply(players, is.numeric)))
+lineup_averages = 
+  data.frame(t(apply(lineups, 1, function(x) {
+    srows = players$SEASON == x[season_col]
+    prows = players$PLAYER_ID %in% as.numeric(x[player_col:player_col+4])
+    sapply(players[srows & prows, numeric_player_columns], mean)
+  })))
+```
+
+## Calculating Usage-Weighted Averages for a Lineup
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+usg_weighted =
+  data.frame(t(apply(lineups, 1, function(x) {
+    srows = players$SEASON == x[season_col]
+    prows = players$PLAYER_ID %in% as.numeric(x[player_col:player_col+4])
+    stats = players[srows & prows, numeric_player_columns]
+    tot_usg = sum(stats$USG_PCT_PCT)
+    sapply(stats, function(y) sum(y * stats$USG_PCT_PCT)/tot_usg)
+  })))
+```
+
+## Putting it all together
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+colnames(lineups) = paste(names(lineups), 'lineup', sep = ".")
+colnames(lineup_averages) = paste(names(lineup_averages),'player',sep='.')
+colnames(usg_weighted) = paste(names(usg_weighted), 'usage', sep='.')
+nba = merge(merge(lineups, lineup_averages, by=0), usg_weighted, by=0)
+nba$Row.names = NULL; nba$Row.names = NULL
+```
+```{r, include=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+if (recalculate) {
+  write.csv(nba, 'data/nba.csv')
+  write.csv(players, 'data/players.csv')
+  write.csv(lineups, 'data/lineups.csv')
+} else {
+  nba = tbl_df(read.csv('data/nba.csv'))
+  nba = select(nba, -X)
+  players=tbl_df(read.csv('data/players.csv'))
+  players = select(players, -X)
+}
+```
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+dim(nba)
+```
+
+## Net Rating
+```{r, echo=FALSE}
+qplot(NET_RATING.player, NET_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(-10,10), ylim=c(-15,10))
+```
+
+## Data Issues?
+```{r, echo=FALSE}
+qplot(MIN_TOTAL.lineup, data=nba, geom='density')
+```
+
+##
+```{r, echo=FALSE}
+minutes = cut(nba$MIN_TOTAL.lineup, c(0,1,10, 100, 1000, 10000))
+qplot(NET_RATING.player, NET_RATING.lineup, data=nba, geom='smooth', color=minutes) + coord_cartesian(xlim=c(-10,10), ylim=c(-15,10))
+```
+
+##
+```{r, echo=FALSE}
+minutes = cut(nba$MIN_TOTAL.lineup, 1:10)
+qplot(NET_RATING.player, NET_RATING.lineup, data=nba, geom='smooth', color=minutes) + coord_cartesian(xlim=c(-10,10), ylim=c(-15,10))
+```
+
+##
+```{r, echo = FALSE}
+qplot(MIN_TOTAL.lineup / MIN_TOTAL.player, data=nba, geom='density')
+```
+
+##
+```{r, echo = FALSE}
+minutes = cut(nba$MIN_TOTAL.lineup / nba$MIN_TOTAL.player, c(0,0.1,0.2,0.3,0.4,0.5,0.6,1))
+qplot(NET_RATING.player, NET_RATING.lineup, data=nba, geom='smooth', color=minutes) + coord_cartesian(xlim=c(-10,10), ylim=c(-15,10))
+```
+
+## Final Cleanup
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+mins_ok = nba$MIN_TOTAL.lineup > 4
+ratio_ok = nba$MIN_TOTAL.lineup / nba$MIN_TOTAL.player < 0.4
+lineup_ok = nba$NET_RATING.lineup > -50 & nba$NET_RATING.lineup < 50
+player_ok = nba$NET_RATING.player > -10 & nba$NET_RATING.player < 10
+nba = nba[mins_ok & ratio_ok & lineup_ok & player_ok,]
+```
+I'm not sure any of this would stand up to statistical scrutiny, but it should be okay for drawing pretty pictures.
+
+## Now What?
+```{r, echo=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+kable(head(select(nba, GROUP_ID.lineup, matches('^PTS\\.'))))
+```
+
+##
+* `.lineup` indicates stats for a given lineup.
+* `.player` indicates the average (full-season)stats for the players in a lineup.
+* `.usage` indicates the usage-weighted stats for the players in a lineup.
+
+# Efficiency vs. Usage Tradeoff
+
+## Players
+```{r, echo=FALSE}
+p1 = qplot(USG_PCT, OFF_RATING, data=players, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3),ylim=c(100,105)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(USG_PCT, TS_PCT, data=players, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(0.45,0.55)) + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+
+##
+```{r, echo=FALSE}
+p1 = qplot(USG_PCT, data=players, geom='density') + coord_cartesian(xlim=c(0.1,0.3))
+p2 = qplot(OFF_RATING, data=players, geom='density') + coord_cartesian(xlim=c(90,110))
+p3 = qplot(TS_PCT, data=players, geom='density') + coord_cartesian(xlim=c(0.4,0.6))
+grid.arrange(p1,p2,p3, ncol=3)
+```
+
+## Lineups
+```{r, echo=FALSE}
+coord = coord_cartesian(xlim=c(0.1,0.3))
+p1 = qplot(USG_PCT.player, OFF_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(100,110)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(USG_PCT.player, TS_PCT.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(0.525,0.575)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p3 = qplot(OFF_RATING.lineup, data=nba, geom='density') + coord_cartesian(xlim=c(50,150))
+p4 = qplot(TS_PCT.lineup, data=nba, geom='density') + coord_cartesian(xlim=c(0.25,0.75))
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+```
+
+## Usage-Weighting
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(OFF_RATING.usage, OFF_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(90,110), ylim=c(90,110)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(TS_PCT.usage, TS_PCT.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0.5,0.55), ylim=c(0.5,0.55)) + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Eli Witus
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(USG_PCT.player, OFF_RATING.lineup - OFF_RATING.usage, data=nba, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(-2.5,4.5)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(USG_PCT.player, TS_PCT.lineup - TS_PCT.usage, data=nba, geom='smooth') + geom_smooth(method='lm',formula=y~x, colour='red') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(-0.005,0.03))
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Turnovers?  Assists?
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(USG_PCT.player, TOV.lineup - (5 * TOV.usage), data=nba, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(0,1)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(USG_PCT.player, AST.lineup - (5 * AST.usage), data=nba, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(-2,0)) + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Rebounding
+```{r, echo=FALSE, warning=FALSE}
+coord = coord_cartesian(xlim=c(0,1))
+p1 = qplot((5 * REB_PCT.player), REB_PCT.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0,1), ylim=c(0, 1)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot((5 * REB_PCT.player), REB_PCT.lineup - (5 * REB_PCT.player), data=nba, geom='smooth') + geom_smooth(method='lm',formula=y~x, colour='red')
+p3 = qplot(REB_PCT.lineup, data=nba, geom='density') + coord
+p4 = qplot((5 * REB_PCT.player), data=nba, geom='density') + coord
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+```
+
+##
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot((5 * OREB_PCT.player), OREB_PCT.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0,0.6), ylim=c(0,0.6)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot((5 * DREB_PCT.player), DREB_PCT.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0.3,1.1), ylim=c(0.3,1.1)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p3 = qplot((5 * OREB_PCT.player), data=nba, geom='density') + coord_cartesian(xlim=c(0,0.6))
+p4 = qplot((5 * DREB_PCT.player), data=nba, geom='density') + coord_cartesian(xlim=c(0.3,1.1))
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+```
+
+## Rebound value
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot((5 * OREB_PCT.player), NET_RATING.lineup, data=nba, geom='smooth') + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot((5 * DREB_PCT.player), NET_RATING.lineup, data=nba, geom='smooth') + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Offense vs. Defense
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(OFF_RATING.player, NET_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(90,110), ylim=c(-5,5)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(DEF_RATING.player, NET_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(90,110), ylim=c(-5,5)) + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Diminishing Returns
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(OFF_RATING.player, OFF_RATING.lineup - OFF_RATING.player, data=nba, geom='smooth') + coord_cartesian(xlim=c(90,110), ylim=c(-5,5)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(DEF_RATING.player, DEF_RATING.lineup - DEF_RATING.player, data=nba, geom='smooth') + coord_cartesian(xlim=c(90,110), ylim=c(-5,5)) + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+
+# 3 Point Shooting
+
+## Historic Volume
+```{r, echo=FALSE, warning=FALSE}
+qplot(SEASON.lineup, FG3M.lineup, data = nba, geom = "boxplot", outlier.size=0.3, notch=TRUE, varwidth=TRUE, coef=0.5) + coord_cartesian(ylim=c(0,15))
+```
+
+## Is it helping?
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(FG3M.lineup, OFF_RATING.lineup, data=nba, geom='smooth')
+p2 = qplot(FG3A.lineup, OFF_RATING.lineup, data=nba, geom='smooth')
+grid.arrange(p1,p2,ncol=2)
+```
+
+## Is this just the effect of time?
+```{r, echo=FALSE, warning=FALSE}
+qplot(FG3M.lineup, OFF_RATING.lineup, data=nba, fill=SEASON.lineup, geom='smooth')
+```
+
+## More shots == more makes
+```{r, echo=FALSE, warning=FALSE}
+qplot(FG3A.lineup, FG3M.lineup, data=nba, geom='smooth')
+```
+
+## We need more shooters!
+```{r, echo=FALSE, warning=FALSE}
+qplot((5 * FG3M.usage), OFF_RATING.lineup, data=nba, fill=SEASON.lineup, geom='smooth') + coord_cartesian(xlim=c(0,20), ylim=c(95,110))
+```
+
+## What's going on?
+```{r, echo=FALSE, warning=FALSE}
+qplot((5 * FG3M.usage), FG3M.lineup, data=nba, fill=SEASON.lineup, geom='smooth') + coord_cartesian(xlim=c(0,20), ylim=c(5,8))
+```
+
+## More Shooting != More Shooting
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot((5 * FG3M.usage), OFF_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0,20), ylim=c(103.5,104.5))
+p2 = qplot((5 * FG3M.usage), FG3M.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0,20), ylim=c(6.6,6.8))
+grid.arrange(p1,p2, ncol=2)
+```
+
+## Conclusion
+* I have a pretty cool data set.
+* I'm pretty good at manipulating data.
+* I need some help with the analysis.
+* Basketball is hard and I'm questioning some of my assumptions.
+
+
