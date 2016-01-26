@@ -1,3 +1,5 @@
+# Helper function to draw state level map by zip based upon values being passed
+
 zip_state_map = function(dataframe, state, palettevalue = 1, legend = "Truckers", title = "Truck Driver Population") { 
 
   p = ZipChoropleth$new(dataframe)
@@ -7,7 +9,17 @@ zip_state_map = function(dataframe, state, palettevalue = 1, legend = "Truckers"
   p$render()
 }
 
+# Fleet data cleanup 
+
+# Still need to complete saving of the data which is being removed
+# Current cleanup is removing Non-US companies as well as DC/PR because the default state code is not
+# supporting them right now
+
 clean_data = function(fleets) {
+  
+#attempt 1 at cleanup - being left here for reference and posterity
+# will be cleaned up some time in near future
+  
 # str(fleets)
 # 
 # UniquePhyscialCountry = levels(fleets$PHY_COUNTRY)
@@ -47,9 +59,13 @@ clean_data = function(fleets) {
 #decided to restrict to just US instead of North Amreican countries for the first cut
 #valid_country_codes = c("US", "CA", "MX")
 
+#attempt 2 at cleanup
+  
 #Decided to eliminate every country except for the North American Countries after initial analysis of the data
+
+#considering removal based on both PHY_STATE and MAILING_STATE values
+  
 not_considered_fleets = fleets[!fleets$PHY_COUNTRY == 'US',] 
-not_considered_fleets = mutate(not_considered_fleets, reason = 'Non-US Fleets')
 nrow(not_considered_fleets) #36837
 
 not_considered_fleets2 =  fleets[!fleets$MAILING_COUNTRY == 'US',]
@@ -61,18 +77,22 @@ nrow(fleets) #1606536
 fleets =  fleets[fleets$MAILING_COUNTRY == 'US',]
 nrow(fleets) #1606379
 
+# prepping for choroplethrZip use 
 fleets$PHY_ZIP = clean.zipcodes(fleets$PHY_ZIP)
+
+# remove records without any zipcode value
 
 not_considered_fleets3 = fleets[is.na(fleets$PHY_ZIP),]
 nrow(not_considered_fleets3) # 26
 fleets =  fleets[!is.na(fleets$PHY_ZIP),]
 nrow(fleets) #1606353
 
-
 not_considered_fleets4 = fleets[is.na(fleets$MAILING_ZIP),]
 nrow(not_considered_fleets4) # 0
 fleets =  fleets[!is.na(fleets$MAILING_ZIP),]
 nrow(fleets) #1606353
+
+# remove records with invalid zipcodes 
 
 not_considered_fleets5 = fleets[!(fleets$PHY_STATE %in% state.abb),]
 nrow(not_considered_fleets5) # 3347
@@ -84,22 +104,25 @@ nrow(not_considered_fleets6) # 3347
 fleets =  fleets[fleets$MAILING_STATE %in% state.abb,]
 nrow(fleets) #1442255
 
-not_considered_fleets7 = fleets[is.na(fleets$NBR_POWER_UNIT),]
-nrow(not_considered_fleets7) # 36220
-fleets =  fleets[!is.na(fleets$NBR_POWER_UNIT),]
-nrow(fleets) #1406035
+#this has changed now......decided to make those values 0 instead of removing them
+# not_considered_fleets7 = fleets[is.na(fleets$NBR_POWER_UNIT),]
+# nrow(not_considered_fleets7) # 36220
+# fleets =  fleets[!is.na(fleets$NBR_POWER_UNIT),]
+# nrow(fleets) #1406035
+# 
+# not_considered_fleets8 = fleets[is.na(fleets$DRIVER_TOTAL),]
+# nrow(not_considered_fleets8) # 11979
+# fleets =  fleets[!is.na(fleets$DRIVER_TOTAL),]
+# nrow(fleets) #1394056
 
-not_considered_fleets8 = fleets[is.na(fleets$DRIVER_TOTAL),]
-nrow(not_considered_fleets8) # 11979
-fleets =  fleets[!is.na(fleets$DRIVER_TOTAL),]
-nrow(fleets) #1394056
-
+# also cleaning up OIC_STATE in case it used in future for analysis
 not_considered_fleets9 = fleets[!(fleets$OIC_STATE %in% state.abb),]
 nrow(not_considered_fleets9) # 1
 fleets =  fleets[fleets$OIC_STATE %in% state.abb,]
 nrow(fleets) #1394055
 
 
+#verifying that the other categorical columns are containing valid values  
 unique(fleets$CARRIER_OPERATION)
 unique(fleets$HM_FLAG)
 unique(fleets$PC_FLAG)
@@ -107,6 +130,8 @@ unique(fleets$PC_FLAG)
 fleets[is.na(fleets$CARRIER_OPERATION),]
 fleets[is.na(fleets$HM_FLAG),]
 fleets[is.na(fleets$PC_FLAG),]
+
+#US fleet records are returned
 
 return(fleets)
 }
