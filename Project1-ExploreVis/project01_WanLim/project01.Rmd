@@ -2,7 +2,7 @@
 title: "Project01Wan"
 author: "Wan"
 date: "January 22, 2016"
-output: html_document
+output: word_document
 ---
 This is the data of comsumer complaints about finance institution.
 It is downloaded from https://catalog.data.gov/dataset/consumer-complaint-database.
