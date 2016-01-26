@@ -16,18 +16,20 @@ NOTE: The dataset, visualizations, and result outputs in this presentation are n
 
 ### 1.1. Initial Questions
 
-<br>
-
 * Initial questions without the Yelp data
-    - A New Yorker is more likely to give higher review scores than people in other states
-    - Female tends to give higher review scores (and / or) more review counts than male
-    - There will be more restaurants with high review scores in New York than other states.
+    - Who are the average Yelp users? 
+        - age group, gender distribution, average number of checkin,...?
+    - What types of food restaurants are rated higher?
+        - vegetarian restaurant, pub, steak restaurant, family restaurant, etc?
+    - New Yorkers are more likely to give higher review scores than people in other states?
+    - Female tends to give higher review scores (and / or) more review counts than male?
+    - More restaurants with high review scores in New York than other states?
 
 <br>
 
-* Yelp Data Set
-    - Yelp Academic Dataset (<https://www.yelp.com/academic_dataset>) for the Yelp Dataset Challenge  (<http://www.yelp.com/dataset_challenge>).
-    - Requires a permission to download
+* Data Set
+    - [Yelp Academic Dataset](https://www.yelp.com/academic_dataset) for [Yelp Dataset Challenge](http://www.yelp.com/dataset_challenge)
+    - Requires a permission to download and disclose the results publicly
 
 <br><br>
 
@@ -35,12 +37,15 @@ NOTE: The dataset, visualizations, and result outputs in this presentation are n
 
 * 1 table 
     - Business (24 variables, 474,434 observations, 289.4 MB)
-
 <br>
 
 * Qustions with the data
     - Average review ratings by state
     - More detailed review ratings by state
+
+<br>
+
+![ER Diagram for Yelp Samll Dataset](./Project 1/img/NYC_DSA_Proj1_YlpDiagram.png "Optional title") <!-- https://www.draw.io/ -->
 
 <br>
 
@@ -51,11 +56,6 @@ NOTE: The dataset, visualizations, and result outputs in this presentation are n
     - latitude/longitude
 
 <br><br>
-
-![ER Diagram for Yelp Samll Dataset](./Project 1/img/NYC_DSA_Proj1_YlpDiagram.png "Optional title") <!-- https://www.draw.io/ -->
-
-<br><br>
-
 
 
 ```{r, echo=FALSE, eval=FALSE, include=FALSE}
@@ -125,7 +125,7 @@ ylpUserSm3 <- ylpUserSm1 %>%
 load("proj1_Yelp.RData")
 ```
 
-<br/>
+<br>
 
 ### 1.3. Average review ratings by state.
 <br>
@@ -141,7 +141,16 @@ dataForTableByStateStar <- dataGroupByStateStar %>% group_by(state) %>%
 
 <br>
 <br>
-**b. Loading the data on the Leaflet map**
+**b. Loading the data on the table**
+<br>
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+library(pander)
+panderOptions("digits", 3)
+pander(dataForTableByStateStar)
+```
+
+<br>
+**c. Loading the data on the Leaflet map**
 <br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE, fig.retina=2,dpi=144, fig.width=6, fig.height=3}
 library(leaflet)
@@ -159,8 +168,8 @@ leaflet(dataTotalAvgStarByState) %>% addTiles() %>%
             opacity = 0.5
   ) 
 ```
-<br>
-<br>
+
+<br><br>
 
 ### 1.4. A grid of detailed average ratings by state. 
 
@@ -193,27 +202,23 @@ ggplot(dataWeightedGroupByStateStar, aes(x = state, y = stars, label = percent))
 
 <br>
 <br>
----
+
 
 ## 2. Yelp Academic Dataset #2 (Big)
 <br/>
 
 ### 2.1. Initial questions
 
-<br>
-
 * Initial questions 
     - Users with more followers at Yelp --> purchase more (or checkin more frequently)
     - Female users --> More frequent reviews
     - Restaurants in the higher price range --> higher review ratings?
-
-* Source link is currently missing.
+<br>
+* Source link is unavailable now.
 
 <br><br>
 
 ### 2.2. Simple exploratory analysis:
-
-<br>
 
 * 5 tables
     - Business (98 variables, 77,445 observations, 30.4MB)
@@ -221,12 +226,6 @@ ggplot(dataWeightedGroupByStateStar, aes(x = state, y = stars, label = percent))
     - Reviews (10 variables, 2,225,213 observations, **1.64GB**)
     - Checkin (170 variables, 55,569 observations, 13.2MB)
     - Tip (6 variables, 591,864 observations, 74.5MB)
-
-<br>
-
-* My qustions with the data
-    - Having more followers at Yelp --> Rate more frequently? 
-    - Having more followers at Yelp --> Rate higher? 
 
 <br>
 
@@ -238,7 +237,21 @@ ggplot(dataWeightedGroupByStateStar, aes(x = state, y = stars, label = percent))
     - fans
     
 <br>
+
+* My qustions with the data
+    - Having more followers at Yelp --> Rate more frequently? 
+    - Having more followers at Yelp --> Rate higher? 
+
 <br>
+
+* __elite user group:__ ([reference](http://officialblog.yelp.com/2012/01/what-makes-a-yelper-elite.html))
+    - Active reviewers elected by Yelp's National Elite Squad Council 
+    - Selection criteria unknown
+        - Examples: well-written reviews, high quality tips, a detailed personal profile, an active voting and complimenting record, and a history of playing well with others. 
+    - invited to private events where up-and-coming restaurants and bars provide food and drinks for free.
+    
+    
+<br><br>
 
 ### 2.3. (Q1) Having more followers at Yelp --> Rate more frequently? 
 <br>
@@ -252,6 +265,8 @@ ylpUserSmNormal <- ylpUserSm3 %>% filter(elite == "[]")
 <br>
 **b. Loading the data on the box plot **
 
+__* All users__:
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 library(ggthemes)
 # Yelp users in the boxplot
@@ -260,13 +275,16 @@ qplot(fans, review_count, data=ylpUserSm3, geom="boxplot", group = Fan_Size, col
 
 <br><br>
 
+__* Elite users__:
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Elite Yelp group users in the boxplot
 qplot(fans, review_count, data=ylpUserSmElite, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Total review counts by the number of fans (Elite users)") + theme(legend.position="none")
 ```
 
 <br><br>
-
+__* normal users__:
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Non-elite Yelp group users in the boxplot
 qplot(fans, review_count, data=ylpUserSmNormal, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Total review counts by the number of fans (Non-elite Users)") + theme(legend.position="none")
@@ -277,6 +295,8 @@ qplot(fans, review_count, data=ylpUserSmNormal, geom="boxplot", group = Fan_Size
 **c. Loading the data on the combination plots (point+smooth) **
 <br>
 
+__* All users__:
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Yelp users in combination plots
 qplot(fans, review_count, data = ylpUserSm1, geom = c("point", "smooth"), colour = fans) + 
@@ -286,7 +306,8 @@ qplot(fans, review_count, data = ylpUserSm1, geom = c("point", "smooth"), colour
 ```
 
 <br><br>
-
+__* elite user group__: 
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Elite Yelp group users in combination plots
 qplot(fans, review_count, data = ylpUserSmElite, geom = c("point", "smooth"), colour = fans) + 
@@ -296,7 +317,8 @@ qplot(fans, review_count, data = ylpUserSmElite, geom = c("point", "smooth"), co
 ```
 
 <br><br>
-
+__* normal users__:
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Non-elite Yelp group users in combination plots
 qplot(fans, review_count, data = ylpUserSmNormal, geom = c("point", "smooth"), colour = fans) + 
@@ -313,20 +335,24 @@ qplot(fans, review_count, data = ylpUserSmNormal, geom = c("point", "smooth"), c
 <br>
 **a. Loading the data on the box plot **
 
+__* All users__:
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Yelp users in the boxplot
 qplot(fans, average_stars, data=ylpUserSm3, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Average ratings by the number of fans") + theme(legend.position="none")
 ```
 
 <br><br>
-
+__* elite user group__: 
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Elite Yelp group users in the boxplot
 qplot(fans, average_stars, data=ylpUserSmElite, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Average ratings by the number of fans (Elite users)") + theme(legend.position="none")
 ```
 
 <br><br>
-
+__* normal users__:
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Non-elite Yelp group users in the boxplot
 qplot(fans, average_stars, data=ylpUserSmNormal, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Average ratings by the number of fans (Non-elite users)") + theme(legend.position="none")
@@ -336,6 +362,8 @@ qplot(fans, average_stars, data=ylpUserSmNormal, geom="boxplot", group = Fan_Siz
 **c. Loading the data on the combination plots (point+smooth) **
 <br>
 
+__* All users__:
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Yelp users in combination plots
 qplot(fans, average_stars, data = ylpUserSm1, geom = c("point", "smooth"), colour = fans) + 
@@ -345,7 +373,8 @@ qplot(fans, average_stars, data = ylpUserSm1, geom = c("point", "smooth"), colou
 ```
 
 <br><br>
-
+__* elite user group__: 
+<br>
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Elite Yelp group users in combination plots
 qplot(fans, average_stars, data = ylpUserSmElite, geom = c("point", "smooth"), colour = fans) + 
@@ -355,6 +384,8 @@ qplot(fans, average_stars, data = ylpUserSmElite, geom = c("point", "smooth"), c
 ```
 
 <br><br>
+__* normal users__:
+<br>
 
 ```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
 # Non-elite Yelp group users in combination plots
@@ -366,4 +397,31 @@ qplot(fans, average_stars, data = ylpUserSmNormal, geom = c("point", "smooth"), 
 ```
 
 
-<br><br>
+<br>
+<br>
+
+
+## 3. Conclusions
+
+<br>
+
+### 3.1. Findings
+<br>
+
+* The number of followers at Yelp and Average rating frequency 
+    - Yelp users tend to rate more frequently until some point as the number of followers increase 
+
+* The number of followers at Yelp and Average rating frequency 
+    - Yelp users, (specifically Elite users), tend to rate more higher as the number of followers increase 
+    
+<br>
+<br>
+
+### 3.2. Next steps
+* interactive Shiny app
+* Statistical analyses for significance of the result
+
+
+<br>
+<br>
+
