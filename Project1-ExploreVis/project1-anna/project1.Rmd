@@ -1,0 +1,281 @@
+---
+title: "Internet Usage in the UK"
+author: "Anna Bohun"
+date: "23 Jan 2016"
+output: html_document
+---
+
+  
+We examine which people aged 16 or over in the United Kingdom have ever (or never) used the internet using a range of variables such as age, ethnicity, pay, occupation and disability. We conjecture that the main factors that separate internet users and non users is age (with older people being less likely to adapt to social media, google, etc) and availability: lower income households may not be able to afford wifi or mobile internet plans. The sample size taken from data.london.gov.uk includes around 333,000 people in the UK and around 27,000 in London and is over the last five years. As such, we need to treat the numbers with caution as the margin for error in modeling internet use as a function of time will be high and there is limited data from which to extrapolate. However, we have a comprehensive list of usage in the boroughs of Greater London. We then are able to compile a density map of internet usage in Greater London.
+
+ 
+We first look at the ages of internet users. We cast the data from wide to long format, with variables "Location" and "Year". We remove rows with missing values from the geographic 'geo' table.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(xlsx)
+library(RColorBrewer)
+library(maps)
+library(ggthemes)
+library(data.table)
+library(leaflet)
+
+age = read.xlsx("~/Downloads/internet-usage-london.xls", 3)
+ethnicity = read.xlsx("~/Downloads/internet-usage-london.xls", 4)
+pay = read.xlsx("~/Downloads/internet-usage-london.xls", 6)
+characteristics = read.xlsx("~/Downloads/internet-usage-london.xls", 7)
+geo = read.xlsx("~/Downloads/internet-usage-london.xls", 2)
+geo = geo[!apply(geo, 1, FUN=function(x) any(is.na(x))),]
+income = read.xlsx("~/Downloads/internet-usage-london.xls", 6)
+jobs = read.xlsx("~/Downloads/internet-usage-london.xls", 5)
+```
+#Age
+We start by removing rows containing age totals and working ages to have a complete partition of the ages 16-75 and over. We create a subtable which displays the total number and percent of users in the UK to show the ascent over the last five years. Since the absolute value of users will obviously be an increasing function of time, in order to take into account the growth of the population to accurately portray the growth in overall percentage of users, we then plot the graphs of percent against year, delineating between London adn the rest of the UK. This shows that on average, 4% more people in London have access to the internet than in the rest of the UK. As expected, less developed and urban areas probably do not have the same infrastructure, are lower income compared to London and hence have less traffic. 
+
+```{r, echo=TRUE}
+age$Year <- as.factor(age$Year)
+temp = select(age, Age, epercent, npercent, ever.used.number, Year, Location)# %>%
+#  filter(., Location=='London') 
+tab = filter(temp, Age!="Working-age 16-64" & Age!="Total" )
+totals = filter(temp, Age == "Total")  
+head(tab)
+```
+
+##Total percentage of people who use internet by age
+```{r, echo=TRUE}
+totals$Year = as.factor(totals$Year)
+totalsplot=ggplot(data=totals, aes(x=as.numeric(totals$Year), y=epercent)) + geom_smooth(method=lm, aes(color=Location),se=FALSE)  +geom_point() + scale_x_continuous(breaks=1:nlevels(as.factor(totals$Year)),labels=c(2011:2015)) + xlab("Year") + ylab("Percent")
+totalsplot + xlab("Year") + ylab("Percent") + ggtitle("Percent of the London and UK using internet since 2011")  
+```
+
+We remark that since x-axis is treated as numeric, it will by default show numbers for the x-axis tick labels. We modify with scale_x_continuous to show the x-axis as the factor levels for Year.
+
+We now reverse the order of the years in order to visualize the smooth curve that shows an increase of internet usage across all age groups in time. We expect to see a smooth curve between ages, since a portion of non-users each age category spill over into the next every subsequent year, and across all age groups, each year should see a decline in the percentage of non-users. This is indeed the case, but shockingly, nearly 80% of those over 75 have never used internet. 
+```{r, fig.width=10, fig.height=6}
+tab$Year <- factor(tab$Year, levels = 2015:2011)
+age.use = ggplot(data=tab, aes(x=Age, y=npercent)) + geom_bar(stat='identity', aes(fill=Year), position = 'dodge')
+plot1 = age.use+ scale_fill_brewer(palette = "Blues") + xlab("Age") + ylab("Percent") + theme_bw() + ggtitle("Percent of the UK which has never used internet")  
+plot1
+```
+
+
+We next group the ages into 3 categories: young, middle, and old. We want to see a rough distribution of people who have used internet within each age category for every year. 
+```{r}
+age_means = mutate(tab, age.group = sapply(tab$Age, function(x) {
+  ifelse(x %in% c("16-24","25-29","30-34"), "young", 
+         ifelse(x %in% c("35-39","40-44","50-54"), "middle","old"))})) %>%
+  group_by(., age.group, Year) %>%
+  summarise(., mean.usage=mean(epercent), mean.num = mean(ever.used.number))
+age_means$Year = as.numeric(as.character(age_means$Year))
+```
+
+We quickly verify that the mean usage in every large age group increases over time. We notice that the sharpest increase is in the 'old' category. Note that the lack of data points hinders analysis on the distribution of users over time. We thus seek to exploit instead the breadth of the age categories to show internet usage as a continuous function of age. 
+```{r}
+age_grouped = mutate(tab, age.group = sapply(tab$Age, function(x) {
+  ifelse(x %in% c("16-24","25-29","30-34"), "young", 
+         ifelse(x %in% c("35-39","40-44","50-54"), "middle","old"))}))  
+
+means = ggplot(age_means, aes(x=as.numeric(Year), y=mean.usage) ) + geom_smooth(method=lm, aes(color=age_means$age.group), se=FALSE)  +geom_point()
+means + xlab("Year") + ylab("Mean usage (%)") + ggtitle("Mean usage by age category")  + scale_color_discrete( name = "Age group", labels = c("Middle","Old","Young")) 
+```
+This graph gives us a quick indication that the older age group, while exhibiting the lowest mean usage, also shows the steepest rate of increase. Our next task is to give a comprehensive analysis of number of users regressed over age as a continuous rather than categorical variable.
+
+#Usage as a function age
+Since the age categories increment only by 4 years, we can reasonably appromixate the number of internet users as a function of age. Treating the age categories as a continuous variable, we can show parallel curves for each of the five years. To do this we split each age category into its left and right numbers, take the mean of those two ages and load a new column of all the age midpoints. This we can then plot as a smooth curve to show the number (and percentage) of internet users as a function of age. To do this we have to split the categories into strings and convert them back into numeric vectors before we can list the median ages. 
+
+```{r}
+midfunc = function(x)
+  { mean(as.numeric(ifelse( x=="75+", 75, strsplit(as.character(x), split = "-"))[[1]]) )
+  }
+age.mids = mutate(tab, age.midpoint = sapply(tab$Age, midfunc )  ) 
+head(age.mids)
+
+age.slope = ggplot(data=age.mids, aes(x=age.midpoint, y=ever.used.number/10^6)) + geom_smooth(aes(color=tab$Year),se=FALSE)  
+age.slope + xlab("Age") + ylab("Number of users (millions)") + ggtitle("Number of people in London using internet by age")  + scale_color_discrete(name = "Year")
+
+p.slope = ggplot(data=age.mids, aes(x=age.midpoint, y=epercent)) + geom_smooth(aes(color=tab$Year),se=FALSE)  
+p.slope + xlab("Age") + ylab("Percent of users") + ggtitle("Percent of London using internet by age")   + scale_color_discrete(name = "Year")
+```
+
+Observe the discrepancy between the graphs. We experience a sharp drop in number of users around age 35, which suggests a decline in the size of the age group 35-40. This is unreliable since the absolute value of users misrepresents their proportion in the overall population, as well as the annual changes in those proportions. However, the percentage of all age groups using internet is fairly stable until around age 50 with a sharp drop for those around the retirement age. Interestingly, the curve shows a marked increase in the rate at which each age group between 40 and 75 acquires new users in recent years, while approximately all of the younger generation has been using internet since 2011.
+
+##Total number of people in the UK separated by age
+We wish to compare the rates of obtainment of new users for each of the age categories. Thus we plot the number of users for each group as a function of time. While the youngest retains the highest number of users, it is evident that those between 65 and 75 or older show the sharpest rate of increase over the last five years. Thus, older people have been catching up to the internet with the recent ubiquity of both computers and mobile devices. 
+```{r}  
+age$Age = as.factor(age$Age) 
+totaluk = group_by(age, Age, Year) %>%
+  summarise(., total = sum(ever.used.number), totalp = mean(epercent)) %>%
+  filter(., Age!="Working-age 16-64" & Age!="Total") 
+#Drop levels so they do not appear in the later analysis.
+totaluk$Age = factor(totaluk$Age)
+totaluk$totalscaled = totaluk$total/10^6
+totaluk$Year = as.numeric(as.character(totaluk$Year))
+plotuk = ggplot(totaluk, aes(x=as.numeric(Year), y=totaluk$totalscaled) ) + geom_smooth(method=lm, aes(color=totaluk$Age), se=FALSE)  +geom_point()
+plotuk + xlab("Year") + ylab("Number of users (millions)") + ggtitle("Comparisons of increase by age")  +  scale_color_discrete( name = "Age group") 
+```
+
+
+With a simple linear regression we can call the slopes of each line to compare the rates of increase in internet usage over the years for every age group. We load the library data.table so we can create a data frame of the fitted coefficients. (This is necessary to unload the table from dplyr.) First we store totaluk as a temporary data table. Then we pull out the intercepts and coefficients from the function lm applied to each member of the group.
+````{r}
+dat1 = data.table(x=totaluk$Year, y=totaluk$total, group = totaluk$Age)
+coefficients = dat1[,list(intercept = coef(lm(y~x))[1], coef = coef(lm(y~x))[2]), by=group]
+coefficients
+```
+
+
+The table shows that some of the growth has been negative over the last 5 years, specifically in the age group 40-44 there are on average 37,300 fewer internet users every year. The sharpest increase is evident in the older age group of 75+. Since the decline is in absolute value, it suggests that the age group is shrinking. Since one must be careful with the population numbers with a relatively small sample size, and since the above analysis suggests that some younger age groups are shrinking, it is better to compare the slopes of the lines of percent of users in each age group regressed over the years. Using a similar method we then see only positive increases in percentages across all ages, particularly in the 65-74 age group:
+```{r}
+dat2 = data.table(x=totaluk$Year, y=totaluk$totalp, group = totaluk$Age)
+dat2[,list(intercept = coef(lm(y~x))[1], coef = coef(lm(y~x))[2]), by=group]
+```
+
+A quick check shows that slopes of the age groups between 16 and 44 have p-values which are too small for statistical significance, but a surprising result is the 5% average annual increase in users for those aged 65-74, and the 4% average annual increase in those over 75. Evidently it is those around the retirement age who are most rapidly beginning to access the internet. 
+
+
+ 
+## Ethnicity
+We now examine the distribution of internet users among different ethnicities. Interestingly, the highest percentage of interet usage is among the mixed races and the chinese. Those who seem to have the least access are the Pakistani and Bangladeshi. The black and white races have consistently gained access to internet over the years.
+```{r}
+ethnicity$Year <- factor(tab$Year, levels = 2015:2011)
+ethfilt = filter(ethnicity, Ethnicity!="BAME" & Ethnicity!="Total" )
+eth.use = ggplot(data=ethfilt, aes(x=Ethnicity, y=npercent)) + geom_bar(stat='identity', aes(fill=Year), position = 'dodge') 
+plot2 = eth.use+ scale_fill_brewer(palette = "Blues") + xlab("Ethnicity") + ylab("Percent") + theme_bw() + ggtitle("Percent of ethnicities who don't use internet")
+plot2
+```
+
+
+## Economic characteristics
+```{r}
+charuk = group_by(characteristics, Characteristics, year) %>% summarise(ukpercent = mean(epercent), uknum = sum(ever.used.number))
+char.use = ggplot(data=charuk, aes(x=reorder(Characteristics, uknum), y=uknum/10^6)) + geom_bar(stat='identity', aes(fill=as.factor(year)), position = 'dodge') 
+charplot = char.use + scale_fill_brewer(palette = "Greens", name = "Year") + xlab("Social group") + ylab("Number of users (millions)") + theme_bw() + ggtitle("Characteristics of internet users in the UK")
+charplot
+```
+We notice that employed, non-disabled members of the population consistently have the highest usage over all five years. Females consist of only a slightly higher internet usage group than males, and those who are unemployed or unable to work show the lowest number of usage. This suggests that those who do not use internet simply do not have access. Using the jobs table, we can also study the occupations which comprise the highest number of internet users. Using the income plot, it is likely that the middle class and managerial groups will demonstrate the most usage, with the elementary or manual professions being among the lower usage groups.
+
+```{r, echo=TRUE, message=FALSE}
+jobs = group_by(jobs, Occupation, Year) %>% summarise(jpercent = mean(epercent), jnum = sum(ever.used))
+char.use = ggplot(data=jobs, aes(x=reorder(Occupation, jobs$jnum), y=jnum/10^6)) + geom_bar(stat='identity', aes(fill=as.factor(Year)), position = 'dodge') 
+jobplot = char.use  + xlab("Occupation") + ylab("Number of users (millions)") + theme_bw() + ggtitle("Jobs of internet users in the UK") +  scale_fill_brewer(palette="Reds", name = "Year") 
+```
+
+```{r, fig.width=10, fig.height=6, echo=FALSE, message=FALSE}
+jobplot
+```
+
+##Income
+In order to analyze the income divisions of internet users, we first create a function to convert the salaries from weekly to annual, removing the splits to preserve the categories of the salary ranges. Again we have to use a bit of a hack to remove the non-numeric characters from the income categories, separate the string variables, convert them to annual salaries and then re-paste them together. We then plot both the number and percentages of internet users divided among their income groups. We suspect that lower income groups will have an internet accessibility problem, with this being nonexistent for the highest income bracket. 
+```{r, fig.width=10, fig.height=6, echo=TRUE}
+options(dplyr.width = Inf)
+income.uk = group_by(income, gross.weekly.pay) %>%
+  summarise(., ever.used = sum(ever.used.number), ever.p = mean(epercent))
+x =income.uk$gross.weekly.pay
+#Remove all the pound and special characters from income
+x = gsub("[\\£]","", x)  
+x = gsub("[\\<]","",x)
+x = gsub("[\\+]","", x)
+income.uk$temp = x
+
+
+sal = function(x)
+  { as.numeric(ifelse( x=="2000", 2000, ifelse(x=="200", 200, strsplit(as.character(x), split = "-")))[[1]]) 
+  }
+income.uk$sal = sapply(income.uk$temp, sal )
+income.uk = mutate(income.uk, annual = sapply(income.uk$sal, function(x) {x*52}))
+income.uk = mutate(income.uk, annualsal = sapply(income.uk$annual, function(x) {paste(x, collapse='-')})) 
+income.uk = mutate(income.uk, annualmedian = sapply(income.uk$annual, function(x) mean(as.numeric(x)) )) 
+income.uk[1,7] = "<10400"
+income.uk[5,7] = "104000+"
+
+income.uk[,c(1,2,3,4,7,8)]
+#The column vectors we temporarily created in sal and annual are not displayed.
+
+income.per = ggplot(data=income.uk, aes(x=reorder(annualsal, annualmedian), y=ever.p)) + geom_bar(stat='identity', aes(fill=as.factor(annualsal))) 
+income.per + xlab("Income range (GBP)") + ylab("Percent of users") + ggtitle("Internet users by income range (percentage) in the UK")  + scale_fill_discrete( name = "Income Range") + coord_cartesian(ylim = c(90, 100)) 
+#Plot the income ranges in ascending order by using our annualmedian function.
+
+income.plot = ggplot(data=income.uk, aes(x=reorder(annualsal, annualmedian), y=ever.used/10^6)) + geom_bar(stat='identity', aes(fill=as.factor(annualsal))) 
+income.plot + xlab("Income range (GBP)") + ylab("Number of users (millions)") + ggtitle("Internet users by income range in the UK") + scale_fill_discrete( name = "Income Range") 
+
+```
+
+Observe that the highest income group comprises the lowest number of internet users, with the highest number coming from the mid-salary range of 20,000-39960 GBP. This is to be expected as the highest income bracket comprises the lowest portion of the actual UK population. What is surprising is that the lowest income bracket of <8000GBP makes up the second highest number of internet users. However, only around 90% of those in the lowest income bracket are actually internet users, while virtually all of those in the mid to highest income bracket have access to internet. The 10% of the poorest people in the UK therefore probably are among those who do not have access. 
+
+##Location
+Let us visualize the geography of internet users in London in 2015. Unfortunately the map of England is not featured in the GoogleVis package so we need to use leaflet for R. We need to integrate this data manually. In base R, leaflet package functions can also be coded from https://github.com/chgrl/leafletR. We load the leaftlet package and download the polygon data from http://www.gadm.org/download. This contains geographic data for every borough in the entire UK and Wales. We wish to merge this with the data we have for London and the UK and include the numbers of users we currently have in order to construct a map with shaded regions. 
+```{r}
+geo2015=filter(geo, Year == 2015)
+geo2015=select(geo2015, Borough, epercent, ever.used.number)
+gadm <- readRDS("/Users/bohun/Downloads/GBR_adm2.rds")
+```
+
+We merge the tables gadm and geo2015 and show the percentage of internet users in each borough. Since there is a lot of missing data, we list the boroughs for which we have the usage and geographic data. We exclude boroughs that are not in greater London so we can zoom in on the region for which we have sufficient data to show a density map, and call this new data frame london. We create a palette which scales the colors adequately for our range of percentages (since they are stacked between 82 and 96) and call it colornum. We also create a popup so that we can zoom over the area and display the percentage use. With the intersect function, we show the Boroughs for which we have both the usage data and the leaflet data. 
+
+Some remarks: in the leaftlet function we need to set several options. We set the view at the center of London and zoom in so that we don't show the empty regions in England. The london$colornum column is used for setting the colors' breaks, i.e. to create the ranges of values for the palette. We create sequence of values from the minimum to the maximum of the range, broken up into the number of rows. The number of breaks needs to be at least as large as the number of shaded regions, since if the sequence of breaks ends before the maximum, the polygons with the maximum percentage of users would not have a fill color. (An important technical note.) We first need to create a base map of tiles from Openstreetmap that show borders and names of London boroughs. Over this map we then layer our density map created from the data in the london table. We also set opacity equal to 0.6 so that we can see the delineation of borders and county names.
+
+##Map by number of users
+We create the first map showing the number of users per borough. Since London exhibits a very high mean internet usage, this will roughly resemble a population density map of London. The larger numbers do not necessarily mean that the borough has a high density of users, since the size of the borough is the main variable and we have not yet normalised.
+```{r}
+gadm$enumber =  ifelse(gadm$NAME_2 %in% geo2015$Borough, geo2015$ever.used.number, NA)
+london <- gadm[gadm$NAME_2 %in% geo2015$Borough,]
+
+london$colornum2 =((london$enumber -  min(london$enumber))/(max(london$enumber)-min(london$enumber))*33)
+
+
+polygon_popup2 = paste0("<strong>", london$NAME_2, "</strong>", "</br>", london$enumber)
+
+pal <- colorQuantile("Greens", NULL, n = 10)
+
+leaflet(london) %>%
+  setView(lat = 51.508, lng = -0.129158, zoom = 10) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+   addPolygons( data = london, fillColor = ~pal(colornum2), 
+   fillOpacity = 0.6,
+   weight = 2,
+   color = "white",
+   popup = polygon_popup2
+  ) %>%
+    addLegend("bottomright", pal = colorNumeric( palette = pal, domain = london$enumber ), values = ~enumber,
+    title = "Number of users",
+    opacity = 1)
+```
+ 
+
+
+##Density map of internet users in London
+We now normalize the previous graph by adjusting the palette to represent the percentage of users rather than number. 
+```{r}   
+intersect(gadm$NAME_2, geo2015$Borough)
+#merge percent data from geo2015 with gadm. This shows the list of Boroughs we can include.
+gadm$epercent = ifelse(gadm$NAME_2 %in% geo2015$Borough, geo2015$epercent, NA)
+
+london <- gadm[gadm$NAME_2 %in% geo2015$Borough,]
+#create a subdata frame from gadm featuring only the areas for which we have data
+
+london$colornum = round((london$epercent -  min(london$epercent))/(max(london$epercent)-min(london$epercent))*33)
+#create the palette
+
+polygon_popup = paste0("<strong>", london$NAME_2, "</strong>", "</br>", london$epercent)
+#create a legend with labels showing the percent
+
+pal <- colorQuantile("Blues", NULL, n = 10)
+#will be 'broken up' into shades depending on colornum
+
+leaflet(london) %>%
+  setView(lat = 51.508, lng = -0.129158, zoom = 10) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+   addPolygons( data = london, fillColor = ~pal(colornum), 
+   fillOpacity = 0.6,
+   weight = 2,
+   color = "white",
+   popup = polygon_popup
+  ) %>%
+    addLegend("bottomright", pal = colorNumeric( palette = pal, domain = london$epercent ), values = ~epercent,
+    title = "Percentage of users",
+    opacity = 1)
+ 
+
+```
+As expected, lower density population areas exhibit the lowest numbers, although the previous map shows that central areas such as Westminster have the highest density of users. From the resulting map we clearly see that Westminster, Newham and Ealing have the densest internet access, while Richmond upon Thames has the highest actual number of internet users. Since Westminster is the center of London it should have the highest percentage, given that it would have the densest internet infrastructure, but surprisingly it is surrounded by areas with relatively lower use. Combining with the economic data in previous graphs, this implies that Westminster is the highest income borough, while the neighboring areas of Wandsworth and Southwark have higher levels of unemployment and low income households. 
+
+
