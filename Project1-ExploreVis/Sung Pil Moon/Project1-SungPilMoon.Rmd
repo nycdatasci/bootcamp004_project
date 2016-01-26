@@ -1,0 +1,369 @@
+---
+title: "Project 1: Exploratory Visualization of Yelp dataset"
+author: "Sung Pil Moon @ NYC DSA"
+date: "January 26, 2016"
+output: html_document
+---
+
+<br/>
+NOTE: The dataset, visualizations, and result outputs in this presentation are not representative for any types of business, users, reviews in Yelp.
+<br>
+<br>
+
+## 1. Yelp Academic Dataset #1 (Small)
+
+<br/>
+
+### 1.1. Initial Questions
+
+<br>
+
+* Initial questions without the Yelp data
+    - A New Yorker is more likely to give higher review scores than people in other states
+    - Female tends to give higher review scores (and / or) more review counts than male
+    - There will be more restaurants with high review scores in New York than other states.
+
+<br>
+
+* Yelp Data Set
+    - Yelp Academic Dataset (<https://www.yelp.com/academic_dataset>) for the Yelp Dataset Challenge  (<http://www.yelp.com/dataset_challenge>).
+    - Requires a permission to download
+
+<br><br>
+
+### 1.2. Simple exploratory analysis about the Yelp dataset:
+
+* 1 table 
+    - Business (24 variables, 474,434 observations, 289.4 MB)
+
+<br>
+
+* Qustions with the data
+    - Average review ratings by state
+    - More detailed review ratings by state
+
+<br>
+
+* Columns of interest
+    - stars (1.0, 1.5, 2.0, ~ 4.5, 5.0)
+    - review_count
+    - state (16 states)
+    - latitude/longitude
+
+<br><br>
+
+![ER Diagram for Yelp Samll Dataset](./Project 1/img/NYC_DSA_Proj1_YlpDiagram.png "Optional title") <!-- https://www.draw.io/ -->
+
+<br><br>
+
+
+
+```{r, echo=FALSE, eval=FALSE, include=FALSE}
+load("proj1_Yelp.RData")
+library(dplyr)
+library(ggplot2)
+library(googleVis)
+library(leaflet)
+library(rgdal)
+ylpDataSmall <- read.csv('Project 1/yelp_dataset_challenge_academic_dataset/yelp_academic_dataset.csv', stringsAsFactors = F)
+
+dataGroupByStateStar <- ylpDataSmall %>% 
+  filter(state != '') %>% mutate(tsum = n()) %>% 
+  group_by(state, stars) 
+
+dataForTableByStateStar <- dataGroupByStateStar %>% group_by(state) %>%
+  summarise(total_business = n(), total_reviews = sum(review_count), avg_rating = round(mean(stars), 2))
+
+dataWeightedGroupByStateStar <- dataGroupByStateStar %>% 
+  summarise(totalByStar = n()) %>% arrange(desc(stars)) %>% 
+  mutate(total = sum(totalByStar)) %>% mutate(percent = round((totalByStar / total)*100, 1)) %>%
+  mutate(percentWeight = ifelse(percent >= 20, percent * 2.5, # custom column to weight the percent for size on the plot
+                                ifelse(percent < 20 & percent >= 15, percent * 1.2, 
+                                       ifelse(percent < 15 & percent >= 10, percent,
+                                              ifelse(percent < 10 & percent >= 5, percent * 0.8, 1)))))
+
+dataTotalAvgStarByState <- dataWeightedGroupByStateStar %>% summarise(sumForTotAvgRating = sum(stars * totalByStar), numRatings = sum(totalByStar)) %>% 
+  mutate(totAvgRatingByState = round((sumForTotAvgRating/numRatings), 2)) %>%
+  mutate(city_name = ifelse(state=='CA', 'Los Angeles', ifelse(state== 'GA', 'Atlanta', ifelse(state=='IL', 'Chicago', 
+                          ifelse(state=='IN', 'Indianapolis', ifelse(state=='MA', 'Boston', ifelse(state== 'MD', 'Baltimore', 
+                          ifelse(state=='MI', 'Detroit', ifelse(state=='NC', 'Charlotte', ifelse(state=='NJ', 'Jersey City', 
+                          ifelse(state=='NY', 'New York City', ifelse(state=='ON', 'Toronto', ifelse(state=='PA', 'Philadelphia', 
+                          ifelse(state=='RI', 'Providence', ifelse(state=='TX', 'Houston', ifelse(state== 'VA', 'Virginia Beach', 
+                          ifelse(state== 'WA', 'Seattle', ""))))))))))))))))) %>%
+  mutate(city_lat = ifelse(city_name =='Los Angeles', 34.052234, ifelse(city_name=='Atlanta', 33.748995, 
+                    ifelse(city_name =='Chicago', 41.878114, ifelse(city_name=='Indianapolis', 39.768403, 
+                    ifelse(city_name =='Boston', 42.360082, ifelse(city_name=='Baltimore', 39.290385,
+                    ifelse(city_name =='Detroit', 42.331427, ifelse(city_name=='Charlotte', 35.227087, 
+                    ifelse(city_name =='Jersey City', 40.728157, ifelse(city_name=='New York City', 40.712784, 
+                    ifelse(city_name =='Toronto', 43.653226, ifelse(city_name=='Philadelphia', 39.952584,
+                    ifelse(city_name =='Providence', 41.823989, ifelse(city_name=='Houston', 29.760427, 
+                    ifelse(city_name =='Virginia Beach', 36.852926, ifelse(city_name== 'Seattle', 47.606209, NA))))))))))))))))) %>%
+  mutate(city_lng = ifelse(city_name=='Los Angeles', -118.243685, ifelse(city_name== 'Atlanta', -84.387982, 
+                    ifelse(city_name=='Chicago', -87.629798, ifelse(city_name=='Indianapolis', -86.158068, 
+                    ifelse(city_name=='Boston', -71.058880, ifelse(city_name== 'Baltimore', -76.612189,
+                    ifelse(city_name=='Detroit', -83.045754, ifelse(city_name== 'Charlotte', -80.843127, 
+                    ifelse(city_name=='Jersey City', -74.077642, ifelse(city_name=='New York City', -74.005941, 
+                    ifelse(city_name=='Toronto', -79.383184, ifelse(city_name=='Philadelphia', -75.165222, 
+                    ifelse(city_name=='Providence', -71.412834, ifelse(city_name=='Houston', -95.369803, 
+                    ifelse(city_name=='Virginia Beach', -75.977985, ifelse(city_name== 'Seattle', -122.332071, NA))))))))))))))))) 
+
+myCol <- colorNumeric('YlOrRd', dataTotalAvgStarByState$totAvgRatingByState)
+
+ylpUser <- read.csv('Project 1/yelp_dataset_challenge_academic_dataset/yelp_academic_dataset_user.csv', stringsAsFactors = F)
+
+ylpUserSm1 <-ylpUser %>% na.omit() %>% select(user_id, average_stars, fans, review_count, elite)
+
+ylpUserSm3 <- ylpUserSm1 %>% 
+  mutate(Fan_Size = ifelse(fans > 1200, "5", 
+                               ifelse(fans > 800, "4", 
+                                      ifelse(fans > 500, "3", 
+                                             ifelse(fans > 200, "2", "1")))))
+```
+
+
+```{r, echo=FALSE, message=FALSE}
+load("proj1_Yelp.RData")
+```
+
+<br/>
+
+### 1.3. Average review ratings by state.
+<br>
+**a. Pulling the data**
+```{r, echo=TRUE, eval=FALSE}
+dataGroupByStateStar <- ylpDataSmall %>% 
+  filter(state != '') %>% mutate(tsum = n()) %>% 
+  group_by(state, stars) 
+
+dataForTableByStateStar <- dataGroupByStateStar %>% group_by(state) %>%
+  summarise(total_business = n(), total_reviews = sum(review_count), avg_rating = round(mean(stars), 2))
+```
+
+<br>
+<br>
+**b. Loading the data on the Leaflet map**
+<br>
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE, fig.retina=2,dpi=144, fig.width=6, fig.height=3}
+library(leaflet)
+leaflet(dataTotalAvgStarByState) %>% addTiles() %>%
+  setView(lng = -96.503906, lat = 38.68551, zoom = 4) %>%
+  addCircles(lng = ~city_lng, lat = ~city_lat, weight = 0,
+             radius = ~exp(totAvgRatingByState * 1.4) * 800,
+             fillOpacity = 0.5,
+             color = ~myCol(totAvgRatingByState),
+             popup = ~totAvgRatingByState
+  ) %>% 
+  addLegend("bottomleft", pal = myCol, values = ~sort(totAvgRatingByState),
+            title = "Avg.Ratings",
+            labFormat = labelFormat(prefix = ""),
+            opacity = 0.5
+  ) 
+```
+<br>
+<br>
+
+### 1.4. A grid of detailed average ratings by state. 
+
+<br>
+**a. Pulling the data**
+```{r, echo=TRUE, eval=FALSE}
+dataWeightedGroupByStateStar <- dataGroupByStateStar %>% 
+  summarise(totalByStar = n()) %>% arrange(desc(stars)) %>% 
+  mutate(total = sum(totalByStar)) %>% mutate(percent = round((totalByStar / total)*100, 1)) %>%
+  mutate(percentWeight = ifelse(percent >= 20, percent * 2.5, # custom column to weight the percent for size on the plot
+                                ifelse(percent < 20 & percent >= 15, percent * 1.2, 
+                                       ifelse(percent < 15 & percent >= 10, percent,
+                                              ifelse(percent < 10 & percent >= 5, percent * 0.8, 1)))))
+```
+
+<br>
+**b. Loading the data on the ggplot bubble plot**
+<br>
+```{r,echo=TRUE,eval=TRUE, message=FALSE, results='asis',tidy=TRUE, fig.retina=2,fig.width=11, fig.height=9, dpi=144}
+library(ggplot2)
+ggplot(dataWeightedGroupByStateStar, aes(x = state, y = stars, label = percent)) +
+  geom_point(aes(size = percentWeight*2, colour = stars, alpha=.05)) + 
+  geom_text(hjust = 0.4, size = 4) +
+  scale_size(range = c(1,30), guide = 'none') + 
+  scale_color_gradient( low = "darkblue", high = "red") + 
+  labs(title="A grid of detailed avg.ratings by state ", x = "State", y="Detailed Avg.Ratings") +
+  scale_y_continuous(breaks=seq(1, 5, 0.5)) +
+  theme(legend.title=element_blank())
+```
+
+<br>
+<br>
+---
+
+## 2. Yelp Academic Dataset #2 (Big)
+<br/>
+
+### 2.1. Initial questions
+
+<br>
+
+* Initial questions 
+    - Users with more followers at Yelp --> purchase more (or checkin more frequently)
+    - Female users --> More frequent reviews
+    - Restaurants in the higher price range --> higher review ratings?
+
+* Source link is currently missing.
+
+<br><br>
+
+### 2.2. Simple exploratory analysis:
+
+<br>
+
+* 5 tables
+    - Business (98 variables, 77,445 observations, 30.4MB)
+    - User (23 variables, 552,339 observations, 135.9MB) 
+    - Reviews (10 variables, 2,225,213 observations, **1.64GB**)
+    - Checkin (170 variables, 55,569 observations, 13.2MB)
+    - Tip (6 variables, 591,864 observations, 74.5MB)
+
+<br>
+
+* My qustions with the data
+    - Having more followers at Yelp --> Rate more frequently? 
+    - Having more followers at Yelp --> Rate higher? 
+
+<br>
+
+![ER Diagram for Yelp Big Dataset](./Project 1/img/NYC_DSA_Proj1_BigYlpDiagram.png "YelpDataBig") 
+
+* Columns of interests (in User table)
+    - average_stars (1.0, 1.5, 2.0, ~ 4.5, 5.0)
+    - elite
+    - fans
+    
+<br>
+<br>
+
+### 2.3. (Q1) Having more followers at Yelp --> Rate more frequently? 
+<br>
+**a. Pulling the data**
+```{r, echo=TRUE, eval=FALSE}
+ylpUserSmElite <- ylpUserSm3 %>% filter(elite != "[]")
+ylpUserSmNormal <- ylpUserSm3 %>% filter(elite == "[]")
+```
+
+<br>
+<br>
+**b. Loading the data on the box plot **
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+library(ggthemes)
+# Yelp users in the boxplot
+qplot(fans, review_count, data=ylpUserSm3, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Total review counts by the number of fans") + theme(legend.position="none")
+```
+
+<br><br>
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Elite Yelp group users in the boxplot
+qplot(fans, review_count, data=ylpUserSmElite, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Total review counts by the number of fans (Elite users)") + theme(legend.position="none")
+```
+
+<br><br>
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Non-elite Yelp group users in the boxplot
+qplot(fans, review_count, data=ylpUserSmNormal, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Total review counts by the number of fans (Non-elite Users)") + theme(legend.position="none")
+
+```
+
+<br><br>
+**c. Loading the data on the combination plots (point+smooth) **
+<br>
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Yelp users in combination plots
+qplot(fans, review_count, data = ylpUserSm1, geom = c("point", "smooth"), colour = fans) + 
+  labs(title = "Total review counts by the number of fans") + 
+  scale_color_gradient( low = "darkblue", high = "darkred") + 
+  stat_smooth(fill="green", colour="cyan", size=1, alpha=0.1)
+```
+
+<br><br>
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Elite Yelp group users in combination plots
+qplot(fans, review_count, data = ylpUserSmElite, geom = c("point", "smooth"), colour = fans) + 
+  labs(title = "Total review counts by the number of fans (Elite users)") + 
+  scale_color_gradient( low = "darkblue", high = "darkred") + 
+  stat_smooth(fill="green", colour="cyan", size=1, alpha=0.1)
+```
+
+<br><br>
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Non-elite Yelp group users in combination plots
+qplot(fans, review_count, data = ylpUserSmNormal, geom = c("point", "smooth"), colour = fans) + 
+  labs(title = "Total review counts by the number of fans (Non-elite users)") + 
+  scale_color_gradient( low = "darkblue", high = "darkred") + 
+  stat_smooth(fill="green", colour="cyan", size=1, alpha=0.1)
+```
+
+
+<br><br>
+
+### 2.3. (Q2) Having more followers at Yelp --> Rate higher? 
+
+<br>
+**a. Loading the data on the box plot **
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Yelp users in the boxplot
+qplot(fans, average_stars, data=ylpUserSm3, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Average ratings by the number of fans") + theme(legend.position="none")
+```
+
+<br><br>
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Elite Yelp group users in the boxplot
+qplot(fans, average_stars, data=ylpUserSmElite, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Average ratings by the number of fans (Elite users)") + theme(legend.position="none")
+```
+
+<br><br>
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Non-elite Yelp group users in the boxplot
+qplot(fans, average_stars, data=ylpUserSmNormal, geom="boxplot", group = Fan_Size, color=Fan_Size) + labs(title = "Average ratings by the number of fans (Non-elite users)") + theme(legend.position="none")
+```
+
+<br><br>
+**c. Loading the data on the combination plots (point+smooth) **
+<br>
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Yelp users in combination plots
+qplot(fans, average_stars, data = ylpUserSm1, geom = c("point", "smooth"), colour = fans) + 
+  labs(title = "Average ratings by the number of fans") + 
+  scale_color_gradient( low = "darkblue", high = "darkred") + 
+  stat_smooth(fill="green", colour="cyan", size=1, alpha=0.1)
+```
+
+<br><br>
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Elite Yelp group users in combination plots
+qplot(fans, average_stars, data = ylpUserSmElite, geom = c("point", "smooth"), colour = fans) + 
+  labs(title = "Average ratings by the number of fans (Elite users)") + 
+  scale_color_gradient( low = "darkblue", high = "red") + 
+  stat_smooth(fill="green", colour="cyan", size=1, alpha=0.1)
+```
+
+<br><br>
+
+```{r, echo=TRUE, message=FALSE, results='asis',tidy=TRUE}
+# Non-elite Yelp group users in combination plots
+qplot(fans, average_stars, data = ylpUserSmNormal, geom = c("point", "smooth"), colour = fans) + 
+  labs(title = "Average ratings by the number of fans (Non-elite users)") + 
+  scale_color_gradient( low = "darkblue", high = "red") + 
+  stat_smooth(fill="green", colour="cyan", size=1, alpha=0.1)
+
+```
+
+
+<br><br>
