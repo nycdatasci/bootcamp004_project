@@ -26,6 +26,22 @@ ggplot(subdata3,aes(reorder(JOB_TITLE_SUBGROUP,-med.salary),med.salary,fill=JOB_
   geom_bar(stat="identity",position='dodge',width=0.6)+
   labs(x="Job Title Subgroup", y="Median Salary")
 
+#--------------------------
+#   By visia type
+#------------------------
+s_ds<-salary[salary$JOB_TITLE_SUBGROUP=="data scientist",]
+visa<-group_by(s_ds,VISA_CLASS) %>%
+summarise(med.salary = median(as.numeric(PAID_WAGE_PER_YEAR),na.rm=TRUE),count=n())%>%
+arrange(med.salary)
+ggplot(visa,aes(reorder(VISA_CLASS,-med.salary),med.salary,fill=VISA_CLASS %in% c("H-1B","greencard")))+
+theme_hc()+
+scale_fill_manual(values = c("grey","blue"),guide=FALSE)+
+ylim(0,155000)+
+geom_bar(stat="identity",position='dodge',width=0.6)+
+labs(x="VISA_CLASS", y="Median Salary")
+
+
+
 #------------------------
 # Job requirments
 #------------------------
@@ -81,7 +97,17 @@ plot(state_nm)
 # 2.adjusted median salary using price parity
 pp<-read.xlsx("price_parity.xlsx",sheet=1)
 pp<-arrange(pp,State)
+#------------------------
+# introduce a new dataset
+#------------------------
+ggplot(pp, aes(x=reorder(State,-Price.Parity), y=Price.Parity,fill=(State %in% c("California","New York","Washington","Massachusetts","Texas")))) +
+geom_bar(stat='identity') +
+geom_hline(yintercept = 100,color="grey",size=0.5)+
+coord_flip(ylim=c(85,120))+
+scale_fill_economist(guide=FALSE)+
+labs(x="", y="",title="2013 Regional Price Parities by States")
 
+###
 adj_state_ds<-left_join(state_ds,pp,by=c("WORK_STATE"="State"))
 adj_state_ds<-mutate(adj_state_ds,adj.Med_Sa=round(Med_Sa/Price.Parity*100)) %>%
   arrange(desc(adj.Med_Sa))
