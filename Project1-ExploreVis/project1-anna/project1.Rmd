@@ -6,7 +6,7 @@ output: html_document
 ---
 
   
-We examine which people aged 16 or over in the United Kingdom have ever (or never) used the internet using a range of variables such as age, ethnicity, pay, occupation and disability. We conjecture that the main factors that separate internet users and non users is age (with older people being less likely to adapt to social media, google, etc) and availability: lower income households may not be able to afford wifi or mobile internet plans. The sample size taken from data.london.gov.uk includes around 333,000 people in the UK and around 27,000 in London and is over the last five years. As such, we need to treat the numbers with caution as the margin for error in modeling internet use as a function of time will be high and there is limited data from which to extrapolate. However, we have a comprehensive list of usage in the boroughs of Greater London. 
+We examine which people aged 16 or over in the United Kingdom have ever (or never) used the internet using a range of variables such as age, ethnicity, pay, occupation and disability. We conjecture that the main factors that separate internet users and non users is age (with older people being less likely to adapt to social media, google, etc) and availability: lower income households may not be able to afford wifi or mobile internet plans. The sample size taken from data.london.gov.uk includes around 333,000 people in the UK and around 27,000 in London and is over the last five years. As such, we need to treat the numbers with caution as the margin for error in modeling internet use as a function of time will be high and there is limited data from which to extrapolate. However, we have a comprehensive list of usage in the boroughs of Greater London. We then are able to compile a density map of internet usage in Greater London.
 
  
 We first look at the ages of internet users. We cast the data from wide to long format, with variables "Location" and "Year". We remove rows with missing values from the geographic 'geo' table.
@@ -128,6 +128,7 @@ The table shows that some of the growth has been negative over the last 5 years,
 dat2 = data.table(x=totaluk$Year, y=totaluk$totalp, group = totaluk$Age)
 dat2[,list(intercept = coef(lm(y~x))[1], coef = coef(lm(y~x))[2]), by=group]
 ```
+
 A quick check shows that slopes of the age groups between 16 and 44 have p-values which are too small for statistical significance, but a surprising result is the 5% average annual increase in users for those aged 65-74, and the 4% average annual increase in those over 75. Evidently it is those around the retirement age who are most rapidly beginning to access the internet. 
 
 
@@ -201,7 +202,7 @@ income.plot + xlab("Income range (GBP)") + ylab("Number of users (millions)") + 
 Observe that the highest income group comprises the lowest number of internet users, with the highest number coming from the mid-salary range of 20,000-39960 GBP. This is to be expected as the highest income bracket comprises the lowest portion of the actual UK population. What is surprising is that the lowest income bracket of <8000GBP makes up the second highest number of internet users. However, only around 90% of those in the lowest income bracket are actually internet users, while virtually all of those in the mid to highest income bracket have access to internet. The 10% of the poorest people in the UK therefore probably are among those who do not have access. 
 
 ##Location
-Let us visualize the geography of internet users in London in 2015. Unfortunately the map of England is not featured in the GoogleVis package so we need to use leaflet for R. We need to integrate this data manually. In base R, leaflet package functions can also be coded from https://github.com/chgrl/leafletR. We load the leaftlet package and download the polygon data from http://www.gadm.org/download. This contains geographic data for the entire UK and Wales. We wish to merge this with the data we have for London and the UK and include the numbers of users we currently have in order to construct a map with shaded regions. 
+Let us visualize the geography of internet users in London in 2015. Unfortunately the map of England is not featured in the GoogleVis package so we need to use leaflet for R. We need to integrate this data manually. In base R, leaflet package functions can also be coded from https://github.com/chgrl/leafletR. We load the leaftlet package and download the polygon data from http://www.gadm.org/download. This contains geographic data for every borough in the entire UK and Wales. We wish to merge this with the data we have for London and the UK and include the numbers of users we currently have in order to construct a map with shaded regions. 
 ```{r}
 geo2015=filter(geo, Year == 2015)
 geo2015=select(geo2015, Borough, epercent, ever.used.number)
