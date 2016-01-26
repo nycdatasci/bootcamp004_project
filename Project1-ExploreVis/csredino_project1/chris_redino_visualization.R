@@ -102,12 +102,13 @@ movie_nodes=left_join(movie_nodes,node_box_office,by="name")
 #movie_nodes=filter(movie_nodes,genre!="None")#remove people with no dominate genre preference
 #movie_nodes=filter(movie_nodes,studio!="None")#remove people with no dominate studio preference
 #movie_nodes=filter(movie_nodes,genre=="Comedy"|genre=="Drama"|genre=="Action"|genre=="Fantasy"|genre=="Horror"|genre=="Romance")#look at a subset of genres
-movie_nodes=filter(movie_nodes,studio=="Fox"|studio=="Universal"|studio=="Buena Vista"|studio== "Sony / Columbia"|studio=="Paramount"|studio=="Warner Bros.")
+#movie_nodes=filter(movie_nodes,studio=="Fox"|studio=="Universal"|studio=="Buena Vista"|studio== "Sony / Columbia"|studio=="Paramount"|studio=="Warner Bros.")
 #movie_nodes=filter(movie_nodes,complete.cases(movie_nodes))#remove incomplete records
 #movie_nodes=filter(movie_nodes,studio=="Warner Bros.")
 #movie_nodes=filter(movie_nodes,studio=="Fox")#
 #movie_nodes=filter(movie_nodes,studio== "Sony / Columbia")
-movie_nodes=filter(movie_nodes,genre== "Drama")
+#movie_nodes=filter(movie_nodes,genre== "Comedy")
+movie_nodes=filter(movie_nodes,studio=="Fox"|studio=="Warner Bros.")
 
 #movie_nodes2<<-arrange(movie_nodes,genre)#need to sort by genre before assigning the number so that circular network plots are more clear
 movie_nodes2<<-arrange(movie_nodes,studio)#need to sort by genre before assigning the number so that circular network plots are more clear
@@ -199,7 +200,7 @@ col_studio[V(movie_network)$studio=="Universal"] = "purple"
 
 
 #actual plot done here
-plot(movie_network,layout=l,vertex.label=NA,vertex.size=3,
+plot(movie_network,vertex.label=NA,vertex.size=3,
      vertex.color=col_studio)#,  #set the colors, the way I've defined the 
 
    
