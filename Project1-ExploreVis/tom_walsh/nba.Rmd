@@ -1,0 +1,678 @@
+---
+title: "NBA Lineup Data"
+author: "Tom Walsh"
+date: "January 22, 2016"
+#output: html_document
+output: 
+  ioslides_presentation:
+    css: assets/css/ioslides.css
+    logo: assets/img/logo.png
+---
+
+``````{r setup, include=FALSE}
+library(knitr)
+library(ggplot2)
+require(gridExtra)
+library(rjson)
+library(dplyr)
+knit_engines$set(asis = function(options) {
+  if (options$echo && options$eval) paste(options$code, collapse = '\n')
+})
+
+# If you need to recalculate everything, set this to true,
+# otherwise, it'll just use the stored values in /data
+recalculate=FALSE
+# Change this to true to include blog text.
+blog=FALSE
+width_cutoff=if(blog) 80 else 50;
+```
+```{asis, echo=blog}
+A preliminary visual investigation of the relationship between the performance of NBA lineups and the players within them.
+```
+
+# Getting NBA Data
+```{asis, echo=!blog}
+Lots of code, so we'll just skim through this.
+```
+```{asis, echo=blog}
+The pages at [stats.nba.com](stats.nba.com) are backed by a great set of json APIs, making it easy to work with their data.  They have an extensive stats for lineups, players, and a lot more.
+
+### Some Libraries We'll Need
+```
+```{r, echo=blog, eval=FALSE}
+library(rjson)
+library(dplyr)
+```
+
+## Getting data from stats.nba.com into R
+```{asis, echo=blog}
+I used the rjson library to download the json and convert it into an R data frame.  The following helper function, given a url, the number of columns, and a list of numeric columns, will fetch the json, convert the data into a matrix, then convert it into a data frame.
+```
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+df_from_url = function(url, ncol, number_columns) {
+  json = fromJSON(file=url, method='C')
+  df = data.frame(
+    matrix(
+      unlist(json$resultSets[[1]][[3]]), 
+      ncol=ncol, 
+      byrow = TRUE
+    ), 
+    stringsAsFactors = FALSE
+  )
+  colnames(df) = json$resultSets[[1]][[2]]
+  df[,number_columns] = apply(
+    df[,number_columns], 
+    2, 
+    function(x) as.numeric(as.character(x))
+  )
+  return(df)
+}
+```
+## Some Setup
+### Years
+```{asis, echo=blog}
+The APIs take seasons as strings, so we need to convert from the years in question to the formatted season strings.  2007 is the first year for which they have lineup data.
+```
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+years = sapply(2007:2015, function(year) sprintf('%4d-%02d', year, (year+1)%%100))
+```
+### Team Ids
+```{asis, echo=blog}
+This is absolute overkill, because none of the team ids have changed over the year range we're interested in, but I didn't know that for sure until after I'd ran it.
+```
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+team_fmt = 'http://stats.nba.com/stats/leaguedashteamstats?Conference=&DateFrom=&DateTo=&Division=&GameScope=&GameSegment=&LastNGames=0&LeagueID=00&Location=&MeasureType=Base&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Per100Plays&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season=%s&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision='
+team_urls = sapply(years, function(year) sprintf(team_fmt, year))
+team_dfs = sapply(team_urls, function(url) df_from_url(url, 30, c(1,3:29)))
+team_ids = Reduce(union, team_dfs[1,])
+```
+```{r, include=FALSE}
+team_ids = c(
+  1610612737,1610612738,1610612766,1610612741,1610612739,1610612742,1610612743,1610612765,1610612744,
+  1610612745,1610612754,1610612746,1610612747,1610612763,1610612748,1610612749,1610612750,1610612751,
+  1610612740,1610612752,1610612753,1610612755,1610612756,1610612757,1610612758,1610612759,1610612760,
+  1610612761,1610612762,1610612764
+)
+```
+## Player Data
+```{asis, echo=blog}
+First, we download the player data.  We'll loop over the years and NBA stat collections, and then combine all the data together with merge and rbind into one big data frame.  We request stats per 100 plays, but the API seems to intelligently determine when to respect that.
+```
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+columns = c(35,32,24,27,30)
+stat_types = c('Base', 'Advanced', 'Misc', 'Scoring', 'Usage')
+player_fmt = 'http://stats.nba.com/stats/leaguedashplayerstats?College=&Conference=&Country=&DateFrom=&DateTo=&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&LastNGames=0&LeagueID=00&Location=&MeasureType=%s&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Per100Plays&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season=%s&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+```
+```{r, echo=blog, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+players = NULL
+for (year in years) {
+  season_df = NULL
+  for (i in 1:length(stat_types)) {
+    stat_type = stat_types[i]
+    c = columns[i]
+    numeric_columns = c(1,3,5:(c-1))
+    url = sprintf(player_fmt, stat_type, year)
+    df = df_from_url(url, c, numeric_columns)
+    if (is.null(season_df)) {
+      season_df = df
+    } else {
+      season_df = merge(
+        season_df, df, by=1, all.x=TRUE, suffixes=c('', sprintf('_%s', stat_type))
+      )
+    }
+  }
+  season_df$SEASON = factor(year)
+  if (is.null(players)) {
+    players = season_df
+  } else {
+    players = rbind(players, season_df)
+  }
+}
+```
+```{asis, echo=!blog}
+
+##
+```
+```{r, echo=!blog, eval=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+players = NULL
+for (year in years) {
+  season_df = NULL
+  for (i in 1:length(stat_types)) {
+    stat_type = stat_types[i]
+    c = columns[i]
+    numeric_columns = c(1,3,5:(c-1))
+    url = sprintf(player_fmt, stat_type, year)
+    df = df_from_url(url, c, numeric_columns)
+    if (is.null(season_df)) {
+      season_df = df
+    } else {
+      season_df = merge(
+        season_df, df, by=1, all.x=TRUE, suffixes=c('', sprintf('_%s', stat_type))
+      )
+    }
+  }
+```
+```{asis, echo=!blog}
+
+##
+``` 
+```{r, echo=!blog, eval=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+  season_df$SEASON = factor(year)
+  if (is.null(players)) {
+    players = season_df
+  } else {
+    players = rbind(players, season_df)
+  }
+}
+```
+
+## Lineup Data
+```{asis, echo=blog}
+Fetching lineup data is similar; however, the API is limited to 250 entries per response, so we loop through the years, teams, and stat groups.  This results in well over a thousand API calls, and can take a very long time to run.
+```
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+stat_types = c('Base', 'Advanced', 'Four+Factors', 'Misc', 'Scoring', 'Opponent')
+columns = c(31,24,18,18,25,31)
+lineup_fmt = 'http://stats.nba.com/stats/leaguedashlineups?Conference=&DateFrom=&DateTo=&Division=&GameID=&GameSegment=&GroupQuantity=5&LastNGames=0&LeagueID=00&Location=&MeasureType=%s&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Per100Plays&Period=0&PlusMinus=N&Rank=N&Season=%s&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&TeamID=%d&VsConference=&VsDivision='
+```
+```{r, eval=recalculate, echo=blog, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+lineups = NULL
+for (year in years) {
+  for (team in team_ids) {
+    season_df = NULL
+    for (i in 1:length(stat_types)) {
+      stat_type = stat_types[i]
+      c = columns[i]
+      numeric_columns = c(4,6:c)
+      url = sprintf(lineup_fmt, stat_type, year, team)
+      df = df_from_url(url, c, numeric_columns)
+      if (is.null(season_df)) {
+        season_df = df
+      } else {
+        season_df = merge(
+          season_df, df, by=2, all.x=TRUE, suffixes=c('', sprintf('_%s', stat_type))
+          )
+      }
+    }
+    season_df$SEASON = factor(year)
+    if (is.null(lineups)) {
+      lineups = season_df
+    } else {
+      lineups = rbind(lineups, season_df)
+    }
+  }
+}
+```
+
+```{asis, echo=!blog}
+
+##
+```  
+```{r, eval=FALSE, echo=!blog, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+lineups = NULL
+for (year in years) {
+  for (team in team_ids) {
+    season_df = NULL
+    for (i in 1:length(stat_types)) {
+      stat_type = stat_types[i]
+      c = columns[i]
+      numeric_columns = c(4,6:c)
+      url = sprintf(lineup_fmt, stat_type, year, team)
+      df = df_from_url(url, c, numeric_columns)
+      if (is.null(season_df)) {
+        season_df = df
+      } else {
+        season_df = merge(
+          season_df, df, by=2, all.x=TRUE, suffixes=c('', sprintf('_%s', stat_type))
+          )
+      }
+    }
+```
+
+```{asis, echo=!blog}
+
+##
+```  
+```{r, eval=FALSE, echo=!blog, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+    season_df$SEASON = factor(year)
+    if (is.null(lineups)) {
+      lineups = season_df
+    } else {
+      lineups = rbind(lineups, season_df)
+    }
+  }
+}
+```
+
+## Player Cleanup
+```{asis, echo=blog}
+The API treats minutes differently depending upon the stat group requested.  Advanced appears to return minutes per game while Usage returns total minutes.  We rename these appropriately.
+```
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+players = mutate(players, MIN_TOTAL=MIN_Usage, MIN_GAME=MIN_Advanced)
+players = select(players, -X, -matches('CFID|CFPARAMS|_[A-Z][a-z]', FALSE))
+```
+
+## Lineup Cleanup
+```{asis, echo=blog}
+For lineups, however, Advanced seems to return the total minutes.  Once again, we rename the column.
+```
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+lineups = tbl_df(lineups)
+lineups = mutate(lineups, MIN_TOTAL=MIN_Advanced)
+lineups = select(
+  lineups, -X, -matches('GROUP_SET|CFID|CFPARAMS|_[A-Z][a-z]', FALSE)
+)
+lineups = Filter(function(x)!all(is.na(x)), lineups)
+```
+
+## Identifying players
+```{asis, echo=blog}
+To match the lineup data to the player data, we need to identify the players in each lineup.  Parsing the GROUP_ID allows us to do that.
+```
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+lineups$PLAYERS = t(
+  sapply(
+    lineups$GROUP_ID, 
+    function(x) {
+        as.integer(unlist(strsplit(as.character(x), split=' - ')))
+    }
+  )
+)
+```
+
+## Calculating Player Averages for a Lineup
+```{asis, echo=blog}
+For a given lineup, we find the stats for the players in the lineup and average them.  For some stats, this makes sense.  For others, it won't.  In many cases, we'll be more interested in the sum, but we can get that later by multiplying by 5.
+```
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+season_col = grep('SEASON', colnames(lineups))
+player_col = grep('PLAYERS', colnames(lineups))
+numeric_player_columns = as.vector(which(sapply(players, is.numeric)))
+lineup_averages = 
+  data.frame(t(apply(lineups, 1, function(x) {
+    srows = players$SEASON == x[season_col]
+    prows = players$PLAYER_ID %in% as.numeric(x[player_col:player_col+4])
+    sapply(players[srows & prows, numeric_player_columns], mean)
+  })))
+```
+
+## Calculating Usage-Weighted Averages for a Lineup
+```{asis, echo=blog}
+We do something similar to calculate the usage-weighted averages for a lineup.  This won't make any sense for most stats, but for many offensive stats, it should provide a more reasonable estimate than a straight average.
+```
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+usg_weighted =
+  data.frame(t(apply(lineups, 1, function(x) {
+    srows = players$SEASON == x[season_col]
+    prows = players$PLAYER_ID %in% as.numeric(x[player_col:player_col+4])
+    stats = players[srows & prows, numeric_player_columns]
+    tot_usg = sum(stats$USG_PCT_PCT)
+    sapply(stats, function(y) sum(y * stats$USG_PCT_PCT)/tot_usg)
+  })))
+```
+
+## Putting it all together
+```{asis, eval=blog}
+Finally, we add suffixes to our lineups, averages, and usage-weighted averages, and merge them all together into a gigantic data frame.
+```
+```{r, eval=recalculate, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+colnames(lineups) = paste(names(lineups), 'lineup', sep = ".")
+colnames(lineup_averages) = paste(names(lineup_averages),'player',sep='.')
+colnames(usg_weighted) = paste(names(usg_weighted), 'usage', sep='.')
+nba = merge(merge(lineups, lineup_averages, by=0), usg_weighted, by=0)
+nba$Row.names = NULL; nba$Row.names = NULL
+```
+```{r, include=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+if (recalculate) {
+  write.csv(nba, 'data/nba.csv')
+  write.csv(players, 'data/players.csv')
+  write.csv(lineups, 'data/lineups.csv')
+} else {
+  nba = tbl_df(read.csv('data/nba.csv'))
+  nba = select(nba, -X)
+  players = tbl_df(read.csv('data/players.csv'))
+  players = select(players, -X)
+}
+```
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+dim(nba)
+```
+
+## Net Rating
+```{asis, echo=blog}
+In the end, what we really care about is the Net Rating of lineups.  Will our lineup score more points than their opponents?  It's important to note stats.nba.com formulation of Net Rating (and hence Offensive Rating and Defensive Rating) for players is essentially scaled +/-, and is distinct from the Dean Oliver version of these stats.
+```
+```{r, echo=FALSE, warning=FALSE}
+qplot(PLUS_MINUS, NET_RATING, data=players)
+```
+```{asis, echo=blog}
+
+Net Rating is point differential per 100 possessions.  +/- in our data is per 100 plays.  The deviations from a straight line should be due to the difference between possessions and plays (which will be a function of things like offensive rebounding).
+```
+```{asis, echo=!blog}
+
+##
+``` 
+```{r, echo=FALSE, warning=FALSE}
+qplot(NET_RATING.player, NET_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(-10,10), ylim=c(-15,10))
+```
+```{asis, echo=blog}
+
+Lineups with 'better' players produce better results.  We've solved basketball!  More seriously, this seems to suggest that +/-, which has often been maligned as "too noisy", has value and can be predictive.
+```
+
+## Data Issues?
+```{asis, echo=blog}
+Can we really trust this data?
+
+```
+
+```{r, echo=FALSE}
+qplot(MIN_TOTAL.lineup, data=nba, geom='density')
+```
+
+
+```{asis, echo=!blog}
+
+##
+``` 
+```{asis, echo=blog}
+
+For lineups with very small numbers of minutes, can we trust their values?  One issue in our data is that we don't have fractional minutes.  Cutting on minutes suggests that while we have the same general trend for infrequently used lineups, the data seems a bit off from what we'd expect.
+```
+```{r, echo=FALSE}
+minutes = cut(nba$MIN_TOTAL.lineup, c(0,1,10, 100, 1000, 10000))
+qplot(NET_RATING.player, NET_RATING.lineup, data=nba, geom='smooth', color=minutes) + coord_cartesian(xlim=c(-10,10), ylim=c(-15,10))
+```
+
+```{asis, echo=!blog}
+
+##
+``` 
+```{asis, echo=blog}
+
+Drilling down into the one to ten minute range, it looks like we have reason to be skeptical of lineups with less than 5 minutes of play.
+```
+```{r, echo=FALSE}
+minutes = cut(nba$MIN_TOTAL.lineup, 1:10)
+qplot(NET_RATING.player, NET_RATING.lineup, data=nba, geom='smooth', color=minutes) + coord_cartesian(xlim=c(-10,10), ylim=c(-15,10))
+```
+
+```{asis, echo=!blog}
+
+##
+``` 
+```{asis, echo=blog}
+
+Furthermore, we should be concerned about lineups involving players who haven't played significantly with other players.
+```
+```{r, echo = FALSE}
+qplot(MIN_TOTAL.lineup / MIN_TOTAL.player, data=nba, geom='density')
+```
+
+```{asis, echo=!blog}
+
+##
+``` 
+```{r, echo = FALSE}
+minutes = cut(nba$MIN_TOTAL.lineup / nba$MIN_TOTAL.player, c(0,0.1,0.2,0.3,0.4,0.5,0.6,1))
+qplot(NET_RATING.player, NET_RATING.lineup, data=nba, geom='smooth', color=minutes) + coord_cartesian(xlim=c(-10,10), ylim=c(-15,10))
+```
+```{asis, echo=blog}
+
+We'll limit ourselves to lineups where the lineup accounts less than 10% of the minutes of the players in the lineup.
+```
+
+## Final Cleanup
+```{asis, echo=blog}
+We'll also remove lineups with crazy values for either the player or lineup NET_RATING.
+
+```
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+mins_ok = nba$MIN_TOTAL.lineup > 4
+ratio_ok = nba$MIN_TOTAL.lineup / nba$MIN_TOTAL.player <= 0.1
+lineup_ok = nba$NET_RATING.lineup > -50 & nba$NET_RATING.lineup < 50
+player_ok = nba$NET_RATING.player > -10 & nba$NET_RATING.player < 10
+nba = nba[mins_ok & ratio_ok & lineup_ok & player_ok,]
+```
+I'm not sure any of this would stand up to statistical scrutiny, but it should be okay for drawing pretty pictures.
+
+## Now What?
+```{asis, echo=blog}
+Here's a very small subset of our data, showing the 3 types of data in our data frame.
+```
+```{r, echo=blog, tidy=TRUE, tidy.opts=list(width.cutoff=width_cutoff)}
+kable(head(select(nba, GROUP_ID.lineup, SEASON.lineup, matches('^PTS\\.'))))
+```
+
+```{asis, echo=!blog}
+
+##
+``` 
+* `.lineup` indicates stats for a given lineup.
+* `.player` indicates the average (full-season)stats for the players in a lineup.
+* `.usage` indicates the usage-weighted (sull-season) stats for the players in a lineup.
+
+# Efficiency vs. Usage Tradeoff
+```{asis, echo=blog}
+One of the fundamental questions within basketball analytics is the value of "shot creation".  Is "shot creation" a valuable skill, or should it be thought of more as "shot taking"?  Should high-volume scorers with below average efficiency be seen as "stars" or are they actually hurting their teams by shooting more than they should?
+
+We'll look at the impact of Usage on both Offensive Rating (reminder: the NBA version, not the Dean Oliver version) and True Shooting Percentage.  True Shooting is an overall measure of shot efficiency taking into account 2 pointers, 3 pointers, and free throws.
+
+We'll limit ourselves to Usage between 10% and 30%, because anyone outside those ranges seems to be an outlier. 
+```
+
+## Players
+```{r, echo=FALSE}
+p1 = qplot(USG_PCT, OFF_RATING, data=players, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3),ylim=c(100,105)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(USG_PCT, TS_PCT, data=players, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(0.45,0.55)) + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+```{asis, echo=blog}
+
+For players, we see a wiggly, but generally upward trend between usage and our offensive metrics.  Naively, this might seem to contract the efficiency/usage tradeoff, as higher-usage players seem to have higher efficiency in general.  However, this likely reflects the decisions of coaches.  If someone can't shoot, we tend to discourage them from doing so.  It doesn't tell us what would happen to a player's efficiency if they increased or decreased their volume.
+```
+
+```{asis, echo=!blog}
+
+##
+``` 
+```{r, echo=FALSE}
+p1 = qplot(USG_PCT, data=players, geom='density') + coord_cartesian(xlim=c(0.1,0.3))
+p2 = qplot(OFF_RATING, data=players, geom='density') + coord_cartesian(xlim=c(90,110))
+p3 = qplot(TS_PCT, data=players, geom='density') + coord_cartesian(xlim=c(0.4,0.6))
+grid.arrange(p1,p2,p3, ncol=3)
+```
+
+## Lineups
+```{r, echo=FALSE}
+coord = coord_cartesian(xlim=c(0.1,0.3))
+p1 = qplot(USG_PCT.player, OFF_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(100,110)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(USG_PCT.player, TS_PCT.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(0.525,0.575)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p3 = qplot(OFF_RATING.lineup, data=nba, geom='density') + coord_cartesian(xlim=c(50,150))
+p4 = qplot(TS_PCT.lineup, data=nba, geom='density') + coord_cartesian(xlim=c(0.25,0.75))
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+```
+```{asis, echo=blog}
+
+Switching to lineup data, we seem the same general trends.  Lineups consisting of higher-usage players seem to perform better.  Once again, this is likely because better shooters get to shoot more.
+```
+
+## Usage-Weighting
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(OFF_RATING.usage, OFF_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(90,110), ylim=c(90,110)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(TS_PCT.usage, TS_PCT.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0.5,0.55), ylim=c(0.5,0.55)) + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+```{asis, echo=blog}
+
+When we look at our usage-weighted stats, we don't see a strong relationship between them and our lineup stats, but it's not all that clear how to interpret this.
+```
+
+## Eli Witus
+```{asis, echo=blog}
+Eli Witus, who is now employed by an NBA team, came up with a [better way of looking at this](http://www.countthebasket.com/blog/2008/03/06/diminishing-returns-for-scoring-usage-vs-efficiency/) (and a better way of explaining it).  He considers the *null hypothesis* that the lineup efficiency should be predicted by the usage-weighted efficiency.  He uses Dean Oliver's Offensive Rating calculation.  We'll instead use the NBA's version of Offensive Rating as well as looking at True Shooting Percentage, which Witus didn't investigate but suggested might produce interesting results.
+
+These plots show the difference between our observed lineup efficiency and that predicted by the null hypothesis:
+
+```
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(USG_PCT.player, OFF_RATING.lineup - OFF_RATING.usage, data=nba, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(-2.5,4.5)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(USG_PCT.player, TS_PCT.lineup - TS_PCT.usage, data=nba, geom='smooth') + geom_smooth(method='lm',formula=y~x, colour='red') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(-0.005,0.03))
+grid.arrange(p1, p2, ncol=2)
+```
+```{asis, echo=blog}
+
+We see that lineups full of high usage players outperform expectations while lineups full of low usage players underperform expectations.  Since a lineup must use 100% of its possessions, we can interpret this as lineup efficiency dropping in situations where players are forced to increase volume above their norms, while their efficiency increases in situations where they are abele to reduce their volume.
+```
+
+## Turnovers?  Assists?
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(USG_PCT.player, TOV.lineup - (5 * TOV.usage), data=nba, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(0,1)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(USG_PCT.player, AST.lineup - (5 * AST.usage), data=nba, geom='smooth') + coord_cartesian(xlim=c(0.1,0.3), ylim=c(-2,0)) + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+```{asis, echo=blog}
+
+Eli Witus posited that turnovers might also be a significant factor.  The above plots show the difference between lineup and expected totals for turnovers and assists.  There doesn't seem to be much of an impact on assist numbers, but we see a jump in turnovers as players are forced to increase their usage.
+```
+
+## Rebounding
+```{r, echo=FALSE, warning=FALSE}
+coord = coord_cartesian(xlim=c(0,1))
+p1 = qplot((5 * REB_PCT.player), REB_PCT.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0,1), ylim=c(0, 1)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot((5 * REB_PCT.player), REB_PCT.lineup - (5 * REB_PCT.player), data=nba, geom='smooth') + geom_smooth(method='lm',formula=y~x, colour='red')
+p3 = qplot(REB_PCT.lineup, data=nba, geom='density') + coord
+p4 = qplot((5 * REB_PCT.player), data=nba, geom='density') + coord
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+```
+```{asis, echo=blog}
+
+Applying a similar approach to rebounding, it looks like there's hardly any relationship between the rebounding numbers of a lineup and its constituent players.  It suggests that no matter who you throw out there, they're going to get about 50% of the available rebounds.  Note that we're no longer using usage-weighted numbers.
+```
+```{asis, echo=!blog}
+
+##
+``` 
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot((5 * OREB_PCT.player), OREB_PCT.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0,0.6), ylim=c(0,0.6)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot((5 * DREB_PCT.player), DREB_PCT.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0.3,1.1), ylim=c(0.3,1.1)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p3 = qplot((5 * OREB_PCT.player), data=nba, geom='density') + coord_cartesian(xlim=c(0,0.6))
+p4 = qplot((5 * DREB_PCT.player), data=nba, geom='density') + coord_cartesian(xlim=c(0.3,1.1))
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+```
+```{asis, echo=blog}
+
+Breaking it down to offensive and defensive rebounding, over typical ranges of player rebounding, we don't seem to see the players having a significant impact on the lineups.
+```
+
+## Rebound value
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot((5 * OREB_PCT.player), NET_RATING.lineup, data=nba, geom='smooth') + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot((5 * DREB_PCT.player), NET_RATING.lineup, data=nba, geom='smooth') + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+```{asis, echo=blog}
+
+If anything, lineups full of rebounders seem to perform poorly
+```
+
+## Offense vs. Defense
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(OFF_RATING.player, NET_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(90,110), ylim=c(-5,5)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(DEF_RATING.player, NET_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(90,110), ylim=c(-5,5)) + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+```{asis, echo=blog}
+
+Both offensive and defensive ratings for players seem to significantly impact lineup net rating in the direction we'd expect.
+```
+
+## Diminishing Returns
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(OFF_RATING.player, OFF_RATING.lineup - OFF_RATING.player, data=nba, geom='smooth') + coord_cartesian(xlim=c(90,110), ylim=c(-5,5)) + geom_smooth(method='lm',formula=y~x, colour='red')
+p2 = qplot(DEF_RATING.player, DEF_RATING.lineup - DEF_RATING.player, data=nba, geom='smooth') + coord_cartesian(xlim=c(90,110), ylim=c(-5,5)) + geom_smooth(method='lm',formula=y~x, colour='red')
+grid.arrange(p1, p2, ncol=2)
+```
+```{asis, echo=blog}
+
+For offense, we see diminishing returns.  Beyong a certain point, more offensive talent doesn't seem to improve the offensive performance of the lineup.  Defensively, however, we don't seem to see the same effect.  At least over normal ranges, it seems you can never have too much defense.
+```
+
+# 3 Point Shooting
+```{asis, echo=blog}
+3 point shooting is a big deal these days.  Let's look at this...
+```
+
+## Historic Volume
+```{r, echo=FALSE, warning=FALSE}
+qplot(SEASON.lineup, FG3M.lineup, data = nba, geom = "boxplot", outlier.size=0.3, notch=TRUE, varwidth=TRUE, coef=0.5) + coord_cartesian(ylim=c(0,15))
+```
+```{asis, echo=blog}
+
+I've had to reduce the length of whiskers to one-half the inter-quartile range in order to make things fit.  There is a lot of variability among lineups.  Despite all that variability, we see an upward trend in recent years.
+```
+
+## Is it helping?
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot(FG3M.lineup, OFF_RATING.lineup, data=nba, geom='smooth')
+p2 = qplot(FG3A.lineup, OFF_RATING.lineup, data=nba, geom='smooth')
+grid.arrange(p1,p2,ncol=2)
+```
+```{asis, echo=blog}
+
+Looking solely at lineup data, we see that taking and making more 3s seems to make your offense better.
+```
+
+## Is this just the effect of time?
+```{r, echo=FALSE, warning=FALSE}
+qplot(FG3M.lineup, OFF_RATING.lineup, data=nba, fill=SEASON.lineup, geom='smooth')
+```
+```{asis, echo=blog}
+
+This trend holds up for every season.
+```
+
+## More shots == more makes
+```{r, echo=FALSE, warning=FALSE}
+qplot(FG3A.lineup, FG3M.lineup, data=nba, geom='smooth')
+```
+```{asis, echo=blog}
+
+You have to take them to make them.
+```
+
+## We need more shooters!
+```{asis, echo=blog}
+So, we should just load up on shooters, right?
+
+```
+```{r, echo=FALSE, warning=FALSE}
+qplot((5 * FG3M.usage), OFF_RATING.lineup, data=nba, fill=SEASON.lineup, geom='smooth') + coord_cartesian(xlim=c(0,20), ylim=c(95,110))
+```
+
+## What's going on?
+```{r, echo=FALSE, warning=FALSE}
+qplot((5 * FG3M.usage), FG3M.lineup, data=nba, fill=SEASON.lineup, geom='smooth') + coord_cartesian(xlim=c(0,20), ylim=c(5,8))
+```
+
+## More Shooting != More Shooting
+```{r, echo=FALSE, warning=FALSE}
+p1 = qplot((5 * FG3M.usage), OFF_RATING.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0,20), ylim=c(103.5,104.5))
+p2 = qplot((5 * FG3M.usage), FG3M.lineup, data=nba, geom='smooth') + coord_cartesian(xlim=c(0,20), ylim=c(6.6,6.8))
+grid.arrange(p1,p2, ncol=2)
+```
+```{asis, echo=blog}
+
+It seems that the volume of 3 pointers made by a lineup doesn't really depend upon the volume of 3 pointers taken by the players in that lineup.  It may be that this is far more dependent on strategy, but this definitely needs more investigation.
+```
+
+```{asis, echo=!blog}
+## Conclusion
+* I have a pretty cool data set.
+* I'm pretty good at manipulating data.
+* I need some help with the analysis.
+* Basketball is hard and I'm questioning some of my assumptions.
+```
+
