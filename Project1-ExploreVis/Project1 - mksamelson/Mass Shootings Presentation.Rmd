@@ -4,7 +4,7 @@
 title: "Mass Shootings"
 subtitle:  "Mother Jones Magazine Data"
 author: "Matt Samelson"
-date: "January 21, 2016"
+date: "January 27, 2016"
 output: ioslides_presentation
 ---
 
@@ -88,6 +88,8 @@ Top States:  Incidents and Victims
 
 ## Mass Shootings 1982 - 2015
 
+Total Victims
+
 ```{r echo=FALSE}
 
 #Total Victims Histogram
@@ -104,6 +106,8 @@ ggplot(shootings,aes(total.victims))+
 
 
 ## Mass Shootings 1982 - 2015
+
+Fatalities and wounded
 
 ```{r echo=FALSE}
 
@@ -128,6 +132,50 @@ wounded.hist = ggplot(shootings,aes(injured))+
 grid.arrange(fatalities.hist,wounded.hist, ncol=1, nrow=2)
 ```
 
+## Mass Shootings 1982 - 2015
+
+<center>
+```{r echo=FALSE}
+ggplot(shootings,aes(year))+
+  geom_bar(fill="#ff9966",colour="black")+ 
+  xlab("Year")+
+  ylab("Number of Events") +
+  ggtitle("Events Per Year")
+
+```
+
+</center>
+
+## Mass Shootings 1982 - 2015
+
+<center>
+
+```{r, echo=FALSE}
+
+#Fatalities by Year
+
+fatalities.year = ggplot(shootings,aes(year,fatalities))+
+  stat_summary(fun.y=sum,geom="bar",colour="black",fill="#66CC99",show.legend = FALSE) +
+  scale_y_continuous(limits=c(0,80))+
+  ylab("Fatalities") +
+  ggtitle("Fatalities")
+
+#Wounded by Year
+
+wounded.year = ggplot(shootings,aes(year,injured))+
+  stat_summary(fun.y=sum,geom="bar",colour="black",fill="#CC6666",show.legend = FALSE) +
+  scale_y_continuous(limits=c(0,80))+
+  xlab("Year")+
+  ylab("Wounded")+
+  ggtitle("Wounded")
+
+grid.arrange(fatalities.year, wounded.year, ncol=1, nrow=2)
+
+
+
+```
+
+</center>
 
 ## Mass Shootings 1982 - 2015
 
@@ -226,5 +274,21 @@ mosaic(table(race.new, age.new), shade = TRUE, legend = TRUE,
 
 ```
 
+## Mass Shootings 1982 - 2015
+
+Top Events
+
+```{r echo=FALSE}
+
+head(arrange(select(shootings, 1:5, 7:9),desc(total.victims)),5)
+
+```
 </center>
 
+## Mass Shootings 1982 - 2015
+
+Conclusions
+
+1.  Data yields results that provides insight by grouping.
+
+2.  Observations not statistically significant/verifiable
