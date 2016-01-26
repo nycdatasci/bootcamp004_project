@@ -297,8 +297,6 @@ alco$State<-as.character(alco$State)
 alco<-data.frame(State=alco[,1],apply(alco[,-1],2,function(x) as.numeric(as.character(x))))
 
 fit<-lm(Any.Use~age_adj_rate,data=alco)
-fit<-lm(Binge~age_adj_rate,data=alco)
-
 pvalue<-signif(summary(fit)$coefficient[2,4],5)
 r2<-round(summary(fit)$r.squared,3)
 ggplot(alco,aes(x=age_adj_rate,y=Any.Use))+geom_point(color="red")+geom_smooth(method="lm")+
