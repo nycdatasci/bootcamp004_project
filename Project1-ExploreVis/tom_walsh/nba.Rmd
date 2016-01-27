@@ -2,11 +2,11 @@
 title: "NBA Lineup Data"
 author: "Tom Walsh"
 date: "January 22, 2016"
-#output: html_document
-output: 
-  ioslides_presentation:
-    css: assets/css/ioslides.css
-    logo: assets/img/logo.png
+output: html_document
+#output: 
+#  ioslides_presentation:
+#    css: assets/css/ioslides.css
+#    logo: assets/img/logo.png
 ---
 
 ``````{r setup, include=FALSE}
@@ -23,7 +23,7 @@ knit_engines$set(asis = function(options) {
 # otherwise, it'll just use the stored values in /data
 recalculate=FALSE
 # Change this to true to include blog text.
-blog=FALSE
+blog=TRUE
 width_cutoff=if(blog) 80 else 50;
 ```
 ```{asis, echo=blog}
@@ -405,7 +405,7 @@ qplot(NET_RATING.player, NET_RATING.lineup, data=nba, geom='smooth', color=minut
 ``` 
 ```{asis, echo=blog}
 
-Furthermore, we should be concerned about lineups involving players who haven't played significantly with other players.
+Furthermore, we should be concerned about lineups involving players who haven't played with other players.
 ```
 ```{r, echo = FALSE}
 qplot(MIN_TOTAL.lineup / MIN_TOTAL.player, data=nba, geom='density')
@@ -535,7 +535,7 @@ grid.arrange(p1, p2, ncol=2)
 ```
 ```{asis, echo=blog}
 
-Eli Witus posited that turnovers might also be a significant factor.  The above plots show the difference between lineup and expected totals for turnovers and assists.  There doesn't seem to be much of an impact on assist numbers, but we see a jump in turnovers as players are forced to increase their usage.
+Eli Witus posited that turnovers might also be a factor.  The above plots show the difference between lineup and expected totals for turnovers and assists.  There doesn't seem to be much of an impact on assist numbers, but we see a jump in turnovers as players are forced to increase their usage.
 ```
 
 ## Rebounding
@@ -564,7 +564,7 @@ grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
 ```
 ```{asis, echo=blog}
 
-Breaking it down to offensive and defensive rebounding, over typical ranges of player rebounding, we don't seem to see the players having a significant impact on the lineups.
+Breaking it down to offensive and defensive rebounding, over typical ranges of player rebounding, we don't seem to see the players having an impact on the lineups.
 ```
 
 ## Rebound value
@@ -586,7 +586,7 @@ grid.arrange(p1, p2, ncol=2)
 ```
 ```{asis, echo=blog}
 
-Both offensive and defensive ratings for players seem to significantly impact lineup net rating in the direction we'd expect.
+Both offensive and defensive ratings for players seem to impact lineup net rating in the direction we'd expect.
 ```
 
 ## Diminishing Returns

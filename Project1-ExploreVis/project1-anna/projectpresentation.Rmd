@@ -1,0 +1,213 @@
+---
+title: "Internet usage in the UK"
+author: "Anna"
+date: "23 Jan 2016"
+output: ioslides_presentation
+---
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(xlsx)
+library(RColorBrewer)
+library(maps)
+library(ggthemes)
+library(data.table)
+library(leaflet)
+library(gridExtra)
+
+age = read.xlsx("~/Downloads/internet-usage-london.xls", 3)
+ethnicity = read.xlsx("~/Downloads/internet-usage-london.xls", 4)
+pay = read.xlsx("~/Downloads/internet-usage-london.xls", 6)
+characteristics = read.xlsx("~/Downloads/internet-usage-london.xls", 7)
+geo = read.xlsx("~/Downloads/internet-usage-london.xls", 2)
+geo = geo[!apply(geo, 1, FUN=function(x) any(is.na(x))),]
+income = read.xlsx("~/Downloads/internet-usage-london.xls", 6)
+jobs = read.xlsx("~/Downloads/internet-usage-london.xls", 5)
+geo2015=filter(geo, Year == 2015)
+geo2015=select(geo2015, Borough, epercent, ever.used.number)
+gadm <- readRDS("/Users/bohun/Downloads/GBR_adm2.rds")
+```
+  
+
+```{r, echo=FALSE, message=FALSE}
+age$Year <- as.factor(age$Year)
+temp = select(age, Age, epercent, npercent, ever.used.number, Year, Location)# %>%
+#  filter(., Location=='London') 
+tab = filter(temp, Age!="Working-age 16-64" & Age!="Total" )
+totals = filter(temp, Age == "Total")  
+```
+  
+  
+##What factors affect internet usage?
+- Age
+- Ethnicity
+- Income
+- Occupation
+- Location
+
+Sample size is 333,000 people in the UK, 27,000 in London, over 33 boroughs from 2011-2015. 
+If for a certain age range, internet usage depends categorically on income, a density map of users should give a rough indication of the higher income areas.  
+
+Limitations: small time frame
+  
+##Total percentage of people using internet in the last five years
+```{r, echo=FALSE, message=FALSE}
+totals$Year = as.factor(totals$Year)
+totalsplot=ggplot(data=totals, aes(x=as.numeric(totals$Year), y=epercent)) + geom_smooth(method=lm, aes(color=Location),se=FALSE)  +geom_point() + scale_x_continuous(breaks=1:nlevels(as.factor(totals$Year)),labels=c(2011:2015)) + xlab("Year") + ylab("Percent")
+totalsplot + xlab("Year") + ylab("Percent") + ggtitle("Percent of the London and UK using internet since 2011")  
+```
+
+
+##How old are most internet users?
+```{r, echo=FALSE, message=FALSE, fig.width=8, fig.height=5}
+tab$Year <- factor(tab$Year, levels = 2015:2011)
+age.use = ggplot(data=tab, aes(x=Age, y=npercent)) + geom_bar(stat='identity', aes(fill=Year), position = 'dodge')
+plot1 = age.use+ scale_fill_brewer(palette = "Blues") + xlab("Age") + ylab("Percent") + theme_bw() + ggtitle("Percent of the UK which has never used internet")  
+plot1
+```
+
+
+
+## Can we plot usage as a function of age?
+```{r, echo=FALSE, message=FALSE, fig.width=8, fig.height=5}
+midfunc = function(x)
+  { mean(as.numeric(ifelse( x=="75+", 75, strsplit(as.character(x), split = "-"))[[1]]) )
+  }
+age.mids = mutate(tab, age.midpoint = sapply(tab$Age, midfunc )  ) 
+
+age.slope = ggplot(data=age.mids, aes(x=age.midpoint, y=ever.used.number/10^6)) + geom_smooth(aes(color=tab$Year),se=FALSE)  
+
+age.slope = age.slope + xlab("Age") + ylab("Number of users (millions)")  + scale_color_discrete(name = "Year") 
+ 
+p.slope = ggplot(data=age.mids, aes(x=age.midpoint, y=epercent)) + geom_smooth(aes(color=tab$Year),se=FALSE)  
+p.slope = p.slope + xlab("Age") + ylab("Percent of users") + theme(legend.position="none")
+
+grid.arrange(age.slope, p.slope, ncol = 2)
+```
+
+
+##Changes over time
+```{r, echo=FALSE, message=FALSE}
+age$Age = as.factor(age$Age) 
+totaluk = group_by(age, Age, Year) %>%
+  summarise(., total = sum(ever.used.number), totalp = mean(epercent)) %>%
+  filter(., Age!="Working-age 16-64" & Age!="Total") 
+#Drop levels so they do not appear in the later analysis.
+totaluk$Age = factor(totaluk$Age)
+totaluk$totalscaled = totaluk$total/10^6
+totaluk$Year = as.numeric(as.character(totaluk$Year))
+plotuk = ggplot(totaluk, aes(x=as.numeric(Year), y=totaluk$totalscaled) ) + geom_smooth(method=lm, aes(color=totaluk$Age), se=FALSE)  +geom_point()
+plotuk + xlab("Year") + ylab("Number of users (millions)") + ggtitle("Comparisons of increase by age")  +  scale_color_discrete( name = "Age group") 
+```
+
+## Which group is growing the fastest?
+- Need to normalise
+```{r}
+dat2 = data.table(x=totaluk$Year, y=totaluk$totalp, group = totaluk$Age)
+dat2[,list(intercept = coef(lm(y~x))[1], coef = coef(lm(y~x))[2]), by=group]
+```
+
+
+
+## Income
+```{r, echo=FALSE, message=FALSE, fig.width=9, fig.height=5}
+income.uk = group_by(income, gross.weekly.pay) %>%
+  summarise(., ever.used = sum(ever.used.number), ever.p = mean(epercent))
+x =income.uk$gross.weekly.pay
+#Remove all the pound and special characters from income
+x = gsub("[\\£]","", x)  
+x = gsub("[\\<]","",x)
+x = gsub("[\\+]","", x)
+income.uk$temp = x
+sal = function(x)
+  { as.numeric(ifelse( x=="2000", 2000, ifelse(x=="200", 200, strsplit(as.character(x), split = "-")))[[1]]) 
+  }
+income.uk$sal = sapply(income.uk$temp, sal )
+income.uk = mutate(income.uk, annual = sapply(income.uk$sal, function(x) {x*52}))
+income.uk = mutate(income.uk, annualsal = sapply(income.uk$annual, function(x) {paste(x, collapse='-')})) 
+income.uk = mutate(income.uk, annualmedian = sapply(income.uk$annual, function(x) mean(as.numeric(x)) )) 
+income.uk[1,7] = "<10400"
+income.uk[5,7] = "104000+"
+
+income.per = ggplot(data=income.uk, aes(x=reorder(annualsal, annualmedian), y=ever.p)) + geom_bar(stat='identity', aes(fill=as.factor(annualsal))) 
+income.per + xlab("Income range (GBP)") + ylab("Percent of users") + ggtitle("Internet users by income range (percentage) in the UK")  + scale_fill_discrete( name = "Income Range") + coord_cartesian(ylim = c(90, 100)) 
+```
+
+## But in absolute value...
+```{r, echo=FALSE, message=FALSE, fig.width=9, fig.height=5}
+income.plot = ggplot(data=income.uk, aes(x=reorder(annualsal, annualmedian), y=ever.used/10^6)) + geom_bar(stat='identity', aes(fill=as.factor(annualsal))) 
+income.plot + xlab("Income range (GBP)") + ylab("Number of users (millions)") + ggtitle("Internet users by income range in the UK") + scale_fill_discrete( name = "Income Range") 
+```
+
+
+##Population map
+- We want to visualize number of users on map, but the dataset is too small and missing areas in the UK
+- Download UK data and focus on London
+
+##Map by numbers
+```{r, echo=FALSE, message=FALSE}
+
+geo2015=filter(geo, Year == 2015)
+geo2015=select(geo2015, Borough, epercent, ever.used.number)
+gadm <- readRDS("/Users/bohun/Downloads/GBR_adm2.rds")
+
+gadm$enumber =  ifelse(gadm$NAME_2 %in% geo2015$Borough, geo2015$ever.used.number, NA)
+london <- gadm[gadm$NAME_2 %in% geo2015$Borough,]
+
+london$colornum2 =((london$enumber -  min(london$enumber))/(max(london$enumber)-min(london$enumber))*33)
+
+
+polygon_popup2 = paste0("<strong>", london$NAME_2, "</strong>", "</br>", london$enumber)
+
+pal <- colorQuantile("Greens", NULL, n = 10)
+
+leaflet(london) %>%
+  setView(lat = 51.508, lng = -0.129158, zoom = 10) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+   addPolygons( data = london, fillColor = ~pal(colornum2), 
+   fillOpacity = 0.6,
+   weight = 2,
+   color = "white",
+   popup = polygon_popup2
+  ) %>%
+    addLegend("bottomright", pal = colorNumeric( palette = pal, domain = london$enumber ), values = ~enumber,
+    title = "Number of users",
+    opacity = 1)
+```
+
+
+##Density map
+```{r, results = 'asis', echo=FALSE, message= FALSE}   
+gadm$epercent = ifelse(gadm$NAME_2 %in% geo2015$Borough, geo2015$epercent, NA)
+
+london <- gadm[gadm$NAME_2 %in% geo2015$Borough,]
+#create a subdata frame from gadm featuring only the areas for which we have data
+
+london$colornum = round((london$epercent -  min(london$epercent))/(max(london$epercent)-min(london$epercent))*33)
+#create the palette
+
+polygon_popup = paste0("<strong>", london$NAME_2, "</strong>", "</br>", london$epercent)
+#create a legend with labels showing the percent
+
+pal <- colorQuantile("Blues", NULL, n = 10)
+#will be 'broken up' into shades depending on colornum
+
+leaflet(london) %>%
+  setView(lat = 51.508, lng = -0.129158, zoom = 10) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+   addPolygons( data = london, fillColor = ~pal(colornum), 
+   fillOpacity = 0.6,
+   weight = 2,
+   color = "white",
+   popup = polygon_popup
+  ) %>%
+    addLegend("bottomright", pal = colorNumeric( palette = pal, domain = london$epercent ), values = ~epercent,
+    title = "Percentage of users",
+    opacity = 1)
+ 
+
+```
+
+
