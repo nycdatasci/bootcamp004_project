@@ -1,11 +1,12 @@
 ---
-title: "Trucking Companies"
+title: "Trucking Census"
 author: "Satish"
-date: "January 25, 2016"
+date: "January 27, 2016"
 output:
   ioslides_presentation:
     css: assets/css/ioslides.css
     logo: assets/img/logo.png
+  beamer_presentation: default
 ---
 # Trucking
 
@@ -31,9 +32,9 @@ output:
 <br>
 
 - Move 9.2 billion tons of freight annually 
-- Requires nearly 3 million heavy-duty Class 8 trucks and 
+- Requires nearly 3 million heavy-duty Class 8 trucks 
 - Over 3 million truck drivers 
-- Takes over 37 billion gallons of diesel fuel to move all of that freight 
+- Uses over 37 billion gallons of diesel fuel  
 
 ## And
 #### **Simply – without trucks, America stops**
@@ -41,10 +42,123 @@ output:
 <img src="images/leadingindicator.png"  STYLE="position:absolute; TOP:200px; LEFT:270px; width="500" height="500">
 
 ## FMCSA 
+###### The 
+###### Federal 
+###### Motor 
+###### Carrier 
+###### Safety 
+###### Administration
 <img src="images/FMCSA.png"  STYLE="position:absolute; TOP:100px; LEFT:200px;  width="600" height="600">
 
-## Data Will Come on CD-ROM in 4-6 weeks
+## Data by CD-ROM in 4-6 Weeks
 
-<img src="images/FMCSAForm.JPG"  STYLE="position:absolute; TOP:100px; LEFT:200px;  width="400" height="400">
-<img src="images/Letter.JPG"  STYLE="position:absolute; TOP:400px; LEFT:400px;  width="300" height="300">
+State of affairs has not changed: same process in 2005, 2008, and 2010
+<img src="images/Letter.JPG"  STYLE="position:absolute; TOP:200px; LEFT:500px;  width="300" height="300">
 
+<img src="images/FMCSAForm.JPG"  STYLE="position:absolute; TOP:200px; LEFT:100px;  width="400" height="400">
+
+## Census Data Summary
+
+````{r, eval = FALSE}
+nrow(fleet_data)
+summary(fleet_data$NBR_POWER_UNIT)
+summary(fleet_data$DRIVER_TOTAL)
+summary(fleet_data$MCS150_MILEAGE)
+```
+
+````{r, eval = FALSE}
+> nrow(fleet_data)  
+[1] 1643373  
+> summary(fleet_data$NBR_POWER_UNIT)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+      0       1       1       5       2  599900 
+> summary(fleet_data$DRIVER_TOTAL)
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+0.00e+00 1.00e+00 1.00e+00 5.25e+00 2.00e+00 3.00e+05 
+> summary(fleet_data$MCS150_MILEAGE)
+     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+0.000e+00 0.000e+00 1.200e+03 2.747e+05 4.000e+04 9.990e+09 
+```
+
+##Outliers
+````{r, eval = FALSE, font_adjustmen = -10}
+> fleets_outlier[,c("LEGAL_NAME", "MCS150_DATE", "PHY_STATE",
+                    "DRIVER_TOTAL", "NBR_POWER_UNIT", "MCS150_MILEAGE")]
+
+  LEGAL_NAME     MCS150_DATE PHY_STATE DRIVER_TOTAL NBR_POWER_UNIT MCS150_MILEAGE
+ALL RESTORED INC   17-DEC-15        DE       299998              1        0
+507 TRUCKING INC.  18-DEC-15        CA       299971         599941        0
+```
+<img src="images/Outlier1.png"  STYLE="position:absolute; TOP:550px; LEFT:50px; width="350" height="150">
+
+````{r, eval = FALSE, font_adjustmen = -10}
+> fleet_data[fleet_data$NBR_POWER_UNIT == 599941,
+           c("DOT_NUMBER", "LEGAL_NAME", "EMAIL_ADDRESS", "PHY_ZIP")]
+           
+        DOT_NUMBER        LEGAL_NAME             EMAIL_ADDRESS PHY_ZIP
+1255558    2833526 507 TRUCKING INC. LAURASPERMITS@HOTMAIL.COM   92879
+```
+
+## Trucker and Truck Population by States
+````{r, eval = FALSE, font_adjustmen = -10}
+STATE_UNITS = 
+  state_choropleth(
+   by_state_only, 
+   title = "Vehicle Population", 
+   legend = "Vehicles", 
+   num_colors = 1, 
+   zoom = NULL)
+```
+<img src="images/StatePopulation.png"  STYLE="position:absolute; TOP:150px; LEFT:400px; width="250" height="250">
+<img src="images/TruckerPopulation.png"  STYLE="position:absolute; TOP:400px; LEFT:400px; width="250" height="250">
+<img src="images/VehiclePopulation.png"  STYLE="position:absolute; TOP:400px; LEFT:40px; width="250" height="250">
+
+## Top Trucking States
+
+<img src="images/DriversStates.png"  STYLE="position:absolute; TOP:100px; LEFT:100px; width="300" height="300">
+
+<img src="images/VehiclesStates.png"  STYLE="position:absolute; TOP:400px; LEFT:100px; width="300" height="300">
+
+  
+
+
+## Trucker Population by Zipcode
+
+<img src="images/CAByZip.png"  STYLE="position:absolute; TOP:120px; LEFT:350px; width="400" height="500">
+
+ZipChoropleth
+<br>
+does not produce country wide 
+<br>
+by zipcode map
+
+## Fleet Types and Truckers & Trucks
+
+<img src="images/FleetVehicleByType.png"  STYLE="position:absolute; TOP:120px; LEFT:50px; width="400" height="500">
+
+<img src="images/DriverFleetByType.png"  STYLE="position:absolute; TOP:120px; LEFT:450px; width="400" height="500">
+
+## Trucker to Truck Relationship
+````{r, eval = FALSE}
+fleets_try = subset(
+  fleets, (NBR_POWER_UNIT < 2000) & 
+    (DRIVER_TOTAL < 1000))
+driver_unit_plot = ggplot(
+  fleets_try, aes(NBR_POWER_UNIT, 
+                  DRIVER_TOTAL )) +
+  geom_point(
+    aes(color=CARRIER_OPERATION)) +
+  xlab("Number of Units") + 
+  ylab("Number of Drivers") +
+ggtitle("Number of Drivers to Units relationship") 
+```
+
+<img src="images/DriversToUnitSubset.png"  STYLE="position:absolute; TOP:120px; LEFT:500px; width="550" height="550">
+
+## Next Steps
+
+- Analysis of inspection done: Issues with data coding
+
+- Relationship between fleets and inspections done
+
+- 
