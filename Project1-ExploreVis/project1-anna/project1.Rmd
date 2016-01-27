@@ -145,7 +145,7 @@ dat2 = data.table(x=totaluk$Year, y=totaluk$totalp, group = totaluk$Age)
 dat2[,list(intercept = coef(lm(y~x))[1], coef = coef(lm(y~x))[2]), by=group]
 ```
 
-A quick check shows that slopes of the age groups between 16 and 44 have p-values which are too small for statistical significance, but a surprising result is the 5% average annual increase in users for those aged 65-74, and the 4% average annual increase in those over 75. Evidently it is those around the retirement age who are most rapidly beginning to access the internet. 
+A quick check shows that slopes of the age groups between 16 and 44 have p-values which are too large for statistical significance, but a surprising result is the 5% average annual increase in users for those aged 65-74, and the 4% average annual increase in those over 75. Evidently it is those around the retirement age who are most rapidly beginning to access the internet. 
 
 
  
