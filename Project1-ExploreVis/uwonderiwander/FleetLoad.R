@@ -196,7 +196,7 @@ fleet_unit_plot
 #failed to produce plot because of the machine size and resources, need to use R server
 #fleets_outlier = subset(fleets, (NBR_POWER_UNIT > 200000) | (DRIVER_TOTAL > 100000))
 #fleets_subset = subset(fleets, (NBR_POWER_UNIT < 200000) & (DRIVER_TOTAL < 100000))
-fleets_outlier[,c("LEGAL_NAME", "PHY_STATE","DRIVER_TOTAL", "NBR_POWER_UNIT")]
+fleets_outlier[,c("LEGAL_NAME", "MCS150_DATE", "PHY_STATE","DRIVER_TOTAL", "NBR_POWER_UNIT", "MCS150_MILEAGE")]
 
 fleets_try = subset(fleets, (NBR_POWER_UNIT < 2000) & (DRIVER_TOTAL < 1000))
 driver_unit_plot = ggplot(fleets_try, aes(NBR_POWER_UNIT, DRIVER_TOTAL )) +
@@ -230,5 +230,5 @@ summary(fleet_data$NBR_POWER_UNIT)
 summary(fleet_data$DRIVER_TOTAL)
 summary(fleet_data$MCS150_MILEAGE)
 
-fleet_data[fleet_data$NBR_POWER_UNIT == 599941,c("DOT_NUMBER", "LEGAL_NAME", "EMAIL_ADDRESS", "PHY_ZIP")]
+fleet_data[fleet_data$NBR_POWER_UNIT == 599941,c("MCS150_DATE", "LEGAL_NAME", "EMAIL_ADDRESS", "PHY_ZIP")]
 

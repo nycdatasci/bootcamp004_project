@@ -3,10 +3,10 @@ title: "Trucking Census"
 author: "Satish"
 date: "January 27, 2016"
 output:
+  beamer_presentation: default
   ioslides_presentation:
     css: assets/css/ioslides.css
     logo: assets/img/logo.png
-  beamer_presentation: default
 ---
 # Trucking
 
@@ -53,9 +53,9 @@ output:
 ## Data by CD-ROM in 4-6 Weeks
 
 State of affairs has not changed: same process in 2005, 2008, and 2010
-<img src="images/Letter.JPG"  STYLE="position:absolute; TOP:200px; LEFT:500px;  width="300" height="300">
+<img src="images/Letter.JPG"  STYLE="position:absolute; TOP:250px; LEFT:500px;  width="300" height="300">
 
-<img src="images/FMCSAForm.JPG"  STYLE="position:absolute; TOP:200px; LEFT:100px;  width="400" height="400">
+<img src="images/FMCSAForm.JPG"  STYLE="position:absolute; TOP:250px; LEFT:100px;  width="400" height="400">
 
 ## Census Data Summary
 
@@ -161,4 +161,6 @@ ggtitle("Number of Drivers to Units relationship")
 
 - Relationship between fleets and inspections done
 
-- 
+- Mileage driven and number of drivers & trucks
+
+- Marrying with the census data for Trucking Nation
