@@ -12,10 +12,11 @@ output:
 #### Target institution is mostly bank..
 #### The complaints are about fincial services like credit card, morgage, loan and so on
 ####Complain example
-##### [9817] Taking/threatening an illegal action     Incorrect information on credit report  
-##### [9819] Account opening, closing, or management  False statements or representation      
-##### [9821] Cont'd attempts collect debt not owed    Communication tactics                   
-##### [9823] Settlement process and costs             Loan modification,collection,foreclosure
+##### [9817] Taking/_threatening_ an illegal action/////Incorrect information on credit report  
+##### [9819] Account opening, closing, or management/////_False statements or representation_      
+##### [9821] Cont'd attempts collect debt not owed/////Communication tactics                   
+##### [9823] Settlement process and costs/////Loan modification,collection,foreclosure
+##### [9661] _Fraud or scam_/////Application, originator, mortgage broker
 
 ## Data structure and sorce
 ### It is downloaded government web site  https://catalog.data.gov/dataset/consumer-complaint-database.
