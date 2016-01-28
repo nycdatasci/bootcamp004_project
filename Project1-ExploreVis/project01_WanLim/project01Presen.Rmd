@@ -1,11 +1,10 @@
 ---
-title: "Project01Wan"
+title: "Untitled"
 author: "Wan"
-date: "January 22, 2016"
-output: 
-  html_document: 
-    toc: yes
+date: "January 28, 2016"
+output: ioslides_presentation
 ---
+
 # Data analysis of Comsumer complaints about financial products and services.
 
 ## Content
@@ -31,13 +30,14 @@ Consumer_Complaints$month <- substr(Consumer_Complaints$Date.received, 1, 2)
 library(dplyr)
 ```
 
-### Table 1. First 5 rows of raw data
+
+## Table 1. First 5 rows of raw data
 ```{r 001_1_table}
-Consumer_Complaints[1:5,]
+Consumer_Complaints[1:2,]
 ```
 the data format looks like "03/11/2015"
 
-### Table 2. Consumer complaints data group by Year.
+## Table 2. Consumer complaints data group by Year.
 ```{r 002}
 
 dateData <- select(Consumer_Complaints, year, month)
@@ -48,7 +48,7 @@ The complaints report increase from 2012 to 2015.
 2011 has only Decomber.
 So I checked by month nested in year.
 
-### Table 3. Information of regression (Total number vs Time)
+## Table 3. Information of regression (Total number vs Time)
 ```{r 003}
 ByYearMonth <- group_by(dateData, year, month) %>% summarise(., total = n())
 ByYearMonth$seq <- c(1:nrow(ByYearMonth))
@@ -58,7 +58,7 @@ summary(regre)
 plot(total ~ seq, data = ByYearMonth, ylab = "Number of reports", xlab = "Time series  by month from 2011/12 ~ 2015/11")
 abline(regre)
 ```
-### Figure 1. The total complaints number is regressed against time.
+## Figure 1. The total complaints number is regressed against time.
 
 ###Table 4. Total percentage of consumer complaints by total 3,441 companies
 ```{r 004}

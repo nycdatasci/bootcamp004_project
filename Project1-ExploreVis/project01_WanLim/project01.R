@@ -1,55 +1,15 @@
----
-title: "Project01Wan"
-author: "Wan"
-date: "January 22, 2016"
-output: 
-  html_document: 
-    toc: yes
----
-# Data analysis of Comsumer complaints about financial products and services.
 
-## Content
-#### Target institution is mostly bank..
-#### The complaints are about fincial services like credit card, morgage, loan and so on
-####Complain example
-##### [9817] Taking/threatening an illegal action     Incorrect information on credit report  
-##### [9819] Account opening, closing, or management  False statements or representation      
-##### [9821] Cont'd attempts collect debt not owed    Communication tactics                   
-##### [9823] Settlement process and costs             Loan modification,collection,foreclosure
-
-## Data structure and sorce
-### It is downloaded government web site  https://catalog.data.gov/dataset/consumer-complaint-database.
-### Number of row : 498,211
-### Number of column : 19
-
-```{r 001_loading_data, results="hide"}
 Consumer_Complaints <- read.csv("/media/wan/64GB/R_CLASS/R_Project_Data/Consumer_Complaints.csv", stringsAsFactors=FALSE)
 
 #separate into Year and Month
 Consumer_Complaints$year <- substr(Consumer_Complaints$Date.received, 7, 10)
 Consumer_Complaints$month <- substr(Consumer_Complaints$Date.received, 1, 2)
+
+#For By month and year
 library(dplyr)
-```
-
-### Table 1. First 5 rows of raw data
-```{r 001_1_table}
-Consumer_Complaints[1:5,]
-```
-the data format looks like "03/11/2015"
-
-### Table 2. Consumer complaints data group by Year.
-```{r 002}
-
 dateData <- select(Consumer_Complaints, year, month)
-groupByYear <- group_by(dateData, year) %>% summarise(., yearNum = n())
-groupByYear
-```
-The complaints report increase from 2012 to 2015.
-2011 has only Decomber.
-So I checked by month nested in year.
-
-### Table 3. Information of regression (Total number vs Time)
-```{r 003}
+View(dateData)
+groupByYear <- group_by(dateData, year) %>% summarise(., total = n())
 ByYearMonth <- group_by(dateData, year, month) %>% summarise(., total = n())
 ByYearMonth$seq <- c(1:nrow(ByYearMonth))
 
@@ -57,58 +17,50 @@ regre <- lm(total ~ seq, data=ByYearMonth)
 summary(regre)
 plot(total ~ seq, data = ByYearMonth, ylab = "Number of reports", xlab = "Time series  by month from 2011/12 ~ 2015/11")
 abline(regre)
-```
-### Figure 1. The total complaints number is regressed against time.
 
-###Table 4. Total percentage of consumer complaints by total 3,441 companies
-```{r 004}
 #top10 company
 Consumer_complainYearMonth <- read.csv("/media/wan/64GB/Documents/DataScience/porject/porject01/Consumer_complainYearMonth.csv")
 companyRank <- group_by(Consumer_complainYearMonth, Company) %>% summarise(., total = n()) %>% arrange(., desc(total) )
-
 companyRank$percentage <- companyRank$total/nrow(Consumer_complainYearMonth)*100
 companyRank$SumOfPercent[1] <- 10.6135
 for(i in 2: nrow(companyRank)) {
 	companyRank$SumOfPercent[i] <- companyRank$SumOfPercent[i-1] +companyRank$percentage[i]	
 }
-print(companyRank, n=50)
+companyRank
+
 
 top10Company <- companyRank[1:10,]
 top10Company$Company <- factor(top10Company$Company, levels = top10Company$Company)
 top10Company$percentage <- top10Company$total/nrow(Consumer_complainYearMonth)*100
 
-top20Company <- companyRank[1:20,]
-top20Company$Company <- factor(top20Company$Company, levels = top20Company$Company)
-top20Company$percentage <- top20Company$total/nrow(Consumer_complainYearMonth)*100
-
 library(ggplot2)
-barCompany <- ggplot(top20Company, aes(x=Company, y=percentage)) + geom_bar(stat="identity")
-barCompany + theme(axis.text.x = element_text(angle = 45, hjust = 1))  + ylab("%")
-```
+barCompany <- ggplot(top10Company, aes(x=Company, y=percentage)) + geom_bar(stat="identity")
+barCompany + theme(axis.text.x = element_text(angle = 90, hjust = 1))  + ylab("%")
 
-``` {r 005_By_Porduct}
+
+#Sort by Porduct
+
 byProduct <- group_by(Consumer_complainYearMonth, Product) %>% summarise(., total= n() ) %>% arrange(., desc(total))
-byProduct$Product <- factor(byProduct$Product, levels = byProduct$Product)
 
+	# barGraph
+byProduct$Product <- factor(byProduct$Product, levels = byProduct$Product)
 byProduct$Percentage <- byProduct$total/nrow(Consumer_complainYearMonth)*100
 barPro <- ggplot(byProduct, aes(x=Product, y=Percentage)) + geom_bar(stat="identity")
 barPro + theme(axis.text.x = element_text(angle = 90, hjust = 1), panel.background = element_blank()) + ylab("%")
 
-```
 
-```{r 006_ByCompanyProduct}
+#ByTop10CompanyGroup
 CcTop10Company <- filter(Consumer_complainYearMonth, Company %in% top10Company$Company)
 CcTop10Company$Company <- factor(CcTop10Company$Company, levels = top10Company$Company)
 byCompanyProduct <- group_by(CcTop10Company, Company, Product) 
 byCompanyProductTotal <- summarise(byCompanyProduct, total = n())
 byCompanyProductArrange <- arrange(byCompanyProductTotal, desc(total))
 
-library(ggplot2)
 library(lattice)
 groupXYplot <- xyplot(byCompanyProductArrange$total ~ byCompanyProductArrange$Product | byCompanyProductArrange$Company, data=byCompanyProductArrange, xlab = list(label = "Product", cex=1), scales=list(x=list(rot=45)), groups = Product)
 groupXYplot
-```
-```{r 007_ByState}
+
+#By State
 onlyState <- select(Consumer_complainYearMonth, State)
 byState <- group_by(onlyState, State) %>% summarise(., total = n())
 byState <- byState[-1,]
@@ -145,9 +97,8 @@ p <- p + geom_polygon(data=Total, aes(x=long, y=lat, group = group, fill=Total$t
 p1 <- p + theme_bw()  + labs(fill = "Total Reports" 
                             ,title = "Total Reports by State", x="", y="")
 p1 + scale_y_continuous(breaks=c()) + scale_x_continuous(breaks=c()) + theme(panel.border = element_blank())
-```
 
-```{r 008_ByMediaYearMonth}
+#via group by year month
 byMediaYearMonth <- group_by(Consumer_complainYearMonth, year, month, Submitted.via) %>% summarise(., total = n())
 byMediaYearMonth <- arrange(byMediaYearMonth, total)
 
@@ -160,10 +111,12 @@ for (i in 1: nrow(byMediaYearMonth)) {
 
 byMediaYearMonth$yymm <- paste(byMediaYearMonth$year, byMediaYearMonth$month, sep = "/")
 byMediaYearMonth <- filter(byMediaYearMonth, yymm != "2015/12")
-
+	
+	#graph
 graph <- qplot(yymm, total, data = byMediaYearMonth, color = Submitted.via)
 graph45 <- graph +  theme(axis.text.x = element_text(angle = 45,size = 14, hjust = 1), panel.background = element_blank())
 
+		#ticks interval 5
 yymm <- byMediaYearMonth$yymm
 yymm <- unique(yymm)
 YearMonth <- data.frame(yymm, stringsAsFactors=FALSE)
@@ -181,8 +134,4 @@ for (i in 1: lastRow) {
 }
 
 graph45five <- graph45 + scale_x_discrete(breaks = ticks5,labels =ticks5)
-graph45five+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-
-```
+graph45five + theme(axis.text.x = element_text(angle = 45, hjust = 1))
