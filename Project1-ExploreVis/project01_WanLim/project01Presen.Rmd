@@ -61,7 +61,7 @@ abline(regre)
 ## Figure 1. The total complaints number is regressed against time.
 
 ###Table 4. Total percentage of consumer complaints by total 3,441 companies
-```{r 004}
+```{r 004 , echo=FALSE}
 #top10 company
 Consumer_complainYearMonth <- read.csv("/media/wan/64GB/Documents/DataScience/porject/porject01/Consumer_complainYearMonth.csv")
 companyRank <- group_by(Consumer_complainYearMonth, Company) %>% summarise(., total = n()) %>% arrange(., desc(total) )
