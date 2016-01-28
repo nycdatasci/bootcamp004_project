@@ -40,12 +40,15 @@ h3 {
 
 From the US Department of Labor’s Office of  [Foreign Labor Certification](http://www.foreignlaborcert.doleta.gov/performancedata.cfm). 
 
->- Most of the applications are in 2014 and 2015.
+Most of the applications are in 2014 and 2015.
+
+The analysis is also useful for native workers.
+
 <center><img src="images/dataset.png"
-	height="350px"/></center>
+	height="275px"/></center>
   
 ```{r import data,include=FALSE, cache=FALSE}
-#setwd("~/Documents/R /Data Bootcamp/Project 1")
+setwd("~/Documents/R /Data Bootcamp/Project 1")
 library(openxlsx)
 library(dplyr)
 library(ggplot2)
@@ -63,8 +66,8 @@ salary=tbl_df(salary)
 
 # Do data scientists have higher or lower salaries than others?
 ## Data scientists have higher median wage |than other data related jobs
+- Using median instead of average wage, because the distribution is spread out
 - Median Salary Per Year: **$108,021.04**
-- Using median instead of average wage, because of large standard deviations
 
 ```{r job_salary,echo=FALSE,fig.width=10, fig.height=4}
 subdata3<-group_by(salary,JOB_TITLE_SUBGROUP) %>%
@@ -83,8 +86,10 @@ ggplot(subdata3,aes(reorder(JOB_TITLE_SUBGROUP,-med.salary),med.salary,fill=JOB_
 ```
 
 # Do salaries change based on visa type?
-## Green-Card Holders make more.| An interesting assumtion
->-"H-1B1 Chile"" and "H-1B1 Singapore" don't enough observations
+## Green-Card Holders make more| An interesting assumtion
+
+>- "H-1B1 Chile"" and "H-1B1 Singapore" don't enough observations
+
 ```{r visa,echo=FALSE,fig.width=10, fig.height=4}
 s_ds<-salary[salary$JOB_TITLE_SUBGROUP=="data scientist",]
 visa<-group_by(s_ds,VISA_CLASS) %>%
@@ -133,7 +138,7 @@ ggplot(edu_ds,aes(reorder(EDUCATION_LEVEL_REQUIRED,-Med_Sa),Med_Sa,fill=EDUCATIO
 ```
 
 # Do salaries change by location?
-## Pay Difference by Location | Using the Number of Applications
+## Pay Difference by State | Using the Number of Applications
 
 ```{r nj_state,echo= FALSE,include=FALSE,include=FALSE}
 s_ds<-salary[salary$JOB_TITLE_SUBGROUP=="data scientist",]
@@ -148,18 +153,18 @@ negeo<- gvisGeoChart(state_ds[,1:2], "WORK_STATE", "Count",
                                   resolution="provinces",
                                   colorAxis="{colors: ['white', 'blue']}"))
 nebar<-gvisBarChart(state_ds[c(1:5),1:2], "WORK_STATE", "Count",                 
-                    options=list( width=300, height=250,
+                    options=list( width=400, height=250,
                     legend="none"))
 state_nm<-gvisMerge(negeo,nebar, horizontal=TRUE,tableOptions="cellspacing=5")
 ```
 
-```{r nj_state_plot, echo= FALSE,results='asis',fig.width=6, fig.height=4,out.extra='style="float:left"'}
+```{r nj_state_plot, echo= FALSE,results='asis',fig.width=11, fig.height=4,out.extra='style="float:left"'}
 
 plot(state_nm,"chart")
 ```
 
 
-## Pay Difference by Location | Using Median Wage
+## Pay Difference by State | Using Median Wage
 ```{r rs_state,echo= FALSE,include=FALSE}
 sgeo <- gvisGeoChart(state_ds[,c(1,3)], "WORK_STATE", "Med_Sa", 
                      options=list(region="US", 
@@ -167,12 +172,12 @@ sgeo <- gvisGeoChart(state_ds[,c(1,3)], "WORK_STATE", "Med_Sa",
                                   resolution="provinces",
                                   colorAxis="{colors: ['white', 'green']}"))
 
-sbar<-gvisBarChart(state_ds[c(1:5),], "WORK_STATE","Med_Sa",              options=list(width=300, height=250,legend='none'))
+sbar<-gvisBarChart(state_ds[c(1:5),], "WORK_STATE","Med_Sa",              options=list(width=400, height=250,legend='none'))
 
 state_ms1<-gvisMerge(sgeo,sbar, horizontal=TRUE,tableOptions="cellspacing=5")
 ```
 
-```{r rs_state_plot, echo= FALSE,results='asis',fig.width=6, fig.height=4,out.extra='style="float:left"'}
+```{r rs_state_plot, echo= FALSE,results='asis',fig.width=11, fig.height=4,out.extra='style="float:left"'}
 
 plot(state_ms1,"chart")
 ```
@@ -180,14 +185,15 @@ plot(state_ms1,"chart")
 # What if we consider about cost of living? 
 ## Adjusted Salary for Cost of Living |By Blending Price Parity with Median Wage data
 
-[Regional Price Parities(2013)](http://www.bea.gov/newsreleases/regional/rpp/rpp_newsrelease.htm)
+U.S. Bureau of Economic Analysis (BEA)[Regional Price Parities(2013)](http://www.bea.gov/newsreleases/regional/rpp/rpp_newsrelease.htm)
 
-Adujusted Median Salary = (Median Salary/Price.Parity)*100
+National Average cost of goods & services = 100
 
 <center><img src="images/pp.png"
 	height="365px"/></center>
 
-## Pay Difference by Location | Using Adjusted Median Wage
+## Pay Difference by State | Using Adjusted Median Wage
+- Adjusted Median Salary = (Median Salary/Price.Parity)*100
 
 ```{r as_state,echo= FALSE,include=FALSE}
 
@@ -203,12 +209,12 @@ adj_sgeo<- gvisGeoChart(adj_state_ds[,c(1,5)], "WORK_STATE", "adj.Med_Sa",
                                      colorAxis="{colors: ['white', 'green']}"))
 
 adj_sbar<-gvisBarChart(adj_state_ds[c(1:5),c(1,5)], "WORK_STATE","adj.Med_Sa",                  
-                       options=list(width=300, height=250,legend='none'))
+                       options=list(width=400, height=250,legend='none'))
 
 state_ms<-gvisMerge(adj_sgeo,adj_sbar, horizontal=TRUE,tableOptions="cellspacing=5")
 ```
 
-```{r as_state_plot, echo= FALSE,results='asis',fig.width=6, fig.height=4,out.extra='style="float:left"'}
+```{r as_state_plot, echo= FALSE,results='asis',fig.width=11, fig.height=4,out.extra='style="float:left"'}
 
 plot(state_ms,"chart")
 ```
@@ -216,7 +222,7 @@ plot(state_ms,"chart")
 # Who pays better? Who hires more?
 ## Large global companies hired more data scientist 
 >- No location limitation
->- Size = Count, Color= Median Salary, Max Color= Blue
+>- Size = Num of Jobs, Color= Median Salary, Max Color= Blue
 
 ```{r nj_cmp,echo= FALSE,include=FALSE}
 comp_ds<-salary[salary$JOB_TITLE_SUBGROUP=="data scientist",]
@@ -250,8 +256,8 @@ plot(Tree,"chart")
 ```
 
 ## Startups pay higher median salaries.
->- Break down by states (top 5 states according to the num. of Applications)
->- Size = Count, Color= Median Salary, Max Color= Blue 
+>- Break down by states (top 5 states according to the num. of applications)
+>- Size = Num of Jobs, Color= Median Salary, Max Color= Blue 
 
 ```{r ms_cmp,echo= FALSE,include=FALSE}
 tm_ds<-salary[salary$JOB_TITLE_SUBGROUP=="data scientist",]
