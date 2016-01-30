@@ -48,7 +48,7 @@ totals = filter(temp, Age == "Total")
 - Location
 
 Sample size is 333,000 people in the UK, 27,000 in London, over 33 boroughs from 2011-2015. 
-If for a certain age range, internet usage depends categorically on income and age, a density map of users should give a good indication of the higher income areas.  
+If for a certain age range, internet usage depends categorically on income, a density map of users should give a rough indication of the higher income areas.  
 
 Limitations: small time frame
   

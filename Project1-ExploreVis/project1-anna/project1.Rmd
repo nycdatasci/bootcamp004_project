@@ -145,7 +145,7 @@ dat2 = data.table(x=totaluk$Year, y=totaluk$totalp, group = totaluk$Age)
 dat2[,list(intercept = coef(lm(y~x))[1], coef = coef(lm(y~x))[2]), by=group]
 ```
 
-A quick check shows that slopes of the age groups between 16 and 44 have p-values which are too small for statistical significance, but a surprising result is the 5% average annual increase in users for those aged 65-74, and the 4% average annual increase in those over 75. Evidently it is those around the retirement age who are most rapidly beginning to access the internet. 
+A quick check shows that slopes of the age groups between 16 and 44 have p-values which are too large for statistical significance, but a surprising result is the 5% average annual increase in users for those aged 65-74, and the 4% average annual increase in those over 75. Evidently it is those around the retirement age who are most rapidly beginning to access the internet. 
 
 
  
@@ -293,6 +293,6 @@ leaflet(london) %>%
  
 
 ```
-As expected, lower density population areas exhibit the lowest numbers, although the previous map shows that central areas such as Westminster have the highest density of users. From the resulting map we clearly see that Westminster, Newham and Ealing have the densest internet access, while Richmond upon Thames has the highest actual number of internet users. Since Westminster is the center of London it should have the highest percentage, given that it would have the densest internet infrastructure, but surprisingly it is surrounded by areas with relatively lower use. Combining with the economic data in previous graphs, this implies that Westminster is the highest income borough, while the neighboring areas of Wandsworth and Southwark have higher levels of unemployment and low income households. 
+As expected, lower density population areas exhibit the lowest numbers, although the previous map shows that central areas such as Westminster have the highest density of users. From the resulting map we clearly see that Westminster, Newham and Ealing have the densest internet access, while Richmond upon Thames has the highest actual number of internet users. Since Westminster is the center of London it should have the highest percentage, given that it would have the densest infrastructure and highest mean salary, but surprisingly it is surrounded by areas with relatively lower use. Combining with the economic data in previous graphs, since everyone above the median income threshold has used internet, this implies that Westminster is the highest income borough, while the neighboring areas of Wandsworth and Southwark have higher levels of unemployment and low income households. 
 
 

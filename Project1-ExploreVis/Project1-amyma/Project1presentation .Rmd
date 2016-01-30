@@ -1,0 +1,311 @@
+---
+title: "How Much Do Data Scientists Make? "
+author: Amy Ma
+date: 2016-01-25
+output:
+  ioslides_presentation:
+    widescreen: true
+    incremental: true
+---
+
+<style>
+body{
+  font-family: Helvetica;
+  font-size: 6.5pt;
+}
+h4,h5,h6{
+  font-size: 7pt;
+}
+</style>
+
+<style>
+h2 { 
+ color: #3399ff;		
+}
+h3 { 
+ color: #3399ff;		
+}
+</style>
+
+
+## Introduction
+<center><img src="images/introduction.png"
+	height="400px"/></center>
+
+>-National Avg Salary
+
+>-Glassdoor:$118,709;  Indeed.com: $123,000
+
+## Dataset Description|Foreign Labor Certification Performance Data
+
+From the US Department of Labor’s Office of  [Foreign Labor Certification](http://www.foreignlaborcert.doleta.gov/performancedata.cfm). 
+
+Most of the applications are in 2014 and 2015.
+
+The analysis is also useful for native workers.
+
+<center><img src="images/dataset.png"
+	height="275px"/></center>
+  
+```{r import data,include=FALSE, cache=FALSE}
+setwd("~/Documents/R /Data Bootcamp/Project 1")
+library(openxlsx)
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(googleVis)
+library(scales)
+salary=read.xlsx("salary.xlsx",sheet = 1)
+pp<-read.xlsx("price_parity.xlsx",sheet=1)
+salary$PAID_WAGE_PER_YEAR<-as.numeric(salary$PAID_WAGE_PER_YEAR)
+salary$CASE_RECEIVED_DATE<-as.Date(salary$CASE_RECEIVED_DATE,'%m/%d/%Y')
+salary$CASE_RECEIVED_Year<-format(salary$CASE_RECEIVED_DATE,"%Y")
+salary=tbl_df(salary)
+
+```
+
+# Do data scientists have higher or lower salaries than others?
+## Data scientists have higher median wage |than other data related jobs
+- Using median instead of average wage, because the distribution is spread out
+- Median Salary Per Year: **$108,021.04**
+
+```{r job_salary,echo=FALSE,fig.width=10, fig.height=4}
+subdata3<-group_by(salary,JOB_TITLE_SUBGROUP) %>%
+  summarise(med.salary = median(as.numeric(PAID_WAGE_PER_YEAR),na.rm=TRUE))%>%
+  arrange(med.salary)
+subdata3$JOB_TITLE_SUBGROUP<-gsub("management consultant",
+                                  "mgmt consultant",subdata3$JOB_TITLE_SUBGROUP)
+ggplot(subdata3,aes(reorder(JOB_TITLE_SUBGROUP,-med.salary),med.salary,fill=JOB_TITLE_SUBGROUP=="data scientist"))+
+  theme(text = element_text(family = "Trebuchet MS", color="#666666", face="bold", size=32),
+        axis.text.x = element_text(angle=20, vjust=1))+ 
+  theme_hc()+
+  scale_fill_manual(values = c("grey","blue"),guide=FALSE)+
+  scale_y_continuous(limits=c(0,150000),labels = scales::dollar)+
+  geom_bar(stat="identity",position='dodge',width=0.6)+
+  labs(x="Job Title Subgroup", y="Median Salary")
+```
+
+# Do salaries change based on visa type?
+## Green-Card Holders make more| An interesting assumtion
+
+>- "H-1B1 Chile"" and "H-1B1 Singapore" don't enough observations
+
+```{r visa,echo=FALSE,fig.width=10, fig.height=4}
+s_ds<-salary[salary$JOB_TITLE_SUBGROUP=="data scientist",]
+visa<-group_by(s_ds,VISA_CLASS) %>%
+  summarise(med.salary = median(as.numeric(PAID_WAGE_PER_YEAR),na.rm=TRUE),count=n())%>%
+  arrange(med.salary)
+ggplot(visa,aes(reorder(VISA_CLASS,-med.salary),med.salary,fill=VISA_CLASS %in% c("H-1B","greencard")))+
+  theme_hc()+ 
+  scale_fill_manual(values = c("grey","blue"),guide=FALSE)+
+  ylim(0,155000)+
+  geom_bar(stat="identity",position='dodge',width=0.6)+
+  labs(x="VISA Type", y="Median Salary")
+```
+
+# Do salaries change based on education and related experience?
+## Higher Education + More Experience = Higher Salary
+>- People have plentiful past experience earn more than others (8.53%)
+>- Those with doctorate degrees earn vastly more than counterparts with some master degree (10.7%) 
+
+```{r experience, echo=FALSE,fig.width=4.5, fig.height=3.5,out.extra='style="float:left"'}
+s_ds<-salary[salary$JOB_TITLE_SUBGROUP=="data scientist",]
+exp_ds<-s_ds %>% 
+  group_by(EXPERIENCE_REQUIRED_Y_N) %>%
+  summarise(Count=n(),Med_Sa=median(as.numeric(PAID_WAGE_PER_YEAR)))
+exp_ds[,1]<-c("No","Yes","Missing")
+
+ggplot(exp_ds,aes(reorder(EXPERIENCE_REQUIRED_Y_N,-Med_Sa),Med_Sa,fill=EXPERIENCE_REQUIRED_Y_N))+
+  theme_hc()+ 
+  scale_y_continuous(limits=c(0,130000),labels = scales::dollar)+
+  scale_fill_economist(guide=FALSE)+
+  geom_bar(stat="identity",position='dodge',width=0.5)+
+  labs(x="Experience Required?", y="Median Salary")
+```
+
+```{r eduaction, echo=FALSE,fig.width=4.5, fig.height=3.5,out.extra='style="float:left"'}
+edu_ds<-s_ds %>% 
+  group_by(EDUCATION_LEVEL_REQUIRED) %>%
+  summarise(Count=n(),Med_Sa=median(as.numeric(PAID_WAGE_PER_YEAR)))
+edu_ds[4,1]<-c("Missing")
+
+ggplot(edu_ds,aes(reorder(EDUCATION_LEVEL_REQUIRED,-Med_Sa),Med_Sa,fill=EDUCATION_LEVEL_REQUIRED))+
+  theme_hc()+ 
+  scale_fill_economist(guide=FALSE)+
+  geom_bar(stat="identity",position='dodge',width=0.5)+
+  scale_y_continuous(limits=c(0,130000),labels = scales::dollar)+
+  labs(x="Education Requirement", y="Median Salary")
+```
+
+# Do salaries change by location?
+## Pay Difference by State | Using the Number of Applications
+
+```{r nj_state,echo= FALSE,include=FALSE,include=FALSE}
+s_ds<-salary[salary$JOB_TITLE_SUBGROUP=="data scientist",]
+
+state_ds<-s_ds %>% 
+  group_by(WORK_STATE) %>%
+  summarise(Count=n(),Med_Sa=median(as.numeric(PAID_WAGE_PER_YEAR))) %>%
+  arrange(desc(Count))
+negeo<- gvisGeoChart(state_ds[,1:2], "WORK_STATE", "Count", 
+                     options=list(region="US", 
+                                  displayMode="regions", 
+                                  resolution="provinces",
+                                  colorAxis="{colors: ['white', 'blue']}"))
+nebar<-gvisBarChart(state_ds[c(1:5),1:2], "WORK_STATE", "Count",                 
+                    options=list( width=400, height=250,
+                    legend="none"))
+state_nm<-gvisMerge(negeo,nebar, horizontal=TRUE,tableOptions="cellspacing=5")
+```
+
+```{r nj_state_plot, echo= FALSE,results='asis',fig.width=11, fig.height=4,out.extra='style="float:left"'}
+
+plot(state_nm,"chart")
+```
+
+
+## Pay Difference by State | Using Median Wage
+```{r rs_state,echo= FALSE,include=FALSE}
+sgeo <- gvisGeoChart(state_ds[,c(1,3)], "WORK_STATE", "Med_Sa", 
+                     options=list(region="US", 
+                                  displayMode="regions", 
+                                  resolution="provinces",
+                                  colorAxis="{colors: ['white', 'green']}"))
+
+sbar<-gvisBarChart(state_ds[c(1:5),], "WORK_STATE","Med_Sa",              options=list(width=400, height=250,legend='none'))
+
+state_ms1<-gvisMerge(sgeo,sbar, horizontal=TRUE,tableOptions="cellspacing=5")
+```
+
+```{r rs_state_plot, echo= FALSE,results='asis',fig.width=11, fig.height=4,out.extra='style="float:left"'}
+
+plot(state_ms1,"chart")
+```
+
+# What if we consider about cost of living? 
+## Adjusted Salary for Cost of Living |By Blending Price Parity with Median Wage data
+
+U.S. Bureau of Economic Analysis (BEA)[Regional Price Parities(2013)](http://www.bea.gov/newsreleases/regional/rpp/rpp_newsrelease.htm)
+
+National Average cost of goods & services = 100
+
+<center><img src="images/pp.png"
+	height="365px"/></center>
+
+## Pay Difference by State | Using Adjusted Median Wage
+- Adjusted Median Salary = (Median Salary/Price.Parity)*100
+
+```{r as_state,echo= FALSE,include=FALSE}
+
+pp<-arrange(pp,State)
+
+adj_state_ds<-left_join(state_ds,pp,by=c("WORK_STATE"="State"))
+adj_state_ds<-mutate(adj_state_ds,adj.Med_Sa=round(Med_Sa/Price.Parity*100)) %>%
+  arrange(desc(adj.Med_Sa))
+adj_sgeo<- gvisGeoChart(adj_state_ds[,c(1,5)], "WORK_STATE", "adj.Med_Sa", 
+                        options=list(region="US", 
+                                     displayMode="regions", 
+                                     resolution="provinces",
+                                     colorAxis="{colors: ['white', 'green']}"))
+
+adj_sbar<-gvisBarChart(adj_state_ds[c(1:5),c(1,5)], "WORK_STATE","adj.Med_Sa",                  
+                       options=list(width=400, height=250,legend='none'))
+
+state_ms<-gvisMerge(adj_sgeo,adj_sbar, horizontal=TRUE,tableOptions="cellspacing=5")
+```
+
+```{r as_state_plot, echo= FALSE,results='asis',fig.width=11, fig.height=4,out.extra='style="float:left"'}
+
+plot(state_ms,"chart")
+```
+
+# Who pays better? Who hires more?
+## Large global companies hired more data scientist 
+>- No location limitation
+>- Size = Num of Jobs, Color= Median Salary, Max Color= Blue
+
+```{r nj_cmp,echo= FALSE,include=FALSE}
+comp_ds<-salary[salary$JOB_TITLE_SUBGROUP=="data scientist",]
+comp_ds<-comp_ds%>%
+  select(EMPLOYER_NAME,as.numeric(PAID_WAGE_PER_YEAR))%>%
+  group_by(EMPLOYER_NAME) %>%
+  mutate(Count=n(),Med_Sa=median(as.numeric(PAID_WAGE_PER_YEAR)))%>%
+  select(EMPLOYER_NAME,Count,Med_Sa)%>%
+  unique()%>%
+  ungroup()%>%
+  arrange(desc(Count))%>%
+  top_n(10,Count)
+comp_ds<-rbind(c("Company",4,110000),comp_ds)
+comp_ds<-cbind(root=c(NA,rep("Company",10)),comp_ds)
+
+Tree <- gvisTreeMap(comp_ds, idvar = "EMPLOYER_NAME", 
+                    parentvar = "root" , 
+                    sizevar = "Count", 
+                    colorvar = "Med_Sa", 
+                    options = list(
+                      minColor='grey',
+                      maxColor='blue',
+                      headerHeight=20,
+                      fontColor="white",
+                      showScale=TRUE,width=600, height=400))
+
+```
+
+```{r nj_cmp_plot,echo= FALSE,results='asis',fig.width=3, fig.height=1.5}
+plot(Tree,"chart")
+```
+
+## Startups pay higher median salaries.
+>- Break down by states (top 5 states according to the num. of applications)
+>- Size = Num of Jobs, Color= Median Salary, Max Color= Blue 
+
+```{r ms_cmp,echo= FALSE,include=FALSE}
+tm_ds<-salary[salary$JOB_TITLE_SUBGROUP=="data scientist",]
+tm_ds$EMPLOYER_NAME<-gsub("INTENT MEDIA, INC.","INTENT MEDIA",tm_ds$EMPLOYER_NAME)
+tm_ds<-tm_ds%>%
+  select(EMPLOYER_NAME,WORK_STATE,as.numeric(PAID_WAGE_PER_YEAR))%>%
+  inner_join(.,state_ds[1:5,1],by="WORK_STATE")%>%
+  group_by(EMPLOYER_NAME) %>%
+  mutate(Count=n(),Med_Sa=median(as.numeric(PAID_WAGE_PER_YEAR)))%>%
+  select(EMPLOYER_NAME,WORK_STATE,Count,Med_Sa) %>%
+  group_by(WORK_STATE)%>%
+  unique()%>%
+  top_n(5,Med_Sa)%>%
+  arrange(WORK_STATE,desc(Count))
+
+# create a parent list 
+parent_list<-state_ds[1:5,]
+parent_list<-cbind(parent_list[,1,drop=F], data.frame(parent=rep("States",5)), parent_list[,2:3,drop=F])
+parent_list<-rbind(c("States",NA,sum(salary$JOB_TITLE_SUBGROUP=="data scientist"),median(as.numeric(salary$PAID_WAGE_PER_YEAR))),parent_list)
+colnames(parent_list)<-colnames(tm_ds)
+
+# combine ts_ds with parent list
+tm<-rbind(parent_list,tm_ds)
+
+
+Tree2 <- gvisTreeMap(tm, idvar = "EMPLOYER_NAME", 
+                    parentvar = "WORK_STATE" , 
+                    sizevar = "Count", 
+                    colorvar = "Med_Sa", 
+                    options = list(
+                      minColor='grey',
+                      maxColor='blue',
+                      headerHeight=20,
+                      fontColor="white",
+                      showScale=TRUE,width=600, height=400))
+```
+
+```{r ms_cmp_plot,echo= FALSE,results='asis',fig.width=3, fig.height=1.5}
+plot(Tree2,"chart")
+```
+
+## Conclusion
+>- Data scientists have higher median wage than other data related jobs.
+>- Green-Card holders make more.
+>- Higher Education + More Experience = Higher Salary
+>- New York offers more opportunities to be a data scientist. But the cost of living is expensive.  
+>- Large global companies hired more data scientist, while startups paid more.
+
+
+
+
