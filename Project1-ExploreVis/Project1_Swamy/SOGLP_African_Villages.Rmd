@@ -193,10 +193,6 @@ View(annual.cadence)
 ###Below are the plots
 ```{r, echo=FALSE}
 
-#Abline Functions (to use for later)
-#abline(v = 70, lwd = 2, lty = 2)
-#abline(v = 68, lwd = 2, lty = 2, col = "red")
-
 #Cols
 cols <- c("Date", "USD.liter")
 colnames(Kerosene.Price.df) <- cols
@@ -306,8 +302,8 @@ Agri.Plot.Line2
 
 ### Percent Agricultural Land vs Electrification Rate 
 
-#Percent of land for agriculture vs electrification rate in 2012
-#For this plot, I want to isolate the year 2012 for both measures to see if there is any kind of relationship between the amount of land used for agriculture (which I'm substituting for "rural"), and electrification rate. I believe this plot can give us a clue about how the amount of rural land a country has impacts the amount of electricity it has (i.e., whether most people with electricity are living in urban areas or towns, or not). My first instutition was to look at percent of agricultural land, rather than percent of population living in rural areas, because I wanted to get a sense for which countries are more likely to have "remote" villages that are removed from the central grid. 
+Percent of land for agriculture vs electrification rate in 2012
+For this plot, I want to isolate the year 2012 for both measures to see if there is any kind of relationship between the amount of land used for agriculture (which I'm substituting for "rural"), and electrification rate. I believe this plot can give us a clue about how the amount of rural land a country has impacts the amount of electricity it has (i.e., whether most people with electricity are living in urban areas or towns, or not). My first instutition was to look at percent of agricultural land, rather than percent of population living in rural areas, because I wanted to get a sense for which countries are more likely to have "remote" villages that are removed from the central grid. 
 
 ```{r}
 Recent.Elec = filter(Electricity.Perc, Year >= 2012)
@@ -538,7 +534,7 @@ class(Kerosene.Rural$Increase.Two)
 
 + geom_point(data=RP, aes(x = Country, y = Poverty_Rate, colour = "Rural Poverty Rate")) 
 
-head(Kenya.Diesel)
+View(Kerosene.Rural)
 KD <- ggplot(Kenya.Diesel, aes(Year, USD.liter))
 KD = KD + stat_smooth() + geom_point()
 KD
