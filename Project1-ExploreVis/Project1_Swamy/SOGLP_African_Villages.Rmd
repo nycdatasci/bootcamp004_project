@@ -62,8 +62,7 @@ Agriculture.Misc = read.csv("General_Agriculture_Worldbank.csv", header = FALSE,
 View(Agriculture.Misc)
 ```
 
-###The next thing I want to do is subset all of these dataframes for Sub-Saharan countries. 
-###The Country Descriptions data.frame contains this information. 
+The next thing I want to do is subset all of these dataframes for Sub-Saharan countries. The Country Descriptions data.frame contains this information. 
 
 ```{r}
 Country.Descriptions = tbl_df(Country.Descriptions)
@@ -550,7 +549,7 @@ KD.Plot3
 
 ###Study of Pay-As-You-Go Solar vs Kerosene Payment Schedules
 
-```{r}
+```{r, echo=FALSE}
 head(SOGLP_Features)
 head(Payment.Schedule)
 head(annual.cadence)
