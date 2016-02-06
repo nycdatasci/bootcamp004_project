@@ -86,12 +86,6 @@ bad_crash_state_value = crash_data[is.na(crash_data$Report_State),]
 crash_data = crash_data[!(is.na(crash_data$Report_State)),]
 
 write.csv(bad_crash_state_value, "data/bad_crash_states.csv")
-by_state_crashes = crash_data %>% group_by(Report_State) %>% summarise(Total_Crashes = n())  %>% arrange(Report_State)           
-by_state_fatals = crash_data %>% group_by(Report_State) %>% summarise(Total_Fatals = sum(Fatalities))  %>% arrange(Report_State)           
-by_state_injures = crash_data %>% group_by(Report_State) %>% summarise(Total_Injuries = sum(Injuries)) %>% arrange(Report_State)           
-
-by_state_fatalities = crash_data %>% group_by(Report_State, Fatalities) %>% summarise(crash_count_by_state = n())  %>% arrange(Report_State)           
-by_state_injuries = crash_data %>% group_by(Report_State) %>% summarise(crash_count_by_state = n())  %>% arrange(Report_State)           
 
 crash_data[is.na(crash_data$Report_Date),]
 mean(as.Date(crash_data$Report_Date, "%d-%b-%y"))

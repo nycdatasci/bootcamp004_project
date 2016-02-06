@@ -5,9 +5,29 @@ require(datasets)
 
 states <- data.frame(state.name, state.x77)
 
+by_state_crashes = crash_data %>% group_by(Report_State) %>% summarise(Total_Crashes = n())  %>% arrange(Report_State)           
+by_state_fatals = crash_data %>% group_by(Report_State) %>% summarise(Total_Fatals = sum(Fatalities))  %>% arrange(Report_State)           
+by_state_injures = crash_data %>% group_by(Report_State) %>% summarise(Total_Injuries = sum(Injuries)) %>% arrange(Report_State)           
+
+by_state_fatalities = crash_data %>% group_by(Report_State, Fatalities) %>% summarise(crash_count_by_state = sum(Fatalities))  %>% arrange(Report_State)           
+by_state_injuries = crash_data %>% group_by(Report_State, Injuries) %>% summarise(crash_count_by_state = sum(Injuries))  %>% arrange(Report_State)           
+
+by_state_crashes = mutate(by_state_crashes, Report_State = state.name[match(by_state_crashes$Report_State, state.abb)])
+by_state_fatals = mutate(by_state_fatals, Report_State = state.name[match(by_state_fatals$Report_State, state.abb)])
+by_state_injures = mutate(by_state_injures, Report_State = state.name[match(by_state_injures$Report_State, state.abb)])
+
+bad_crashes = by_state_crashes[is.na(by_state_crashes$Report_State),]
+by_state_crashes = by_state_crashes[!(is.na(by_state_crashes$Report_State)),]
+bad_fatals = by_state_fatals[is.na(by_state_fatals$Report_State),]
+by_state_fatals = by_state_fatals[!(is.na(by_state_fatals$Report_State)),]
+bad_injures = by_state_injures[is.na(by_state_injures$Report_State),]
+by_state_injures = by_state_injures[!(is.na(by_state_injures$Report_State)),]
+
+by_state_fatals$Report_State
 states = mutate(states, TotalCrashes = by_state_crashes$Total_Crashes[match(by_state_crashes$Report_State, states$state.name)])
 states = mutate(states, TotalFatalities = by_state_fatals$Total_Fatals[match(by_state_fatals$Report_State, states$state.name)])
 states = mutate(states, TotalInjuries = by_state_injures$Total_Injuries[match(by_state_injures$Report_State, states$state.name)])
+
 by_2015 = byyear_state_crashes %>% filter(Report_Year==2015) 
 states = mutate(states, T2015Crashes = by_2015$Total_Crashes[match(by_2015$Report_State, states$state.name)])
 by_2014 = byyear_state_crashes %>% filter(Report_Year==2014) 
@@ -46,7 +66,7 @@ ui <- dashboardPage(
                             collapsible = TRUE,
                             selectizeInput("selected",
                                            "Select1 Item to Display",
-                                           selected = "Income",
+                                           selected = "TotalCrashes",
                                            choice)),
                         box(title = "Income Chart", status = "success", solidHeader = TRUE,
                             collapsible = FALSE,
@@ -56,7 +76,7 @@ ui <- dashboardPage(
                             collapsible = TRUE,
                             selectizeInput("selected2",
                                            "Select3 Item to Display",
-                                           selected = "Murder",
+                                           selected = "TotalFatalities",
                                            choice)),
                         box(title = "Murder Chart", status = "success", solidHeader = TRUE,
                             collapsible = FALSE,
@@ -66,6 +86,7 @@ ui <- dashboardPage(
                             collapsible = TRUE,
                             selectizeInput("selected3",
                                            "Select3 Item to Display",
+                                           selected = "TotalInjuries",
                                            choice)),
                         box(title = "Popluation", status = "success", solidHeader = TRUE,
                             collapsible = FALSE,
