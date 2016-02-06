@@ -97,9 +97,6 @@ crash_data = mutate(crash_data, Report_Date = as.Date(crash_data$Report_Date, "%
 crash_data = mutate(crash_data, Report_Year = as.numeric(format(crash_data$Report_Date,'%Y')))
 crash_data = mutate(crash_data, Report_Month = as.numeric(format(crash_data$Report_Date,'%m')))
 
-byyear_state_crashes = crash_data %>% group_by(Report_State, Report_Year) %>% summarise(Total_Crashes = n())  %>% arrange(Report_State)           
-byyear_state_fatals = crash_data %>% group_by(Report_State, Report_Year) %>% summarise(Total_Fatals = sum(Fatalities))  %>% arrange(Report_State)           
-byyear_state_injures = crash_data %>% group_by(Report_State, Report_Year) %>% summarise(Total_Injuries = sum(Injuries)) %>% arrange(Report_State)           
 
 MakeCode_Table = MakeCode_Table[,-1]
 MakeCode_Table[nrow(MakeCode_Table)+1] = c("UUU", "Invalid", "Invalid", "Invalid", "Invalid", "Invalid", "Invalid")
