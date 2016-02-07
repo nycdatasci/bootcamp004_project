@@ -84,6 +84,14 @@ states = mutate(states, Y2013Injuries = by_2013$Total_Injuries[match(by_2013$Rep
 #states = mutate(states, PercentCrashes = (states$Total_Crashes/states$Population) * 100)
 
 write.csv(states, "data/crash_summary.csv")
+crashes_by_makeyear = crashes_by_make  %>% 
+  group_by (Make, Report_Year) %>% 
+  summarise(Crashes = sum(Total_Crashes))  %>% 
+  arrange(Crashes) 
+inspections_by_makeyear = insp_by_make  %>% 
+  group_by (Make, Inspection_Year) %>% 
+  summarise(Inspections = sum(Total_Insps))  %>% 
+  arrange(Inspections)
 
 crashes_by_makename = crashes_by_make  %>% 
   group_by (Make) %>% 
@@ -113,6 +121,13 @@ ui <- dashboardPage(
                           buttonId = "searchButton",
                           label = "Search...",
                           icon = shiny::icon("search")),
+        sliderInput("crashrows",
+                    "Makes for crashes:",
+                    min = 1,  max = 160, value = 15),
+        sliderInput("insprows",
+                    "Makes for inspections:",
+                    min = 1,  max = 350, value = 15),
+        
         sidebarMenu(
             menuItem("Map", tabName = "map", icon = icon("map")),
             menuItem("Chart", tabName = "chart", icon = icon("chart")),
@@ -157,12 +172,18 @@ ui <- dashboardPage(
                     ),
             tabItem(tabName = "chart",
                 fluidRow(
-                      box(title = "Select 4", status = "info", solidHeader = TRUE,
-                        collapsible = TRUE,
-                        selectizeInput("selected4",
-                                     "Select4 Item to Display",
-                                     selected = "TopMakesForCrashes",
-                                     choice)),
+                      
+#                       box(title = "Select 4", status = "info", solidHeader = TRUE,
+#                         collapsible = TRUE,
+#                         sliderInput("crashrows",
+#                                     "Makes to show:",
+#                                     min = 1,  max = 150, value = 15),
+#                         
+# #                         selectizeInput("selected4",
+# #                                      "Select4 Item to Display",
+# #                                      selected = "TopMakesForCrashes",
+# #                                      choice)
+#                         ),
                   
                         box(title = "Total Crashes over last 3 years", status = "primary", solidHeader = TRUE,
                         collapsible = TRUE,
@@ -225,17 +246,17 @@ server <- function(input, output) {
                   options=list(page='enable'))
     })
     output$crashbymaketable <- renderGvis({
-      gvisTable(crashes_by_makename,
+      gvisTable(crashes_by_makeyear,
                 options=list(page='enable'))
     })
     output$inspectionbymaketable <- renderGvis({
-      gvisTable(inspections_by_makename,
+      gvisTable(inspections_by_makeyear,
                 options=list(page='enable'))
     })
     
     output$crashChart <- renderGvis({
       
-      gvisColumnChart(head(crashes_by_makename_subset[order(crashes_by_makename_subset$Crashes, decreasing = T),], n=10),
+      gvisColumnChart(head(crashes_by_makename[order(crashes_by_makename$Crashes, decreasing = T),], n=input$crashrows),
 
         
         #crashes_by_makename_subset, 
@@ -255,7 +276,7 @@ server <- function(input, output) {
     })
     output$inspectionChart <- renderGvis({
       
-      gvisColumnChart(head(inspections_by_makename_subset[order(inspections_by_makename_subset$Inspections, decreasing = T),], n=10),
+      gvisColumnChart(head(inspections_by_makename[order(inspections_by_makename$Inspections, decreasing = T),], n=input$insprows),
                       #gvisColumnChart(inspections_by_makename_subset, 
                       xvar="Make", yvar= "Inspections", 
                       options=list(title="Inspections by Make",
