@@ -139,62 +139,50 @@ ui <- dashboardPage(
         tabItems(
             tabItem(tabName = "map",
                     fluidRow(
-                        box(title = "Select 1", status = "info", solidHeader = TRUE,
+                      box( status = "info", solidHeader = TRUE,
                             collapsible = TRUE,
                             selectizeInput("selected",
-                                           "Select1 Item to Display",
+                                           "Select Parameter to Display",
                                            selected = "TotalCrashes",
                                            choice)),
-                        box(title = "Income Chart", status = "success", solidHeader = TRUE,
-                            collapsible = FALSE,
-                            htmlOutput("geoChart")),
-                        
-                        box(title = "Select 2", status = "info", solidHeader = TRUE,
+                      box( status = "success", solidHeader = TRUE,
+                          collapsible = FALSE,
+                          htmlOutput("geoChart")),
+                      
+                      
+                      box( status = "info", solidHeader = TRUE,
                             collapsible = TRUE,
                             selectizeInput("selected2",
-                                           "Select3 Item to Display",
+                                           "Select Paramter to Display",
                                            selected = "TotalFatalities",
                                            choice)),
-                        box(title = "Murder Chart", status = "success", solidHeader = TRUE,
-                            collapsible = FALSE,
-                            htmlOutput("geoChart2")),
-
-                        box(title = "Select 3", status = "info", solidHeader = TRUE,
+                      box( status = "success", solidHeader = TRUE,
+                          collapsible = FALSE,
+                          htmlOutput("geoChart2")),
+                      
+                      box( status = "info", solidHeader = TRUE,
                             collapsible = TRUE,
                             selectizeInput("selected3",
-                                           "Select3 Item to Display",
+                                           "Select Parameter to Display",
                                            selected = "TotalInjuries",
                                            choice)),
-                        box(title = "Popluation", status = "success", solidHeader = TRUE,
-                            collapsible = FALSE,
-                            htmlOutput("geoChart3"))
-                        )
-                    ),
+                      box( status = "success", solidHeader = TRUE,
+                          collapsible = FALSE,
+                          htmlOutput("geoChart3"))
+                      #title="Chart3",
+                      
+                    )
+            ),
             tabItem(tabName = "chart",
                 fluidRow(
-                      
-#                       box(title = "Select 4", status = "info", solidHeader = TRUE,
-#                         collapsible = TRUE,
-#                         sliderInput("crashrows",
-#                                     "Makes to show:",
-#                                     min = 1,  max = 150, value = 15),
-#                         
-# #                         selectizeInput("selected4",
-# #                                      "Select4 Item to Display",
-# #                                      selected = "TopMakesForCrashes",
-# #                                      choice)
-#                         ),
-                  
                         box(title = "Total Crashes over last 3 years", status = "primary", solidHeader = TRUE,
                         collapsible = TRUE,
                         htmlOutput("crashChart")
                         ),
-                          
                         box(title = "Total Inspections over last 3 years", status = "primary", solidHeader = TRUE,
                         collapsible = TRUE,
                         htmlOutput("inspectionChart")
                         )
-                          
                 )
             ),
             tabItem(tabName = "data",
@@ -215,9 +203,10 @@ server <- function(input, output) {
     output$geoChart <- renderGvis({
         gvisGeoChart(states, "state.name", input$selected, 
                      options=list(region="US", 
+                                  title="Chart1",
                                   displayMode="regions", 
                                   resolution="provinces",
-                                  width=360, height=240,
+                                  #width=360, height=240,
                                   backgroundColor="lightbrown",
                                   colorAxis="{colors:['pink', 'red']}"
                                   ))
@@ -225,32 +214,35 @@ server <- function(input, output) {
     output$geoChart2 <- renderGvis({
       gvisGeoChart(states, "state.name", input$selected2,
                    options=list(region="US", 
+                                title="Chart2",
                                 displayMode="regions", 
                                 resolution="provinces",
-                                width=360, height=240,
-                                  backgroundColor="lightgreen",
+                                #width=360, height=240,
+                                  backgroundColor="lightbrown",
                                   colorAxis="{colors:['lightblue', 'darkblue']}"
                               ))
     })    
     output$geoChart3 <- renderGvis({
       gvisGeoChart(states, "state.name", input$selected3,
                    options=list(region="US", 
+                                title="Chart3",
                                 displayMode="regions", 
                                 resolution="provinces",
-                                  backgroundColor="lightblue",
-                                colorAxis="{colors:['lightgreen', 'darkgreen']}",
-                                width=360, height=240))
+                                  backgroundColor="lightbrown",
+                                #width=360, height=240,
+                                colorAxis="{colors:['lightgreen', 'darkgreen']}"
+                                ))
     })
     output$crashtable <- renderGvis({
-        gvisTable(states,
+        gvisTable(states[order(states$Population, decreasing = T),],
                   options=list(page='enable'))
     })
     output$crashbymaketable <- renderGvis({
-      gvisTable(crashes_by_makeyear,
+      gvisTable(crashes_by_makeyear[order(crashes_by_makeyear$Crashes, decreasing = T),],
                 options=list(page='enable'))
     })
     output$inspectionbymaketable <- renderGvis({
-      gvisTable(inspections_by_makeyear,
+      gvisTable(inspections_by_makeyear[order(inspections_by_makeyear$Inspections, decreasing = T),],
                 options=list(page='enable'))
     })
     
