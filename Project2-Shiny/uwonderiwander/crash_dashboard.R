@@ -3,8 +3,11 @@ library(shinydashboard)
 library(googleVis)
 require(datasets)
 
-states <- data.frame(state.name, state.x77)
-crash_data = mutate(crash_data, Report_State = state.name[match(crash_data$Report_State, state.abb)])
+states = data.frame(state.name, state.x77)
+
+states = states[,(names(states) %in% c("state.name","Population", "Area"))]
+
+#crash_data = mutate(crash_data, Report_State = state.name[match(crash_data$Report_State, state.abb)])
 bad_crash_state_data = crash_data[is.na(crash_data$Report_State), ]
 crash_data = crash_data[!(is.na(crash_data$Report_State)), ]
   
@@ -40,50 +43,71 @@ byyear_state_injures = crash_data %>% group_by(Report_State, Report_Year) %>% su
 # byyear_state_injures = byyear_state_injures[!(is.na(byyear_state_injures$Report_State)),]
 
 
-# states = mutate(states, TotalCrashes = by_state_crashes$Total_Crashes[match(by_state_crashes$Report_State, states$state.name)])
-# states = mutate(states, TotalFatalities = by_state_fatals$Total_Fatals[match(by_state_fatals$Report_State, states$state.name)])
-# states = mutate(states, TotalInjuries = by_state_injures$Total_Injuries[match(by_state_injures$Report_State, states$state.name)])
+states = mutate(states, TotalCrashes = by_state_crashes$Total_Crashes[match(by_state_crashes$Report_State, states$state.name)])
+states = mutate(states, TotalFatalities = by_state_fatals$Total_Fatals[match(by_state_fatals$Report_State, states$state.name)])
+states = mutate(states, TotalInjuries = by_state_injures$Total_Injuries[match(by_state_injures$Report_State, states$state.name)])
 
 by_2015 = byyear_state_crashes %>% filter(Report_Year==2015) 
-states = mutate(states, T2015Crashes = by_2015$Total_Crashes[match(by_2015$Report_State, states$state.name)])
+states = mutate(states, Y2015Crashes = by_2015$Total_Crashes[match(by_2015$Report_State, states$state.name)])
 by_2014 = byyear_state_crashes %>% filter(Report_Year==2014) 
-states = mutate(states, T2014Crashes = by_2014$Total_Crashes[match(by_2014$Report_State, states$state.name)])
+states = mutate(states, Y2014Crashes = by_2014$Total_Crashes[match(by_2014$Report_State, states$state.name)])
 
 by_2013 = byyear_state_crashes %>% filter(Report_Year==2013) 
 missing_states= c(state.name[!(state.name %in% by_2013$Report_State)])
 missing_state_list = data_frame(missing_states, c("2013"), 0)
 l = list(by_2013, missing_state_list)
 by_2013 = rbindlist(l)
-states = mutate(states, T2013Crashes = by_2013$Total_Crashes[match(by_2013$Report_State, states$state.name)])
+states = mutate(states, Y2013Crashes = by_2013$Total_Crashes[match(by_2013$Report_State, states$state.name)])
 
 by_2015 = byyear_state_fatals %>% filter(Report_Year==2015) 
-states = mutate(states, T2015Fatalities = by_2015$Total_Fatals[match(by_2015$Report_State, states$state.name)])
+states = mutate(states, Y2015Fatalities = by_2015$Total_Fatals[match(by_2015$Report_State, states$state.name)])
 by_2014 = byyear_state_fatals %>% filter(Report_Year==2014) 
-states = mutate(states, T2014Fatalities = by_2014$Total_Fatals[match(by_2014$Report_State, states$state.name)])
+states = mutate(states, Y2014Fatalities = by_2014$Total_Fatals[match(by_2014$Report_State, states$state.name)])
 by_2013 = byyear_state_fatals %>% filter(Report_Year==2013) 
 missing_states= c(state.name[!(state.name %in% by_2013$Report_State)])
 missing_state_list = data_frame(missing_states, c("2013"), 0)
 l = list(by_2013, missing_state_list)
 by_2013 = rbindlist(l)
-states = mutate(states, T2013Fatalities = by_2013$Total_Fatals[match(by_2013$Report_State, states$state.name)])
+states = mutate(states, Y2013Fatalities = by_2013$Total_Fatals[match(by_2013$Report_State, states$state.name)])
 
 by_2015 = byyear_state_injures %>% filter(Report_Year==2015) 
-states = mutate(states, T2015Injuries = by_2015$Total_Injuries[match(by_2015$Report_State, states$state.name)])
+states = mutate(states, Y2015Injuries = by_2015$Total_Injuries[match(by_2015$Report_State, states$state.name)])
 by_2014 = byyear_state_injures %>% filter(Report_Year==2014) 
-states = mutate(states, T2014Injuries = by_2014$Total_Injuries[match(by_2014$Report_State, states$state.name)])
+states = mutate(states, Y2014Injuries = by_2014$Total_Injuries[match(by_2014$Report_State, states$state.name)])
 by_2013 = byyear_state_injures %>% filter(Report_Year==2013) 
 missing_states= c(state.name[!(state.name %in% by_2013$Report_State)])
 missing_state_list = data_frame(missing_states, c("2013"), 0)
 l = list(by_2013, missing_state_list)
 by_2013 = rbindlist(l)
-states = mutate(states, T2013Injuries = by_2013$Total_Injuries[match(by_2013$Report_State, states$state.name)])
+states = mutate(states, Y2013Injuries = by_2013$Total_Injuries[match(by_2013$Report_State, states$state.name)])
+
+#states = mutate(states, PercentCrashes = (states$Total_Crashes/states$Population) * 100)
+
+write.csv(states, "data/crash_summary.csv")
+
+crashes_by_makename = crashes_by_make  %>% 
+  group_by (Make) %>% 
+  summarise(Crashes = sum(Total_Crashes))  %>% 
+  arrange(Crashes) 
+(order(crashes_by_makename$Crashes, decreasing = T))
+
+crashes_by_makename_subset = crashes_by_makename[crashes_by_makename$Crashes > 100, ]
+
+inspections_by_makename = insp_by_make  %>% 
+  group_by (Make) %>% 
+  summarise(Inspections = sum(Total_Insps))  %>% 
+  arrange(Inspections) 
+(order(inspections_by_makename$Inspections, decreasing = T))
+
+inspections_by_makename_subset = inspections_by_makename[inspections_by_makename$Inspections > 500, ]
+
 
 choice <- names(states)[-1]
 
 ui <- dashboardPage(
-    dashboardHeader(title = "Basic dashboard"),
+    dashboardHeader(title = "Trucking Crash and Inspections Dashboard"),
     dashboardSidebar(
-        sidebarUserPanel("Shu Yan",
+        sidebarUserPanel("Satish Joshi",
                          image = "https://pbs.twimg.com/profile_images/633795666754576386/HS1cKWjb.jpg"),
         sidebarSearchForm(textId = "searchText",
                           buttonId = "searchButton",
@@ -133,27 +157,39 @@ ui <- dashboardPage(
                     ),
             tabItem(tabName = "chart",
                 fluidRow(
-                  
-                        box(title = "Column Chart", status = "primary", solidHeader = TRUE,
+                      box(title = "Select 4", status = "info", solidHeader = TRUE,
                         collapsible = TRUE,
-                        htmlOutput("columnChart")
+                        selectizeInput("selected4",
+                                     "Select4 Item to Display",
+                                     selected = "TopMakesForCrashes",
+                                     choice)),
+                  
+                        box(title = "Total Crashes over last 3 years", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE,
+                        htmlOutput("crashChart")
+                        ),
+                          
+                        box(title = "Total Inspections over last 3 years", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE,
+                        htmlOutput("inspectionChart")
                         )
+                          
                 )
             ),
             tabItem(tabName = "data",
                     fluidRow(
-                        box(htmlOutput("table"), width = 10)
+                        box(htmlOutput("crashtable"), width = 10),
+                        box(htmlOutput("crashbymaketable"), width = 10),
+                        box(htmlOutput("inspectionbymaketable"), width = 10)
                     )
             )
+            
         )
     )
 )
 
 server <- function(input, output) {
-    min_query <- min(states$Population)
-    max_query <- max(states$Population)
-    min_query2 <- min(states$Income)
-    max_query2 <- max(states$Income)
+
     
     output$geoChart <- renderGvis({
         gvisGeoChart(states, "state.name", input$selected, 
@@ -184,26 +220,57 @@ server <- function(input, output) {
                                 colorAxis="{colors:['lightgreen', 'darkgreen']}",
                                 width=360, height=240))
     })
-    output$table <- renderGvis({
+    output$crashtable <- renderGvis({
         gvisTable(states,
                   options=list(page='enable'))
     })
-    
-    output$columnChart <- renderGvis({
-        if(input$searchButton) {
-            isolate({
-                if(input$searchText %in% states$state.name) {
-                    gvisColumnChart(
-                        data.frame(item=choice,
-                                   value=as.numeric(states[input$searchText,-1])))
-                } else {
-                    gvisColumnChart(
-                        data.frame(item=choice,
-                                   value=sapply(states[,-1], mean)))
-                }
-            })
-        }
+    output$crashbymaketable <- renderGvis({
+      gvisTable(crashes_by_makename,
+                options=list(page='enable'))
     })
+    output$inspectionbymaketable <- renderGvis({
+      gvisTable(inspections_by_makename,
+                options=list(page='enable'))
+    })
+    
+    output$crashChart <- renderGvis({
+      
+      gvisColumnChart(head(crashes_by_makename_subset[order(crashes_by_makename_subset$Crashes, decreasing = T),], n=10),
+
+        
+        #crashes_by_makename_subset, 
+        xvar="Make", yvar= "Crashes",
+                      options=list(title="Crashes by Make",
+                                   titleTextStyle="{color:'red', 
+                                           fontName:'Courier', 
+                                            fontSize:16}", 
+                                   vAxis="{title:'Crash Count'}",
+                                   hAxis="{title:'Make'}",
+                                   legend="bottom",
+                                   color = "green",
+                                   backgroundColor="#D3D3D3", 
+                                   width=360, height=240 )
+                     )
+
+    })
+    output$inspectionChart <- renderGvis({
+      
+      gvisColumnChart(head(inspections_by_makename_subset[order(inspections_by_makename_subset$Inspections, decreasing = T),], n=10),
+                      #gvisColumnChart(inspections_by_makename_subset, 
+                      xvar="Make", yvar= "Inspections", 
+                      options=list(title="Inspections by Make",
+                                   titleTextStyle="{color:'red', 
+                                           fontName:'Courier', 
+                                            fontSize:16}", 
+                                   vAxis="{title:'Inspection Count'}",
+                                   hAxis="{title:'Make'}",
+                                   legend="bottom",
+                                   color = "blue",
+                                   backgroundColor="#D3D3D3", 
+                                   width=360, height=240 )
+                     )
+      
+    })    
 }
 
 shinyApp(ui, server)
