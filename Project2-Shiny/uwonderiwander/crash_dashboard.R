@@ -109,6 +109,8 @@ inspections_by_makename = insp_by_make  %>%
 
 inspections_by_makename_subset = inspections_by_makename[inspections_by_makename$Inspections > 500, ]
 
+#paste0(nrow(inspection_data))
+x = "test"
 
 choice <- names(states)[-1]
 
@@ -129,14 +131,24 @@ ui <- dashboardPage(
                     min = 1,  max = 350, value = 15),
         
         sidebarMenu(
-            menuItem("Map", tabName = "map", icon = icon("map")),
-            menuItem("Chart", tabName = "chart", icon = icon("chart")),
-            menuItem("Data", tabName = "data", icon = icon("database"))
+          menuItem("Summary", tabName = "summary", icon = icon("summary")),
+          menuItem("Maps", tabName = "map", icon = icon("map")),
+            menuItem("Charts", tabName = "chart", icon = icon("chart")),
+            menuItem("Data Tables", tabName = "data", icon = icon("database"))
             )
         ),
     
     dashboardBody(
         tabItems(
+          tabItem(tabName = "summary",
+                  
+          fluidRow(
+            # A static infoBox
+            infoBox("TotalInspections"),
+            infoBoxOutput("progressBox"),
+            infoBoxOutput("approvalBox")
+          )
+          ),
             tabItem(tabName = "map",
                     fluidRow(
                       box( status = "info", solidHeader = TRUE,
@@ -199,7 +211,24 @@ ui <- dashboardPage(
 
 server <- function(input, output) {
 
-    
+  output$TotalInspections <- renderInfoBox({
+    infoBox(
+      "Inspections", as.character(nrow(inspection_data)), icon = icon("list"),
+      color = "purple", fill = TRUE
+    )
+  })
+    output$progressBox <- renderInfoBox({
+      infoBox(
+       "Progress", c(x , "%"), icon = icon("list"),
+       color = "purple", fill = TRUE
+      )
+    })
+   output$approvalBox <- renderInfoBox({
+     infoBox(
+        "Approval", "80%", icon = icon("thumbs-up", lib = "glyphicon"),
+        color = "yellow", fill = TRUE
+     )
+    })
     output$geoChart <- renderGvis({
         gvisGeoChart(states, "state.name", input$selected, 
                      options=list(region="US", 
