@@ -122,8 +122,8 @@ ui <- dashboardPage(
 #                          icon = shiny::icon("search")),
         sidebarMenu(
           menuItem("Summary", tabName = "summary", icon = icon("list")),
-          menuItem("Maps", tabName = "map", icon = icon("maps")),
-            menuItem("Charts", tabName = "chart", icon = icon("charts")),
+          menuItem("Maps", tabName = "map", icon = icon("map-marker")),
+            menuItem("Charts", tabName = "chart", icon = icon("bar-chart")),
             menuItem("Data Tables", tabName = "data", icon = icon("database"))
             ),
         sliderInput("crashrows",
@@ -137,12 +137,6 @@ ui <- dashboardPage(
     dashboardBody(
         tabItems(
           tabItem(tabName = "summary",
-#           fluidRow(column=1, width=20,
-#             infoBox("Crash and Inspection Data Summary", 0)
-#             
-#                     #infoBox("summarytext", "Summary Data for Crashes and Inspections", icon = icon("credit-card")),
-#            ),
-#                   
           fluidRow(
                    infoBoxOutput("TotalInspections"),
                    infoBoxOutput("progressBox")
@@ -152,8 +146,24 @@ ui <- dashboardPage(
                    infoBoxOutput("approvalBox2")
             ),
           fluidRow(
-            infoBoxOutput("approvalBox3"),
-            infoBoxOutput("approvalBox4")
+                    infoBoxOutput("approvalBox3"),
+                    infoBoxOutput("approvalBox4")
+          ),
+          fluidRow(
+                    infoBoxOutput("approvalBox5"),
+                    infoBoxOutput("approvalBox6")
+          ),
+          fluidRow(
+                    infoBoxOutput("approvalBox7"),
+                    infoBoxOutput("approvalBox8")
+          ),
+          fluidRow(
+                    infoBoxOutput("approvalBox9"),
+                    infoBoxOutput("approvalBox10")
+          ),
+          fluidRow(
+                    infoBoxOutput("approvalBox11"),
+                    infoBoxOutput("approvalBox12")
           )
           
           ),
@@ -202,14 +212,7 @@ ui <- dashboardPage(
                         br(),
                         htmlOutput("inspectionChart")
                         )
-                        # htmlOutput("crashChart"),
-#                         box(title = "Total Inspections over last 3 years", status = "primary", solidHeader = TRUE,
-#                         collapsible = TRUE,
-#                         htmlOutput("inspectionChart")
-#                         ),
-                          # htmlOutput("inspectionChart")
-                
-            ),
+             ),
             tabItem(tabName = "data",
                     fluidRow(
                         box(htmlOutput("crashtable"), width = 10),
@@ -223,24 +226,14 @@ ui <- dashboardPage(
 ) # End of dashpage
 
 
-# TotalInspections = nrow(inspection_data)
-# TotalCrashes = nrow(crash_data)
-# 
-# TotalFatalities = sum(crash_data$Fatalities)
-# TotalInjuries = sum(crash_data$Injuries)
-# 
-# TotalOOSViol = sum(inspection_data$OOS_TOTAL)
-# TotalVehOOSViol = sum(inspection_data$VEHICLE_OOS_TOTAL)
-# TotalDriverOOSViol = sum(inspection_data$DRIVER_OOS_TOTAL)
-# TotalUnsafeDrivingInsp = nrow(inspection_data[inspection_data$UNSAFE_INSP == "Y",])
-# TotalFatugueDrivingInsp = nrow(inspection_data[inspection_data$FATIGUED_INSP == "Y",])
-# TotalMaintenanxeInsp = nrow(inspection_data[inspection_data$VH_MAINT_INSP == "Y",])
-# 
-# PercentTowaway = (nrow(crash_data[crash_data$Tow_Away == "Yes",])/TotalCrashes) * 100
-# PercentHazmat = (nrow(crash_data[crash_data$Hazmat_released == "Yes",])/TotalCrashes) * 100
-
+ 
 server <- function(input, output) {
-
+  # TotalInspections = nrow(inspection_data)
+  # TotalCrashes = nrow(crash_data)
+  # 
+  # TotalFatalities = sum(crash_data$Fatalities)
+  # TotalInjuries = sum(crash_data$Injuries)
+  
   output$TotalInspections <- renderInfoBox({
     infoBox(
       "Total Inspections", TotalInspections, icon = icon("list"),
@@ -265,25 +258,86 @@ server <- function(input, output) {
        color = "red", fill = TRUE
      )
    })
+   # PercentTowaway = (nrow(crash_data[crash_data$Tow_Away == "Yes",])/TotalCrashes) * 100
+   # PercentHazmat = (nrow(crash_data[crash_data$Hazmat_released == "Yes",])/TotalCrashes) * 100
+   
    output$approvalBox3 <- renderInfoBox({
      infoBox(
        "Tow Away", paste0(PercentTowaway,"%"), icon = icon("thumbs-down", lib = "glyphicon"),
-       color = "yellow", fill = TRUE
+       color = "red", fill = TRUE
      )
    })
    output$approvalBox4 <- renderInfoBox({
      infoBox(
        "Hazmat Involved", paste0(PercentHazmat,"%"), icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "red", fill = TRUE
+     )
+   })
+   # TotalHazOOSViol = sum(inspection_data$HAZMAT_OOS_TOTAL)
+   # TotalOOSViol = sum(inspection_data$OOS_TOTAL)
+   # TotalVehOOSViol = sum(inspection_data$VEHICLE_OOS_TOTAL)
+   # TotalDriverOOSViol = sum(inspection_data$DRIVER_OOS_TOTAL)
+   
+   output$approvalBox5 <- renderInfoBox({
+     infoBox(
+       "Total OOS Violation", TotalOOSViol, icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "blue", fill = TRUE
+     )
+   })
+   output$approvalBox6 <- renderInfoBox({
+     infoBox(
+       "Hazmat OOS Violation", TotalHazOOSViol, icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "blue", fill = TRUE
+     )
+   })
+   output$approvalBox7 <- renderInfoBox({
+     infoBox(
+       "Vehicle OOS Violation", TotalVehOOSViol, icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "blue", fill = TRUE
+     )
+   })
+   output$approvalBox8 <- renderInfoBox({
+     infoBox(
+       "Driver OOS Violation", TotalDriverOOSViol, icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "blue", fill = TRUE
+     )
+   })
+   
+   # TotalUnsafeDrivingInsp = nrow(inspection_data[inspection_data$UNSAFE_INSP == "Y",])
+   # TotalAlcoholDrivingInsp = nrow(inspection_data[inspection_data$SUBT_ALCOHOL_INSP == "Y",])
+   # TotalFatugueDrivingInsp = nrow(inspection_data[inspection_data$FATIGUED_INSP == "Y",])
+   # TotalMaintenanxeInsp = nrow(inspection_data[inspection_data$VH_MAINT_INSP == "Y",])
+   output$approvalBox9 <- renderInfoBox({
+     infoBox(
+       "Vehicle Maintenance Insp", TotalMaintenanxeInsp, icon = icon("thumbs-down", lib = "glyphicon"),
        color = "yellow", fill = TRUE
      )
    })
+   output$approvalBox10 <- renderInfoBox({
+     infoBox(
+       "Fatigued Driving Insp", TotalFatugueDrivingInsp, icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "yellow", fill = TRUE
+     )
+   })
+   output$approvalBox11 <- renderInfoBox({
+     infoBox(
+       "Alcohol Substance Insp", TotalAlcoholDrivingInsp, icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "yellow", fill = TRUE
+     )
+   })
+   output$approvalBox12 <- renderInfoBox({
+     infoBox(
+       "Unsafe Driving Insp", TotalUnsafeDrivingInsp, icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "yellow", fill = TRUE
+     )
+   })   
     output$geoChart <- renderGvis({
         gvisGeoChart(states, "state.name", input$selected, 
                      options=list(region="US", 
                                   title="Chart1",
                                   displayMode="regions", 
                                   resolution="provinces",
-                                  #width=360, height=240,
+                                  width=260, height=200,
                                   backgroundColor="lightbrown",
                                   colorAxis="{colors:['pink', 'red']}"
                                   ))
@@ -294,9 +348,9 @@ server <- function(input, output) {
                                 title="Chart2",
                                 displayMode="regions", 
                                 resolution="provinces",
-                                #width=360, height=240,
-                                  backgroundColor="lightbrown",
-                                  colorAxis="{colors:['lightblue', 'darkblue']}"
+                                width=260, height=200,
+                                backgroundColor="lightbrown",
+                                colorAxis="{colors:['lightblue', 'darkblue']}"
                               ))
     })    
     output$geoChart3 <- renderGvis({
@@ -305,24 +359,24 @@ server <- function(input, output) {
                                 title="Chart3",
                                 displayMode="regions", 
                                 resolution="provinces",
-                                  backgroundColor="lightbrown",
-                                #width=360, height=240,
+                                backgroundColor="lightbrown",
+                                width=260, height=200,
                                 colorAxis="{colors:['lightgreen', 'darkgreen']}"
                                 ))
     })
     output$crashtable <- renderGvis({
         gvisTable(states[order(states$Population, decreasing = T),],
-                  options=list(page='enable'))
+                  options=list(page='enable', width=800, height=300, color='blue'))
     })
     output$crashbymaketable <- renderGvis({
       gvisTable(crashes_by_makeyear[order(crashes_by_makeyear$Crashes, decreasing = T),],
-                options=list(page='enable'))
+                options=list(page='enable',width=500, height=300))
     })
     output$inspectionbymaketable <- renderGvis({
       gvisTable(inspections_by_makeyear[order(inspections_by_makeyear$Inspections, decreasing = T),],
-                options=list(page='enable'))
+                options=list(page='enable',width=500, height=300))
     })
-    
+    options=list(width=200, height=300)
     output$crashChart <- renderGvis({
       
       gvisColumnChart(head(crashes_by_makename[order(crashes_by_makename$Crashes, decreasing = T),], n=input$crashrows),
@@ -336,10 +390,12 @@ server <- function(input, output) {
                                             fontSize:16}", 
                                    vAxis="{title:'Crash Count'}",
                                    hAxis="{title:'Make'}",
-                                   legend="bottom",
                                    color = "green",
+                                   legend = "{position: 'none'}",
+                                   hAxis.textPosition = "in",
+                                   hAxis.slantedTextAngle = 90,
                                    backgroundColor="#D3D3D3", 
-                                   width=800, height=350 )
+                                   width=600, height=300 )
                      )
 
     })
@@ -354,10 +410,10 @@ server <- function(input, output) {
                                             fontSize:16}", 
                                    vAxis="{title:'Inspection Count'}",
                                    hAxis="{title:'Make'}",
-                                   legend="bottom",
                                    color = "blue",
+                                   legend = "{position: 'none'}",
                                    backgroundColor="#D3D3D3", 
-                                   width=800, height=350 )
+                                   width=600, height=300 )
                      )
       
     })    
