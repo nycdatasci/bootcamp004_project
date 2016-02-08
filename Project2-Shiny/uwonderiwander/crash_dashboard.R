@@ -113,30 +113,50 @@ inspections_by_makename_subset = inspections_by_makename[inspections_by_makename
 choice <- names(states)[-1]
 
 ui <- dashboardPage(
-    dashboardHeader(title = "Trucking Crash and Inspections Dashboard"),
+    dashboardHeader(title = "Crashes & Inspections"),
     dashboardSidebar(
-        sidebarUserPanel("Satish Joshi",
-                         image = "https://pbs.twimg.com/profile_images/633795666754576386/HS1cKWjb.jpg"),
-        sidebarSearchForm(textId = "searchText",
-                          buttonId = "searchButton",
-                          label = "Search...",
-                          icon = shiny::icon("search")),
+#        sidebarUserPanel("Satish Joshi"),
+#        sidebarSearchForm(textId = "searchText",
+##                          buttonId = "searchButton",
+#                          label = "Search...",
+#                          icon = shiny::icon("search")),
+        sidebarMenu(
+          menuItem("Summary", tabName = "summary", icon = icon("list")),
+          menuItem("Maps", tabName = "map", icon = icon("maps")),
+            menuItem("Charts", tabName = "chart", icon = icon("charts")),
+            menuItem("Data Tables", tabName = "data", icon = icon("database"))
+            ),
         sliderInput("crashrows",
                     "Makes for crashes:",
                     min = 1,  max = 160, value = 15),
         sliderInput("insprows",
                     "Makes for inspections:",
-                    min = 1,  max = 350, value = 15),
-        
-        sidebarMenu(
-            menuItem("Map", tabName = "map", icon = icon("map")),
-            menuItem("Chart", tabName = "chart", icon = icon("chart")),
-            menuItem("Data", tabName = "data", icon = icon("database"))
-            )
+                    min = 1,  max = 350, value = 15)
         ),
     
     dashboardBody(
         tabItems(
+          tabItem(tabName = "summary",
+#           fluidRow(column=1, width=20,
+#             infoBox("Crash and Inspection Data Summary", 0)
+#             
+#                     #infoBox("summarytext", "Summary Data for Crashes and Inspections", icon = icon("credit-card")),
+#            ),
+#                   
+          fluidRow(
+                   infoBoxOutput("TotalInspections"),
+                   infoBoxOutput("progressBox")
+            ),
+          fluidRow(
+                   infoBoxOutput("approvalBox"),
+                   infoBoxOutput("approvalBox2")
+            ),
+          fluidRow(
+            infoBoxOutput("approvalBox3"),
+            infoBoxOutput("approvalBox4")
+          )
+          
+          ),
             tabItem(tabName = "map",
                     fluidRow(
                       box( status = "info", solidHeader = TRUE,
@@ -174,16 +194,21 @@ ui <- dashboardPage(
                     )
             ),
             tabItem(tabName = "chart",
-                fluidRow(
-                        box(title = "Total Crashes over last 3 years", status = "primary", solidHeader = TRUE,
+                        box(width = 12, 
+                          title = "Total Crashes & Inspections over last 3 years", status = "primary", solidHeader = TRUE,
                         collapsible = TRUE,
-                        htmlOutput("crashChart")
-                        ),
-                        box(title = "Total Inspections over last 3 years", status = "primary", solidHeader = TRUE,
-                        collapsible = TRUE,
+                        htmlOutput("crashChart"),
+                        br(),
+                        br(),
                         htmlOutput("inspectionChart")
                         )
-                )
+                        # htmlOutput("crashChart"),
+#                         box(title = "Total Inspections over last 3 years", status = "primary", solidHeader = TRUE,
+#                         collapsible = TRUE,
+#                         htmlOutput("inspectionChart")
+#                         ),
+                          # htmlOutput("inspectionChart")
+                
             ),
             tabItem(tabName = "data",
                     fluidRow(
@@ -193,13 +218,65 @@ ui <- dashboardPage(
                     )
             )
             
-        )
-    )
-)
+        ) # End of tabitems
+    ) # End of dashboard body
+) # End of dashpage
+
+
+# TotalInspections = nrow(inspection_data)
+# TotalCrashes = nrow(crash_data)
+# 
+# TotalFatalities = sum(crash_data$Fatalities)
+# TotalInjuries = sum(crash_data$Injuries)
+# 
+# TotalOOSViol = sum(inspection_data$OOS_TOTAL)
+# TotalVehOOSViol = sum(inspection_data$VEHICLE_OOS_TOTAL)
+# TotalDriverOOSViol = sum(inspection_data$DRIVER_OOS_TOTAL)
+# TotalUnsafeDrivingInsp = nrow(inspection_data[inspection_data$UNSAFE_INSP == "Y",])
+# TotalFatugueDrivingInsp = nrow(inspection_data[inspection_data$FATIGUED_INSP == "Y",])
+# TotalMaintenanxeInsp = nrow(inspection_data[inspection_data$VH_MAINT_INSP == "Y",])
+# 
+# PercentTowaway = (nrow(crash_data[crash_data$Tow_Away == "Yes",])/TotalCrashes) * 100
+# PercentHazmat = (nrow(crash_data[crash_data$Hazmat_released == "Yes",])/TotalCrashes) * 100
 
 server <- function(input, output) {
 
-    
+  output$TotalInspections <- renderInfoBox({
+    infoBox(
+      "Total Inspections", TotalInspections, icon = icon("list"),
+      color = "purple", fill = TRUE
+    )
+  })
+    output$progressBox <- renderInfoBox({
+      infoBox(
+       "Total Crashes", TotalCrashes, icon = icon("list"),
+       color = "purple", fill = TRUE
+      )
+    })
+   output$approvalBox <- renderInfoBox({
+     infoBox(
+        "Fatalities", TotalFatalities, icon = icon("thumbs-down", lib = "glyphicon"),
+        color = "red", fill = TRUE
+     )
+    })
+   output$approvalBox2 <- renderInfoBox({
+     infoBox(
+       "Injuries", TotalInjuries, icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "red", fill = TRUE
+     )
+   })
+   output$approvalBox3 <- renderInfoBox({
+     infoBox(
+       "Tow Away", paste0(PercentTowaway,"%"), icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "yellow", fill = TRUE
+     )
+   })
+   output$approvalBox4 <- renderInfoBox({
+     infoBox(
+       "Hazmat Involved", paste0(PercentHazmat,"%"), icon = icon("thumbs-down", lib = "glyphicon"),
+       color = "yellow", fill = TRUE
+     )
+   })
     output$geoChart <- renderGvis({
         gvisGeoChart(states, "state.name", input$selected, 
                      options=list(region="US", 
@@ -262,7 +339,7 @@ server <- function(input, output) {
                                    legend="bottom",
                                    color = "green",
                                    backgroundColor="#D3D3D3", 
-                                   width=360, height=240 )
+                                   width=800, height=350 )
                      )
 
     })
@@ -280,7 +357,7 @@ server <- function(input, output) {
                                    legend="bottom",
                                    color = "blue",
                                    backgroundColor="#D3D3D3", 
-                                   width=360, height=240 )
+                                   width=800, height=350 )
                      )
       
     })    
