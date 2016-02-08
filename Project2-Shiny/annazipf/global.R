@@ -25,7 +25,7 @@ if (!(exists('drscity') &
 {
   print('loading data')
   print(getwd())
-  drscity = read.csv('drscity.csv')
+  drscity = read.csv('drscity.csv.bz2')
   states = read.csv("states.csv")
   spec = read.xlsx("spec.xlsx",1)
   school = read.csv("school.csv")
@@ -45,17 +45,17 @@ if (!(exists('drscity') &
     polygon_popup = paste0("<strong>", usa$NAME_1, "</strong>", "</br>", usa$percent)  
     pal = colorQuantile("Blues", NULL, n = 10)
     
-    densitymap = leaflet(usa) %>%
-      addTiles() %>%
-      setView(lat = 39.82, lng = -98.58, zoom = 4) %>%
-      addPolygons(data = usa, fillColor = ~colorQuantile("Blues", NULL, n = 10)(colornum), 
-                  fillOpacity = 0.6,
-                  weight = 2,
-                  color = "white",
-                  popup = polygon_popup )  %>%
-      addLegend("bottomright", pal = colorNumeric( palette = pal, domain = usa$percent ), values = ~percent,
-                title = "State doctors per 100 people",
-                opacity = 1)  
+#     densitymap = leaflet(usa) %>%
+#       addTiles() %>%
+#       setView(lat = 39.82, lng = -98.58, zoom = 4) %>%
+#       addPolygons(data = usa, fillColor = ~colorQuantile("Blues", NULL, n = 10)(colornum), 
+#                   fillOpacity = 0.6,
+#                   weight = 2,
+#                   color = "white",
+#                   popup = polygon_popup )  %>%
+#       addLegend("bottomright", pal = colorNumeric( palette = pal, domain = usa$percent ), values = ~percent,
+#                 title = "State doctors per 100 people",
+#                 opacity = 1)  
       
        print('done loading data')
 }

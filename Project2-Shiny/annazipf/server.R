@@ -40,11 +40,20 @@ shinyServer(function(input, output, session) {
                       "Years of experience:",  selectdrs()$experience, sep = " ")
       })
       
-      
-      
       #call the density map
       output$denmap <- renderLeaflet({
-        densitymap   })
+        leaflet(usa) %>%
+          addTiles() %>%
+          setView(lat = 39.82, lng = -98.58, zoom = 4) %>%
+        addPolygons(data = usa, fillColor = ~colorQuantile("Blues", NULL, n = 10)(colornum), 
+                      fillOpacity = 0.6,
+                      weight = 2,
+                      color = "white",
+                      popup = polygon_popup) %>%
+          addLegend("bottomright", pal = colorNumeric( palette = pal, domain = usa$percent ), values = ~percent,
+                    title = "State doctors per 100 people",
+                    opacity = 1)     
+    })
       
       #creating the database explorer
       output$drtable <- DT::renderDataTable({
