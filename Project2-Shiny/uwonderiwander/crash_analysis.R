@@ -220,6 +220,5 @@ TotalDriverOOSViol = sum(inspection_data$DRIVER_OOS_TOTAL)
 TotalUnsafeDrivingInsp = nrow(inspection_data[inspection_data$UNSAFE_INSP == "Y",])
 TotalFatugueDrivingInsp = nrow(inspection_data[inspection_data$FATIGUED_INSP == "Y",])
 TotalMaintenanxeInsp = nrow(inspection_data[inspection_data$VH_MAINT_INSP == "Y",])
-
-PercentTowaway = (nrow(crash_data[crash_data$Tow_Away == "Yes",])/TotalCrashes) * 100
-PercentHazmat = (nrow(crash_data[crash_data$Hazmat_released == "Yes",])/TotalCrashes) * 100
+PercentTowaway = round((nrow(crash_data[crash_data$Tow_Away == "Yes",])/TotalCrashes) * 100, digits = 2)
+PercentHazmat = round((nrow(crash_data[crash_data$Hazmat_released == "Yes",])/TotalCrashes) * 100, digits = 2)
