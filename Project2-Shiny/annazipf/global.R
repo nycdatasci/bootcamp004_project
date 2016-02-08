@@ -55,9 +55,9 @@ if (!(exists('drscity') &
                   popup = polygon_popup )  %>%
       addLegend("bottomright", pal = colorNumeric( palette = pal, domain = usa$percent ), values = ~percent,
                 title = "State doctors per 100 people",
-                opacity = 1)
-    
-    print('done loading data')
+                opacity = 1)  
+      
+       print('done loading data')
 }
 
 subset = c("NURSE PRACTITIONER", "INTERNAL MEDICINE", "FAMILY PRACTICE", 
