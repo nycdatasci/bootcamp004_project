@@ -25,7 +25,7 @@ if (!(exists('drscity') &
 {
   print('loading data')
   print(getwd())
-  drscity = read.csv('drscity.csv')
+  drscity = read.csv('drscity.csv.bz2')
   states = read.csv("states.csv")
   spec = read.xlsx("spec.xlsx",1)
   school = read.csv("school.csv")
