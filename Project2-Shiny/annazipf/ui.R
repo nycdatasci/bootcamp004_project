@@ -79,6 +79,11 @@ tabPanel("Stability",
              plotOutput("changep", height = 350),
              plotOutput("changepisolate", height = 350)
          ) )
+# tabPanel("Fun plots",
+#          div(class="outer",
+#              selectInput("specialplot", "Select a specialty", names, multiple = FALSE),
+#              plotOutput("selfplot", height = 500)
+#          ) )
 
   
 )

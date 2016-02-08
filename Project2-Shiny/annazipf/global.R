@@ -25,7 +25,7 @@ if (!(exists('drscity') &
 {
   print('loading data')
   print(getwd())
-  drscity = read.csv('drscity.csv.bz2')
+  drscity = read.csv('drscity.csv')
   states = read.csv("states.csv")
   spec = read.xlsx("spec.xlsx",1)
   school = read.csv("school.csv")
@@ -34,7 +34,6 @@ if (!(exists('drscity') &
   subgender = read.csv("subgender.csv")
   change = read.xlsx("change.xlsx",1)
   usa = readOGR("usa.shp", layer = "usa")
-  print('done loading data')
     drscity$X = NULL
     timesp$X = NULL
     timesp = na.omit(timesp)
@@ -56,7 +55,9 @@ if (!(exists('drscity') &
                   popup = polygon_popup )  %>%
       addLegend("bottomright", pal = colorNumeric( palette = pal, domain = usa$percent ), values = ~percent,
                 title = "State doctors per 100 people",
-                opacity = 1)  
+                opacity = 1)
+    
+    print('done loading data')
 }
 
 subset = c("NURSE PRACTITIONER", "INTERNAL MEDICINE", "FAMILY PRACTICE", 
@@ -78,7 +79,7 @@ medschool = unique(as.character(drscity$Medical.school.name))
 
 
 
-#clean the database
+#cleaning the database
 cleantable <- tbl_df(drscity) %>%
   dplyr::select(First.Name,
          Last.Name,
