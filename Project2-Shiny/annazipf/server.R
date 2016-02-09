@@ -77,6 +77,8 @@ shinyServer(function(input, output, session) {
       output$timespp = renderPlot(timespp)
       output$changepisolate = renderPlot(changepisolate)
       
+     
+      ##Plot hovers and popovers
       
       output$hover_info1 = renderText({
         paste0("Percent=", input$plot_hover1$x)
@@ -124,5 +126,16 @@ content="USA schools producing highest number of medicare
                  trigger = "hover", options = NULL)
       
 
+      
+#       output$text = renderText({
+#       paste(list(unique(as.character(drscity$Primary.specialty))), sep = ", ")
+#       })
 })
+
+
+ 
+
+
+
+
 

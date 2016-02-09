@@ -107,7 +107,7 @@ schoolp = schoolp+ ggtitle("20 most popular medical schools") +xlab("Schools of 
 schoolp= schoolp+theme(legend.position="none")
 
 timep=ggplot(data=time, aes(x=Graduation.year, y = grads)) +geom_point() + geom_line() +xlab("Year") +ylab("Number of graduates")
-timep = timep+ ggtitle("Average increase of medicare professionals") + 
+timep = timep+ ggtitle("Average increase in medicare staff") + 
   theme(axis.text = element_text(size = 14),
         legend.key = element_rect(fill = "navy"),
         legend.background = element_rect(fill = "white"),
