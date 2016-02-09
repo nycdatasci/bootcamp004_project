@@ -20,8 +20,7 @@ if (!(exists('drscity') &
       exists('subgender') &
       exists('timesp') &
       exists('usa') &
-      exists('change') &
-      exists('densitymap'))) 
+      exists('change'))) 
 {
   print('loading data')
   print(getwd())
@@ -36,12 +35,12 @@ if (!(exists('drscity') &
   usa = readOGR("usa.shp", layer = "usa")
     drscity$X = NULL
     timesp$X = NULL
+    subgender$X = NULL
     timesp = na.omit(timesp)
     drscity = na.omit(drscity)
     change = na.omit(change)
     
     #create the density map only once
-    
     polygon_popup = paste0("<strong>", usa$NAME_1, "</strong>", "</br>", usa$percent)  
     pal = colorQuantile("Blues", NULL, n = 10)
     
@@ -60,9 +59,16 @@ if (!(exists('drscity') &
        print('done loading data')
 }
 
-subset = c("NURSE PRACTITIONER", "INTERNAL MEDICINE", "FAMILY PRACTICE", 
-           "CERTIFIED REGISTERED NURSE ANESTHETIST", "DIAGNOSTIC RADIOLOGY", "ANESTHESIOLOGY",
-           "CLINICAL PSYCHOLOGIST", "NEUROLOGY", "CHIROPRACTIC", "PSYCHIATRY")
+subset = c("ADDICTION MEDICINE",
+           "GENERAL PRACTICE",
+           "NUCLEAR MEDICINE",
+           "CARDIAC SURGERY",
+           "PREVENTATIVE MEDICINE",
+           "ALLERGY/IMMUNOLOGY",
+           "THORACIC SURGERY",
+           "CARDIOVASCULAR DISEASE (CARDIOLOGY)",
+           "PSYCHIATRY",
+           "GERIATRIC PSYCHIATRY")
 
 changefilter = dplyr::filter(change, Primary.specialty %in% subset)
 changefilter$NA. = NULL
@@ -101,13 +107,13 @@ aes( fill = Specialty)) + coord_flip()
 plot = plot+ ggtitle("20 most popular medical disciplines") +xlab("Field") +ylab("Number of doctors")
 plot = plot +theme(legend.position="none")
 
-schoolp= ggplot(school[1:20,], aes(x=reorder(Medical.school.name,Count), y= Count)) + geom_bar(stat='identity',
-aes( fill = Medical.school.name)) + coord_flip()
+schoolp= ggplot(school[1:40,], aes(x=reorder(Medical.school.name,Count), y= Count)) + geom_bar(stat='identity',
+aes( fill = Gender), position = "stack") + coord_flip()
 schoolp = schoolp+ ggtitle("20 most popular medical schools") +xlab("Schools of medicine") +ylab("Number of graduates since 1951")
-schoolp= schoolp+theme(legend.position="none")
+schoolp= schoolp+theme(legend.position="right")
 
-timep=ggplot(data=time, aes(x=Graduation.year, y = grads)) +geom_point() + geom_line() +xlab("Year") +ylab("Number of graduates")
-timep = timep+ ggtitle("Average increase of medicare professionals") + 
+timep=ggplot(data=time, aes(x=age, y = count)) +geom_point() + geom_line() +xlab("age") +ylab("Number")
+timep = timep+ ggtitle("Age distribution of medicare staff") + 
   theme(axis.text = element_text(size = 14),
         legend.key = element_rect(fill = "navy"),
         legend.background = element_rect(fill = "white"),
@@ -120,14 +126,14 @@ genderp = ggplot(data = subgender, aes(x = reorder(Primary.specialty,percent), y
 genderp = genderp + ggtitle("Most disparate male-female medical disciplines") +
   ylab("Percent of male/female") + xlab("Field") + theme_bw()
 
-changep = ggplot(data=change, aes(x=Graduation.year, y = grads)) +geom_line(aes(color=Primary.specialty)) +
-  xlab("Year") +ylab("Number of new professionals") +theme(legend.position="none")
-changep = changep + ggtitle("Field increases in Medicare")  
+changep = ggplot(data=change, aes(x=experience, y = grads)) +geom_line(aes(color=Primary.specialty)) +
+  xlab("Experience") +ylab("Number") +theme(legend.position="none")
+changep = changep + ggtitle("Experience distribution of 77 sectors")  
 
-changepisolate = ggplot(data=changefilter, aes(x=Graduation.year, y = grads)) +
+changepisolate = ggplot(data=changefilter, aes(x=experience, y = grads)) +
   geom_line(aes(color=Primary.specialty)) +
-  xlab("Year") +ylab("Number of new professionals") +theme(legend.position="right")
-changepisolate = changepisolate + ggtitle("Top 10 volatile fields")  +
+  xlab("Experience") +ylab("Number") +theme(legend.position="right")
+changepisolate = changepisolate + ggtitle("Top 10 highest experience fields")  +
   theme(axis.text = element_text(size = 14),
         legend.key = element_rect(fill = "white"),
         legend.background = element_rect(fill = "white"),
@@ -135,14 +141,14 @@ changepisolate = changepisolate + ggtitle("Top 10 volatile fields")  +
         panel.grid.minor = element_blank(),
         panel.background = element_rect(fill = "white")) + guides(col=guide_legend(title="Field"))
 
-timespp = ggplot(data=timesp, aes(x=Graduation.year, y = num)) +geom_point() + geom_line(aes(col=Gender)) +xlab("Year") +ylab("Number of graduates")
-timespp = timespp+ ggtitle("Change in number of medicare professionals by gender") + 
+timespp = ggplot(data=timesp, aes(x=age, y = num)) +geom_point() + geom_line(aes(col=Gender)) +xlab("Age") +ylab("Number")
+timespp = timespp+ ggtitle("Age distribution of medicare professionals by gender") + 
   theme(axis.text = element_text(size = 14),
         legend.background = element_rect(fill = "white"),
         panel.grid.major = element_line(colour = "grey"),
         panel.grid.minor = element_blank(),
         panel.background = element_rect(fill = "white")) +
-  scale_x_continuous(breaks=pretty(timesp$Graduation.year, n=20)) + 
+  scale_x_continuous(breaks=pretty(timesp$age, n=10)) + 
   scale_y_continuous(breaks=pretty(timesp$num, n=10))
 
 
