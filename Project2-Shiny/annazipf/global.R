@@ -41,7 +41,6 @@ if (!(exists('drscity') &
     change = na.omit(change)
     
     #create the density map only once
-    
     polygon_popup = paste0("<strong>", usa$NAME_1, "</strong>", "</br>", usa$percent)  
     pal = colorQuantile("Blues", NULL, n = 10)
     
