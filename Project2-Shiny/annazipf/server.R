@@ -86,15 +86,15 @@ shinyServer(function(input, output, session) {
       
       output$hover_info2 = renderText({
         if(!is.null(input$plot_hover2)) {
-        paste0("Number of new professionals=", input$plot_hover2$y, 
-               "\n Year=", round(input$plot_hover2$x)) }
+        paste0("Number=", input$plot_hover2$y, 
+               "\n Years of experience=", round(input$plot_hover2$x)) }
       })
       
        
       
       addPopover(session=session, id="timespp", title="Distribution of age by gender", 
                  content='Plot of new male/female medical graduates in medicare between 1950-2015. Females
-                 have a mean age of about 33: 10 years younger than males.', placement = "bottom",
+                 have a mean age of about 33: 15 years younger than males.', placement = "bottom",
                  trigger = "hover", options = NULL)
       addPopover(session=session, id="genderp", title="Male/female dominated fields", 
                  content='Top 26 most gender-segregated medical fields.', placement = "top",
