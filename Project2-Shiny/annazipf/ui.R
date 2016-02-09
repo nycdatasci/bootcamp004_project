@@ -70,7 +70,7 @@ tabPanel("Basic stats",
             plotOutput("schoolp", height = 350)
              ),
 
-tabPanel("Changes/Disparity",
+tabPanel("Age/Gender",
              plotOutput("timespp", height = 350),
              plotOutput("genderp", height = 350,  
                         hover = hoverOpts(id ="plot_hover1")),
@@ -78,7 +78,7 @@ tabPanel("Changes/Disparity",
           
          
          
-tabPanel("Stability",
+tabPanel("Experience",
          fluidPage(
              plotOutput("changep", height = 350),
              bsTooltip("changepisolate", "test",
