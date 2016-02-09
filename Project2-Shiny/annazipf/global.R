@@ -21,7 +21,7 @@ if (!(exists('drscity') &
       exists('timesp') &
       exists('usa') &
       exists('change'))) 
-{
+{ setwd("Documents/DataSci/bootcamp004_project/Project2-Shiny/annazipf/")
   print('loading data')
   print(getwd())
   drscity = read.csv('drscity.csv.bz2')
