@@ -20,8 +20,7 @@ if (!(exists('drscity') &
       exists('subgender') &
       exists('timesp') &
       exists('usa') &
-      exists('change') &
-      exists('densitymap'))) 
+      exists('change'))) 
 {
   print('loading data')
   print(getwd())
@@ -36,6 +35,7 @@ if (!(exists('drscity') &
   usa = readOGR("usa.shp", layer = "usa")
     drscity$X = NULL
     timesp$X = NULL
+    subgender$X = NULL
     timesp = na.omit(timesp)
     drscity = na.omit(drscity)
     change = na.omit(change)

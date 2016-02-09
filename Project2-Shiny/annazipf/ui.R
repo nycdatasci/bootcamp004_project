@@ -1,5 +1,6 @@
 library(shiny)
 library(leaflet)
+library(shinyBS)
 
 
 shinyUI(navbarPage("Medicare doctors in the USA", id="nav",
@@ -63,30 +64,32 @@ tabPanel("Density map",
                         leafletOutput("denmap", width="100%", height="100%") ) ),
 
 
-tabPanel("Stats",
-         div(class="outer",
+tabPanel("Basic stats",
+         
             plotOutput("plot", height = 350),
             plotOutput("schoolp", height = 350)
-             ) ),
+             ),
 
 tabPanel("Changes/Disparity",
-         div(class="outer",
              plotOutput("timespp", height = 350),
-             plotOutput("genderp", height = 350)
-         ) ),
+             plotOutput("genderp", height = 350,  
+                        hover = hoverOpts(id ="plot_hover1")),
+               verbatimTextOutput("hover_info1")),
+          
+         
+         
 tabPanel("Stability",
-         div(class="outer",
+         fluidPage(
              plotOutput("changep", height = 350),
-             plotOutput("changepisolate", height = 350)
-         ) )
-# tabPanel("Fun plots",
-#          div(class="outer",
-#              selectInput("specialplot", "Select a specialty", names, multiple = FALSE),
-#              plotOutput("selfplot", height = 500)
-#          ) )
-
+             bsTooltip("changepisolate", "test",
+              placement = "bottom"),
+             plotOutput("changepisolate", height = 350 , hover = hoverOpts(id="plot_hover2", 
+                nullOutside = TRUE)),
+             conditionalPanel(
+               condition = "!is.null(input.plot_hover2)",
+               verbatimTextOutput("hover_info2"))
+         )
+         ) 
   
-)
-  )
 
-
+))

@@ -72,27 +72,57 @@ shinyServer(function(input, output, session) {
       output$plot = renderPlot(plot)     
       output$schoolp = renderPlot(schoolp)
       output$timep = renderPlot(timep)
-      output$genderp = renderPlot(genderp)
+      output$genderp = renderPlot({genderp})
       output$changep = renderPlot(changep)
       output$timespp = renderPlot(timespp)
       output$changepisolate = renderPlot(changepisolate)
-} )
+      
+      
+      output$hover_info1 = renderText({
+        paste0("Percent=", input$plot_hover1$x)
+      })
+      
+      output$hover_info2 = renderText({
+        if(!is.null(input$plot_hover2)) {
+        paste0("Number of new professionals=", input$plot_hover2$y, 
+               "\n Year=", round(input$plot_hover2$x)) }
+      })
+      
+       
+      
+      addPopover(session=session, id="timespp", title="Gender based growth", 
+                 content='Plot of new male/female medical graduates in medicare from 1950-2015. Females 
+                 entered later: both experience a decline around 2007.', placement = "bottom",
+                 trigger = "hover", options = NULL)
+      addPopover(session=session, id="genderp", title="Male/female dominated fields", 
+                 content='Top 26 most gender-segregated medical fields.', placement = "top",
+                 trigger = "hover", options = NULL)
+      
+      
+      addPopover(session=session, id="changep", title="Variance in growth of all 77 medicare sectors", 
+                 content="Visualizing the number of new medicare professionals who join
+the industry each year. All 77 disciplines are plotted simultaneously:
+  we can pull out the top 10 most volatile fields in the lower graph.
+Note that the y-axis is not cumulative, so each drop/raise represents
+a shift in the number of new doctors.", placement = "bottom",
+                 trigger = "hover", options = NULL)
+      
+      addPopover(session=session, id="changepisolate", title="Most volatile sectors", 
+                 content="Growth of sectors with highest variance.", placement = "top",
+                 trigger = "hover", options = NULL)
+      
+      
+      addPopover(session=session, id="schoolp", title = "Popular schools",
+content="USA schools producing highest number of medicare
+                 doctors since 1951", 
+                placement = "top",
+                 trigger = "hover", options = NULL)
+      
+      addPopover(session=session, id="plot", content="Largest medical fields", 
+                 title = " ",
+                placement = "bottom",
+                 trigger = "hover", options = NULL)
+      
 
-      
-      #interactive plot
-#       
-#       finalInput <- reactive({
-#         changefilter = dplyr::filter(change, Primary.specialty %in% subset)
-#         
-#       })
-#       
-#       output$plot <- renderPlot({
-#         data <- getSymbols(input$symb, src = "yahoo", 
-#                            from = input$dates[1],
-#                            to = input$dates[2],
-#                            auto.assign = FALSE)
-#         
-#         chartSeries(data, theme = chartTheme("white"), 
-#                     type = "line", log.scale = input$log, TA = NULL)
-#       })
-      
+})
+
