@@ -1,0 +1,622 @@
+---
+title: "SOGLP for African Villages"
+author: "Ashwin Swamy"
+date: "January 21, 2016"
+output: html_document
+---
+
+###Kerosene Assumptions
+
+- Many studies prior to 2014 assume that there is a 4% (inflation-adjusted rate of 3-5% annual) price increase, per year, for kerosene from 2012 to 2020. While there was a sharp price decrease in kerosene in 2014, this original price projection will still be considered. 
+- We are assuming a household consumption of 60 liters of kerosene per year = 6 hours daily usage (for nighttime)
+- Assuming a price premium for rural customers -- anywhere from a 33.8% to 44% premium -- based on collected data
+- Assuming -- based on data -- that Kerosene prices reflect diesel prices
+- Initial Kerosene data gathered from Lighting Africa report. Prices reflect historical unit prices of Kenyan kerosene from 2003 to 2011, taken from highway filling stations, town prices, and for 2010 to 2011 prices, an unnamed multinational oil company. 
+- In order to standardize the kerosene prices for the purposes of this study, I want to first study the relationship between kerosene prices and world crude oil prices (which are apparently related). If a relative price difference holds between the kerosene prices and world crude oil prices, I will apply this for all kerosene price estimates, before applying rural premiums. 
+- I am also making the assumption that families are not individually traveling to towns to retrieve kerosene, so will not be looking at opportunity cost/transport costs. 
+- Unlike what is quoted in the studies, crude oil prices and kerosene prices dropped significantly in 2015. 
+- Most data will be for Sub-Saharan countries. 
+
+###Loading Packages
+```{r}
+install.packages("dplyr")
+library(dplyr)
+install.packages("ggplot2")
+library(ggplot2)
+install.packages("reshape2")
+library(reshape2)
+
+```
+
+###Loading Datasets from World Bank International Development Association
+```{r}
+
+
+#1 - 
+Electricity.Access = read.csv("Access_Electricity_Worldbank.csv", header = TRUE)
+
+#2 - 
+Agriculture.Percent.Land = read.csv("Agriculture_Percent_Land_Worldbank.csv", header = TRUE)
+
+#3 - 
+Cellular.Subscriptions = read.csv("Cellular_Subscriptions_Worldbank.csv", header = TRUE)
+
+#4 - 
+Diesel.Pump.Price = read.csv("DieselPumpPrice_Worldbank.csv", header = TRUE)
+
+#5 - 
+Employment.Agriculture = read.csv("Employment_Agriculture_Worldbank.csv", header = TRUE)
+View(Employment.Agriculture)
+
+#6 - 
+Country.Descriptions = read.csv("Metadata_Country_Region.csv", header = TRUE)
+
+#7 - 
+Rural.Population = read.csv("Rural_Population_Worldbank.csv", header = TRUE)
+
+#8 - 
+Rural.Poverty = read.csv("Rural_Poverty_Headcount_Ratio_Worldbank.csv", header = TRUE)
+
+#9 - 
+Agriculture.Misc = read.csv("General_Agriculture_Worldbank.csv", header = FALSE, stringsAsFactors=FALSE, fileEncoding="latin1")
+View(Agriculture.Misc)
+```
+
+The next thing I want to do is subset all of these dataframes for Sub-Saharan countries. The Country Descriptions data.frame contains this information. 
+
+```{r}
+Country.Descriptions = tbl_df(Country.Descriptions)
+head(Country.Descriptions)
+Sub.Saharan.Description = filter(Country.Descriptions, Region == "Sub-Saharan Africa")
+Sub.Saharan.Country = select(Sub.Saharan.Description, Country.Name)
+#This will allow us to left join for the rest of the data sets and keep only values pertaining to Sub-Saharan Africa
+
+true.col.names = filter(Agriculture.Misc, V1 == "Code")
+true.col.names = c(true.col.names)
+Agriculture.Misc = tbl_df(Agriculture.Misc)
+Agriculture.Misc = transmute(Agriculture.Misc, "Code" = V1, "Country" = V2, "Population increase 1980-2015" = V3, "Projected population increase, 2015-2050" = V4, "Population 2050/2015 ratio" = V5, "Projected rural population, 2015" = V6, "Projected rural population increase, 2015-2050" = V7, "% agriculture in total economically active population, 2010" = V8)
+View(Agriculture.Misc)
+Agriculture.Misc = Agriculture.Misc[-1,]
+View(Agriculture.Misc)
+#Agriculture.Misc now Fixed
+
+#Selecting Only Sub-Saharan Countries
+
+Electricity.Access = inner_join(Electricity.Access, Sub.Saharan.Country, by = "Country.Name")
+View(Electricity.Access)
+Agriculture.Percent.Land = inner_join(Agriculture.Percent.Land, Sub.Saharan.Country, by = "Country.Name")
+Cellular.Subscriptions = inner_join(Cellular.Subscriptions, Sub.Saharan.Country, by = "Country.Name")
+Diesel.Pump.Price = inner_join(Diesel.Pump.Price, Sub.Saharan.Country, by = "Country.Name")
+Employment.Agriculture = inner_join(Employment.Agriculture, Sub.Saharan.Country, by = "Country.Name")
+Rural.Population = inner_join(Rural.Population, Sub.Saharan.Country, by = "Country.Name")
+Rural.Poverty = inner_join(Rural.Poverty, Sub.Saharan.Country, by = "Country.Name")
+Agriculture.1 = mutate(Agriculture.Misc, Country.Name = Country)
+Agriculture.2 = inner_join(Agriculture.1, Sub.Saharan.Country, by = "Country.Name")
+Agriculture.2 = Agriculture.2[,-9]
+View(Agriculture.2)
+
+View(Agriculture.Percent.Land)
+```
+
+
+In order to establish some kind of relationship between kerosene and diesel pump price, I took data plotted from a "Lighting Africa" report, a joint effort between the World Bank and the IFC. The original study can be found here:
+http://light.lbl.gov/pubs/tr/Lumina-TR3.pdf
+
+In addition, I had to search for the historic conversion rate between Kenyan shillings and USD. The price fluctuates throughout the year, so estimates were taken at the start of each year. A more exact study might average across the year or take the effort of pinpointing month-to-month price changes. Prices are estimated from the tables on this site:
+http://www.xe.com/currencytables/?from=KES&date=2015-01-01
+
+
+```{r}
+#Note that $1US = 67 Kenyan Shillings
+Kerosene.Pricing <- read.csv("Kerosene_USD.csv", header = TRUE)
+View(Kerosene.Pricing)
+Kerosene.Price.df <- tbl_df(Kerosene.Pricing)
+Kerosene.Price.df = transmute(Kerosene.Price.df, Kerosene.Unit.Cost = Kerosene.Unit.Cost..Ksh.l., Exchange.Rate.USD = Exchange.Rate..Ksh.USD. )
+
+
+Kerosene.Price.df <- mutate(Kerosene.Price.df, Kerosene.USD.liter = Kerosene.Unit.Cost/Exchange.Rate.USD)
+View(Kerosene.Price.df)
+Kerosene.Price.df <- data.frame(Kerosene.Pricing$Date, Kerosene.Price.df$Kerosene.USD.liter)
+View(Kerosene.Price.df)
+head(Kerosene.Price.df)
+cols <- c("Date", "USD.liter")
+colnames(Kerosene.Price.df) <- cols
+head(Kerosene.Price.df)
+```
+
+###Assumptions for Economic Indicators used from World Bank Datasets
+
+The viability and relevance of Solar Off-grid Lighting Platforms (SOGLP) is directly related to a variety of economic indicators and trends in Sub-Saharan Africa. Since urban areas are already connected to a centralized electrical grid, measurements such as "Agricultural Land %," "Employment in Agriculture," "% Rural Trend", "Rural Poverty Headcount Ratio at National Poverty Lines" and "Access to Electricity" help paint a picture of the potential market need for SOGLP products. 
+- In addition, "Mobile Cellular Subsriptions (per 100 people) can help toidentify the growth of mobile use in Sub-Saharan African countries. Projections can be made by applying estimated mobile penetration rates. This measure is key in understand the potential growth of PAYG platforms, and viability of PAYG platforms. 
+- Understanding the potential relationships between monile penetration, kerosene pricing, income levels, and the above indicators is central to the EDA for this study. 
+
+
+###Understanding SOGLP and PAYG
+
+- This portion of the study looks into the Solar Pay-As-You-Go platforms pricing model. This includes projections for price decreases every 5 years, and a 5-year product life. 
+- In particular, two products are examined -- Angaza Design's/Greenlight Planet's Sun King Eco, which is a simple study lamp, and d.light/M-Kopa's S300, which is a study lamp and a mobile phone charger. In order get a sense of the impact of mobile phone charging using SOGLP, the price difference between in-town charging and charging using the M-Kopa S300 is considered. 
+- With a clear understanding of the PAYG SOGLP payment schedule, one can more easily study the impact of PAYG on savings for rural families, particular those living below the poverty line. 
+- A quick comparison between non-PAYG and PAYG SOGLP will be considered to understand the impact of mobile data coverage on savings. 
+
+```{r}
+#Model information comes from Greenlight Planet and D.Light product spec information online. 
+#D.Light funding platform is build by M.KOPA
+#Greenlight Planet uses platform built by Angaza Design
+Model.Name <- c("D.Light_S300", "GLP_Sun_King_Eco") 
+Hours.Light <- c(6,6)
+Mobile <- c("YES", "NO")
+Mobile.Spend.Low <- c(0, .5)
+Mobile.Spend.High <- c(0, 3)
+Charges.Per.Week <- c(3, 3)
+SOGLP_Features <- data.frame(Model.Name, Hours.Light, Mobile, Mobile.Spend.Low, Mobile.Spend.High, Charges.Per.Week)
+head(SOGLP_Features)
+```
+
+###Pricing Model
+Previous off-grid lighting field observations in Kenya has indicated that in rural villages people tend to purchase kerosene in small quantities that are well under one-liter.
+
+```{r}
+
+#Payment Schedule for SOGLP Products and Kerosene
+Model.Name2 <- c("D.Light_S300", "GLP_Sun_King_Eco", "d.light D10", "Kerosene")
+Down.Payment <- c(4.60, 2.30, 29, 0.4734470*5)
+#5 liters of kerosene once a month
+Recurring.Payment <- c(3.12, 1.56, .52, 0)
+Frequency.Payment <- c("weekly", "weekly", "daily", "monthly")
+Number.Periods <- c(10, 10, 365, 12)
+Rate.change <- c(.67, .67, .67, 1)
+Payment.Schedule <- data.frame(Model.Name2, Down.Payment, Recurring.Payment, Frequency.Payment, Number.Periods, Rate.change)
+
+View(Payment.Schedule)
+
+###Comparing Kerosene to PAYG SOGLP
+
+# The key figure in this section is the aggregate expenditure of kerosene vs PAYG, and a comparison between the payment schedules for kerosene and PAYG SOGLP. 
+```
+
+```{r}
+#Graph for Payment Period
+a = c(1:364)
+monthly = ifelse(a%%28 == 0, 1,0)
+weekly <- rep(c(0,0,0,0,0,0,1), 52)
+daily <- rep(c(1,1,1,1,1,1,1), 52)
+annual.cadence = data.frame(daily, weekly, monthly)
+annual.cadence = mutate(annual.cadence, weekly2 = 1*weekly)
+head(annual.cadence)
+View(annual.cadence)
+#For this, I am going to multiply the daily by the SOGLP price.
+#I am then going to multiply one of the weekly by kerosene, the monthly by kerosene, and another weekly by another SOGLP. I can then compare these graphs. 
+```
+
+
+###Below are the plots
+```{r, echo=FALSE}
+
+#Cols
+cols <- c("Date", "USD.liter")
+colnames(Kerosene.Price.df) <- cols
+
+#######VISUAL EDA of ECONOMIC INDICATORS FOR RURAL SUB-SAHARAN AFRICA############
+#Access to Electricity Boxplot (% of Population)
+Electricity.Scatter = select(Electricity.Access, -Country.Code, -Indicator.Name, -Indicator.Code)
+View(Electricity.Scatter)
+cols.electricity <- c("Country", 1960:2015)
+colnames(Electricity.Scatter) <- cols.electricity
+View(Electricity.Scatter)
+
+
+library(Hmisc)
+A=melt(Electricity.Scatter, id.vars = "Country")
+View(A)
+A = tbl_df(A)
+#A$value = impute(A$value, 0)
+View(A)
+Electricity.Percentage <- A
+
+cols.electricity <- c("Country", "Year", "Percentage")
+colnames(Electricity.Percentage) <- cols.electricity
+
+
+Electricity.Percentage$Year = as.numeric(Electricity.Percentage$Year)
+Electricity.Percentage = filter(Electricity.Percentage, Year > 30)
+Electricity.Percentage = mutate(Electricity.Percentage, Year = Year + 1959)
+Electricity.Perc = Electricity.Percentage[complete.cases(Electricity.Percentage),]
+class(Electricity.Perc$Year)
+View(Electricity.Perc)
+head(Electricity.Perc)
+
+#Separate data frame for averages by year
+means <- aggregate(Percentage~Year, Electricity.Perc, mean)
+medians <- aggregate(Percentage~Year, na.rm = FALSE, Electricity.Perc, FUN=median)
+head(means)
+head(medians)
+
+install.packages("ggthemes")
+library(ggthemes)
+
+Boxplot.Elect <- ggplot(Electricity.Perc, aes(x=Year, y=Percentage, fill=Year, group = Year, binwidth = 1)) + 
+  geom_boxplot(aes(fill= factor(Year))) + 
+  ggtitle("Electrification Rate in Sub-Saharan Africa (1990-2012)") + 
+  theme_gdocs() + scale_fill_tableau() + 
+  scale_x_continuous(limits=c(1985, 2015)) +
+  scale_y_continuous(limits=c(0, 110)) 
+#+ geom_text(data = means, aes(label = Percentage))
+
+#geom_text(data = means, aes(label = Percentage)) +                                                                                         #geom_text(x="1992", y = 24, label="24") 
+
+Boxplot.Elect
+#+ geom_dotplot(binaxis="y", stackdir="center", binwidth = 1.5) 
+######################################################################
+
+#Bar plot for countries' electrification rate, in ascending order, for 2010 and 2012
+Recent.Elec = filter(Electricity.Perc, Year >= 2012)
+Recent.Elec = group_by(Recent.Elec, Year)
+Recent.Elec = arrange(Recent.Elec, Percentage)
+Recent.Elec = group_by(Recent.Elec, Year)
+Recent.Elec = arrange(Recent.Elec, Year)
+View(Recent.Elec)
+
+Elec.2012 = ggplot(Recent.Elec, aes(x = reorder(Country, Percentage), y = Percentage), colour = "blue") +
+         geom_bar(stat = "identity") +  ggtitle("Electrification Rate in Sub-Saharan Africa in 2012, by Country") +
+  theme_gdocs() + theme(
+  axis.text.x = element_text(angle=90,hjust=1,vjust=0.5), axis.ticks = element_blank())
+Elec2.2012 = Elec.2012 + xlab("Sub-Saharan Countries in 2012")
+Elec3.2012 = Elec2.2012 + geom_hline(aes(yintercept = 32, colour = "mean=36.9"))
+Elec4.2012 = Elec3.2012 + geom_hline((aes(yintercept = 36.9, colour = "median=32")))
+Elec5.2012 = Elec4.2012 + theme_hc()
+Elec5.2012
+
+#################### LINE PLOT TO SEE AGRI LAND USE CHANGE OVER TIME #####################
+
+#Agricultural level (%of land area)
+Agriculture.Perc = select(Agriculture.Percent.Land, -Country.Code, -Indicator.Name, -Indicator.Code, -X1960)
+cols.electricity <- c("Country", 1961:2015)
+colnames(Agriculture.Perc) <- cols.electricity
+Agriculture.Perc = filter(Agriculture.Perc, Country < "South Sudan")
+Agriculture.Perc2 = select(Agriculture.Perc, -c(55:56))
+
+B=melt(Agriculture.Perc2, id.vars = "Country")
+View(B)
+B = tbl_df(B)
+#A$value = impute(A$value, 0)
+View(B)
+Agri.Perc <- B
+cols.agri<- c("Country", "Year", "Percentage")
+colnames(Agri.Perc) <- cols.agri
+View(Agri.Perc)
+Agri.Perc <- Agri.Perc[complete.cases(Agri.Perc),]
+
+Agri.Plot = ggplot(data=Agri.Perc, aes(x=Year, y=Percentage,
+                      group=Country,
+                      colour=Country)) 
+
+Agri.Plot.Line = Agri.Plot + geom_line() + ggtitle("% Land Used for Agriculture (1961-2013)") + scale_y_continuous(limits=c(0, 110)) + theme_minimal()
+
+Agri.Plot.Line2 = Agri.Plot.Line +  theme(
+  axis.text.x = element_text(angle=90,hjust=1,vjust=0.5), axis.ticks = element_blank()) + theme(legend.position="none")
+head(Agri.Perc)
+View(Agri.Perc)
+Agri.Plot.Line2
+```
+
+### Percent Agricultural Land vs Electrification Rate 
+
+Percent of land for agriculture vs electrification rate in 2012
+For this plot, I want to isolate the year 2012 for both measures to see if there is any kind of relationship between the amount of land used for agriculture (which I'm substituting for "rural"), and electrification rate. I believe this plot can give us a clue about how the amount of rural land a country has impacts the amount of electricity it has (i.e., whether most people with electricity are living in urban areas or towns, or not). My first instutition was to look at percent of agricultural land, rather than percent of population living in rural areas, because I wanted to get a sense for which countries are more likely to have "remote" villages that are removed from the central grid. 
+
+```{r}
+Recent.Elec = filter(Electricity.Perc, Year >= 2012)
+Recent.Elec = group_by(Recent.Elec, Year)
+Recent.Elec = arrange(Recent.Elec, Percentage)
+Recent.Elec = group_by(Recent.Elec, Year)
+Recent.Elec = arrange(Recent.Elec, Year)
+View(Recent.Elec)
+
+Recent.Elec2 = filter(Electricity.Perc, Year == 2010)
+Recent.Elec2 = group_by(Recent.Elec2, Year)
+Recent.Elec2 = arrange(Recent.Elec2, Percentage)
+Recent.Elec2 = group_by(Recent.Elec2, Year)
+Recent.Elec2 = arrange(Recent.Elec2, Year)
+
+View(Agri.Perc)
+Agri.Perc.10 = filter(Agri.Perc, Year == 2010)
+Agri.Perc.12 = filter(Agri.Perc, Year == 2012)
+head(Agri.Perc.10)
+head(Agri.Perc.12)
+head(Recent.Elec2)
+head(Recent.Elec)
+Recent.Elec12=Recent.Elec
+Recent.Elec10 = Recent.Elec2
+
+#Join Dataframes
+Agri.Elec12 = left_join(Recent.Elec12, Agri.Perc.12, by = "Country")
+Agri.Elec10 = left_join(Recent.Elec10, Agri.Perc.10, by = "Country")
+View(Agri.Elec12)
+head(Agri.Elec10)
+Agr.Elec12 = Agri.Elec12[complete.cases(Agri.Elec12),]
+Agr.Elec10 = Agri.Elec10[complete.cases(Agri.Elec10),]
+Agr.Elec12 = select(Agr.Elec12, -Year.y)
+Agr.Elec10 = select(Agr.Elec10, -Year.y)
+head(Agr.Elec10)
+head(Agr.Elec12)
+
+cols2 <- c("Country", "Year", "Electrification", "Agricultural_Land")
+colnames(Agr.Elec10) <- cols2
+colnames(Agr.Elec12) <- cols2
+View(Agr.Elec10)
+```
+
+The purpose of the below plots, as previously mentioned, is to try to identify any relationship between electrification rate and percentage of agricultural land. 
+
+```{r}
+
+###For Countries in 2010
+a1 <- ggplot(Agr.Elec10, aes(x = reorder(Country, Electrification), group = 1))
+a2 <- a1 + geom_line(aes(group=1, y = Electrification, colour = "Electrification")) + geom_line(aes(group=1, y = Agricultural_Land, colour = "Agricultural_Land"))
+a3 <- a2 + theme_gdocs() + scale_fill_tableau() + ggtitle("% Land Used for Agriculture vs Electrification Rate in 2010") + theme(
+  axis.text.x = element_text(angle=90,hjust=1,vjust=0.5)) + xlab("Sub-Saharan Countries in 2010") + ylab("Percentage")
+
+Plot_Agriculture_Elec_10 <- a3
+Plot_Agriculture_Elec_10
+
+#For Countries in 2012
+v1 <- ggplot(Agr.Elec12, aes(x = reorder(Country, Electrification), group = 1))
+v2 <- v1 + geom_line(aes(group=1, y = Electrification, colour = "Electrification")) + geom_line(aes(group=1, y = Agricultural_Land, colour = "Agricultural_Land"))
+v3 <- v2 + theme_gdocs() + scale_fill_tableau() + ggtitle("% Land Used for Agriculture vs Electrification Rate in 2012") + theme(
+  axis.text.x = element_text(angle=90,hjust=1,vjust=0.5)) + xlab("Sub-Saharan Countries in 2012") + ylab("Percentage")
+
+Plot_Agriculture_Elec_12 <- v3
+Plot_Agriculture_Elec_12
+```
+
+####CELLULAR SUBSCRIPTIONS
+
+For this section, I want to display the rate of growth of cellular subscriptions per 100 people and compare this to electrification rate and percentage of population in agriculture, to see the  relationship between countries that have many cellular subscriptions and the percentage of population that has access to electricity, and the percentage of population that lives in a rural area. 
+
+```{r}
+head(Cellular.Subscriptions)
+colnames(Cellular.Subscriptions)
+class(Cellular.Subscriptions)
+Cellular = select(Cellular.Subscriptions, -Country.Code, -Indicator.Name, -Indicator.Code)
+colnames(Cellular)
+Cell.Names = c("Country", 1960:2015)
+colnames(Cellular) = Cell.Names
+colnames(Cellular)
+
+
+C=melt(Cellular, id.vars = "Country")
+C = tbl_df(C)
+colnames(C) = c("Country", "Year", "Subscriptions.100")
+C$Year = as.numeric(C$Year)
+C = mutate(C, Year = Year + 1959)
+C = filter(C, Year>1990)
+View(C)
+
+C = C[complete.cases(C),]
+View(C)
+#Boxplot
+Boxplot.C <- ggplot(C, aes(x=Year, y=Subscriptions.100, group = Year, binwidth = 1)) + 
+  geom_boxplot() + 
+  ggtitle("Cellular Subscriptions per 100 People (1991-2014)") + 
+  theme_gdocs() + scale_fill_tableau() + 
+  scale_y_continuous(limits=c(0, 110))
+
+Boxplot.C
+Cellular_Subscriptions_Box = Boxplot.C
+
+############ Creating Line Plot of Cellular Subscriptions ############
+
+Cellular.Plot = ggplot(data=C, aes(x=Year, y=Subscriptions.100,
+                      group=Country,
+                      colour=Country)) 
+
+Cellular.Line = Cellular.Plot + geom_line() + ggtitle("Cellular Subscriptions per 100 people (Sub-Saharan Africa)") + scale_y_continuous(limits=c(0, 140)) + theme_minimal()
+
+Cellular.Line2 = Cellular.Line +  theme(
+  axis.text.x = element_text(angle=90,hjust=1,vjust=0.5), axis.ticks = element_blank()) + theme(legend.position="none") + geom_hline(aes(yintercept = 100), linetype="dashed")
+Cellular.Line2 
+
+```
+
+###Comparing Cellular Subscriptions, Rural Poverty, and Rural Population
+
+The above plots clearly show a huge amount of growth in cellular subscriptions per 100 people, but a large amount of variance exists between Sub-Saharan African countries. It would be interesting to see if there is any relationship at all between rural poverty, rural population, and cellular subscriptions per 100 people. The data for rural poverty from the World Bank is fairly sparse, so it isn't possible to notice major trends in rural poverty, but it's still worthwhile to see how these impoverished regions fall within different levels of cellular subscriptions and rural population percentages. 
+
+```{r}
+
+Rural.Pop.12 = select(Rural.Population, Country.Name, X2012)
+P=melt(Rural.Pop.12, id.vars = "Country.Name")
+P = tbl_df(P)
+#A$value = impute(A$value, 0)
+View(P)
+cols.agri<- c("Country", "Year", "Percentage")
+colnames(P) <- cols.agri
+head(P)
+P = select(P, Country, Percentage)
+head(Recent.Elec12)
+#Join Dataframes
+Pop.Elec12 = left_join(Recent.Elec12, P, by = "Country")
+Pop.Elec12 = Pop.Elec12[complete.cases(Pop.Elec12),]
+head(Pop.Elec12)
+colnames(Pop.Elec12) <- c("Country", "Year", "Electrification", "Rural_Pop")
+head(Pop.Elec12)
+
+
+Pop1 <- ggplot(Pop.Elec12, aes(x = reorder(Country, Electrification), group = 1))
+Pop2 <- Pop1 + geom_line(aes(group=1, y = Electrification, colour = "Electrification")) + geom_line(aes(group=1, y = Rural_Pop, colour = "Rural_Pop"))
+Pop3 <- Pop2 + theme_gdocs() + scale_fill_tableau() + ggtitle("% Population in Rural Areas vs Electrification Rate in 2012") + theme(
+  axis.text.x = element_text(angle=90,hjust=1,vjust=0.5)) + xlab("Sub-Saharan Countries in 2012") + ylab("Percentage")
+
+Pop3
+Plot_Rural_Electrification <- Pop3
+
+#For this next portion, I am creating a dataframe with rural poverty values for the countries listed below. While there are only very few countries with values from 2012, I am borrowing from the 2010 and 2011. 
+
+head(Rural.Poverty)
+Rural.Pov = select(Rural.Poverty, Country.Name, X2009, X2010, X2011, X2012)
+head(Rural.Pov)
+colnames(Rural.Pov) = c("Country", "2009", "2010", "2011", "2012")
+RP=melt(Rural.Pov, id.vars = "Country")
+RP = tbl_df(RP)
+head(RP)
+colnames(RP) <- c("Country", "Year", "Poverty_Rate")
+View(RP)
+RP = RP[complete.cases(RP),]
+RP = select(RP, Country, Poverty_Rate)
+
+head(RP)
+
+Pop4 <- Pop3 + geom_point(data=RP, aes(x = Country, y = Poverty_Rate, colour = "Rural Poverty Rate")) 
+Pop4
+
+#Just for comparison sake, I am plotting rural poverty rates on the agricultural percent land vs electrification graph. 
+
+#Electrification vs Rural Poverty Rate
+PAP1 <- v1 + geom_line(aes(group=1, y = Electrification, colour = "Electrification"))
+PAP1 <- PAP1 + theme_gdocs() + scale_fill_tableau() + ggtitle("Rural Poverty Rate vs Electrification Rate in 2012") + theme(
+  axis.text.x = element_text(angle=90,hjust=1,vjust=0.5)) + xlab("Sub-Saharan Countries in 2012") + ylab("Percentage") + geom_point(data=RP, aes(x = Country, y = Poverty_Rate, colour = "Rural Poverty Rate")) 
+
+PAP1 <- PAP1 + geom_line(data=RP, aes(x = Country, y = Poverty_Rate, colour = "Rural Poverty Rate")) 
+PAP1
+
+#Cell Subscription vs Rural Poverty Rate
+
+C2 <- filter(C, Year == "2012")
+C2.Plot <- ggplot(C2, aes(x = reorder(Country, Subscriptions.100), group = 1))
+C2.Plot <- C2.Plot + geom_line(aes(group=1, y = Subscriptions.100, colour = "Subscriptions")) + geom_line(data=RP, aes(x = Country, y = Poverty_Rate, colour = "Rural Poverty Rate")) 
+C2.Plot <- C2.Plot + theme_gdocs() + scale_fill_tableau() + ggtitle("Cellular Subscriptions per 100 vs Rural Poverty Rate in 2012") + theme(
+  axis.text.x = element_text(angle=90,hjust=1,vjust=0.5)) + xlab("Sub-Saharan Countries in 2012") + scale_y_continuous(limits=c(0, 110))
+C2.Plot = C2.Plot + geom_point(data=RP, aes(x = Country, y = Poverty_Rate, colour = "Rural Poverty Rate")) 
+C2.Plot
+
+#There does not seem to be any relationship between cell phone subscriptions and rural poverty rate. 
+#There needs to be a study on cell phone subscriptions in rural areas. 
+```
+
+####Understanding Kerosene Pricing 
+
+Surprisingly, there is no official kerosene index, in Africa or the world. The general rule of thumb, according to the World Bank and other sources, is that kerosene varies directly with diesel and is typically more expensive in villages at a premium of 33.8% to 44%. The purpose of the below analysis is to determine whether the data reflects this claim. I've taken diesel prices from the World Crude Oil Index and kerosene prices from a World Bank report. The Kerosene prices are from towns in Kenya. 
+
+```{r}
+View(Diesel.Pump.Price)
+Diesel.Price = select(Diesel.Pump.Price, -Indicator.Name, -Indicator.Code, -Country.Code)
+colnames(Diesel.Price) = c("Country", 1960:2015)
+head(Diesel.Price)
+Diesel.df=melt(Diesel.Price, id.vars = "Country")
+Diesel.df = tbl_df(Diesel.df)
+Diesel.df = Diesel.df[complete.cases(Diesel.df),]
+View(Diesel.df)
+
+Boxplot.Diesel <- ggplot(Diesel.df, aes(x=variable, y=value, group = variable, binwidth = 1)) + 
+  geom_boxplot() + 
+  ggtitle("Diesel Prices Per Liter (1960-2014)") + 
+  theme_gdocs() + scale_fill_tableau() 
+Boxplot.Diesel
+#From this plot, it's cleary why reports from 2012 expected a 4% per year rise in diesel prices. Diesel had risen steadily from 1998 to 2012, before a slight dip in 2014 and large decrease in 2015. 
+
+Kenya.Diesel = filter(Diesel.df, Country == "Kenya")
+head(Kenya.Diesel)
+head(Kerosene.Price.df)
+Kerosene.Rural = mutate(Kerosene.Price.df, "34% Increase" = 1.34*USD.liter, "44% Increase" = 1.44*USD.liter)
+#The above table, when plotted, will require a jitter, as prices within the same year were taken from different months
+
+class(Kerosene.Price.df$USD.liter)
+Kenya.Diesel$variable = as.numeric(Kenya.Diesel$variable)
+Kenya.Diesel = mutate(Kenya.Diesel, variable = variable + 1959)
+class(Kenya.Diesel$variable)
+colnames(Kenya.Diesel) = c("Country", "Year", "USD.liter")
+head(Kerosene.Rural)
+colnames(Kerosene.Rural) <- c("Year", "USD.liter", "Increase.One", "Increase.Two")
+class(Kerosene.Rural$Increase.One)
+class(Kerosene.Rural$Increase.Two)
+########### Looking at Kerosene vs Diesel in Kenya ##########
+
++ geom_point(data=RP, aes(x = Country, y = Poverty_Rate, colour = "Rural Poverty Rate")) 
+
+View(Kerosene.Rural)
+KD <- ggplot(Kenya.Diesel, aes(Year, USD.liter))
+KD = KD + stat_smooth() + geom_point()
+KD
+KD.Plot1 = KD + geom_jitter(data=Kerosene.Rural, aes(x = Year, y = USD.liter, colour="USD.liter")) + ggtitle("Price of Kerosene in Town Pump Stations") 
+KD.Plot1
+
+KD.Plot2 = KD + geom_jitter(data=Kerosene.Rural, aes(x = Year, y = Increase.One, colour = "34% Increase")) + ggtitle("Kerosene with 34% Price Premium")
+KD.Plot2
+
+KD.Plot3 = KD + geom_jitter(data=Kerosene.Rural, aes(x = Year, y = Increase.Two, colour = "44% Increase")) + ggtitle("Kerosene with 44% Price Premium")
+KD.Plot3
+```
+
+###Study of Pay-As-You-Go Solar vs Kerosene Payment Schedules
+
+```{r, echo=FALSE}
+head(SOGLP_Features)
+head(Payment.Schedule)
+head(annual.cadence)
+#Payment Schedule Table for different products set at different prices
+#Multiple columns by different things
+#Create two horizontal lines at 1.90 and 3.10
+#Remember to add down payments to relevant rows
+#Diesel Schedule set at weekly or monthly 
+View(annual.cadence)
+annual.cadence1 = mutate(annual.cadence, D.Light.S300 = weekly*3.12)
+annual.cadence2 = mutate(annual.cadence1, GLP.Sun.King.Eco = weekly*1.56)
+annual.cadence3 = mutate(annual.cadence2, d.light.D10 = daily*.52)
+annual.cadence4 = mutate(annual.cadence3, Kerosene.today = weekly*.47)
+annual.cadence5 = mutate(annual.cadence4, kerosene.twelve = weekly*1.26)
+annual.cadence5 = select(annual.cadence5, -daily, -weekly, -monthly, -weekly2)
+annual.cadence5[1,2] = 2.3
+annual.cadence5[1,1] = 4.6
+annual.cadence5[1,3] = 29
+annual.cadence5[71:364,1] = 0
+annual.cadence5[71:364,2] = 0
+annual.cadence5 = mutate(annual.cadence5, days = 1:364)
+head(annual.cadence5)
+annual.cadence5$days <- as.numeric(annual.cadence5$days)
+class(annual.cadence5$days)
+
+
+annual.cadence.plot = ggplot(data = annual.cadence5[which(annual.cadence5$D.Light.S300>0),], aes(x=days, y=D.Light.S300, colour="D.Light.S300", size = 4)) +
+  geom_point() 
+
+annual.cadence.plot2 = annual.cadence.plot + geom_point(data = annual.cadence5[which(annual.cadence5$GLP.Sun.King.Eco>0),], aes(x=days, y=GLP.Sun.King.Eco, colour="GLP.Sun.King.Eco", size = 4)) 
+annual.cadence.plot2
+
+annual.cadence.plot3 = annual.cadence.plot2 + geom_point(data = annual.cadence5[which(annual.cadence5$Kerosene.today>0),], aes(x=days, y=Kerosene.today, colour= "Kerosene.today", size = 4)) 
+annual.cadence.plot3
+
+annual.cadence.plot4 = annual.cadence.plot3 + geom_point(data = annual.cadence5[which(annual.cadence5$kerosene.twelve>0),], aes(x=days, y=kerosene.twelve, colour="kerosene.twelve", size = 4)) 
+
+annual.cadence.plot4 = annual.cadence.plot4 + theme_minimal()
+annual.cadence.plot4 = annual.cadence.plot4 + geom_hline(aes(yintercept = 3.10, colour = "Poverty.Rate.40%", size = 1.5)) + geom_hline(aes(yintercept = 1.90, colour = "Poverty.Rate.20%", size = 1.5))
+
+annual.cadence.plot4 = annual.cadence.plot4 + geom_vline(aes(xintercept = 70, colour = "Payment Complete"), linetype="dashed", size = 1.5)
+
+annual.cadence.final = annual.cadence.plot4 + geom_vline(aes(xintercept = 28), linetype="dotted", alpha=.4) + geom_vline(aes(xintercept = 56), linetype="dotted", alpha=.4) + geom_vline(aes(xintercept = 84), linetype="dotted", alpha=.4)
+annual.cadence.final
+annual.cadence.final = annual.cadence.final + geom_vline(aes(xintercept = 112), linetype="dotted", alpha=.4) 
+
+annual.cadence.final = annual.cadence.final + geom_vline(aes(xintercept = 140), linetype="dotted", alpha=.4) 
+
+annual.cadence.final = annual.cadence.final + geom_vline(aes(xintercept = 168), linetype="dotted", alpha=.4) 
+
+annual.cadence.final = annual.cadence.final + geom_vline(aes(xintercept = 196), linetype="dotted", alpha=.4) 
+
+annual.cadence.final = annual.cadence.final + geom_vline(aes(xintercept = 224), linetype="dotted", alpha=.4) 
+
+annual.cadence.final = annual.cadence.final + geom_vline(aes(xintercept = 252), linetype="dotted", alpha=.4) 
+
+annual.cadence.final = annual.cadence.final + geom_vline(aes(xintercept = 280), linetype="dotted", alpha=.4) 
+
+annual.cadence.final = annual.cadence.final + geom_vline(aes(xintercept = 308), linetype="dotted", alpha=.4) 
+
+annual.cadence.final = annual.cadence.final + geom_vline(aes(xintercept = 336), linetype="dotted", alpha=.4) 
+
+annual.cadence.final = annual.cadence.final + geom_vline(aes(xintercept = 364), linetype="dotted", alpha=.4) 
+
+annual.cadence.final = annual.cadence.final + ggtitle("Annual Payment Schedule for SOGLP vs Kerosene")
+annual.cadence.final = annual.cadence.final + scale_x_continuous(0:365) + theme_gdocs()
+annual.cadence.final = annual.cadence.final + xlab("Days in Calendar Year")
+annual.cadence.final
+```
+
