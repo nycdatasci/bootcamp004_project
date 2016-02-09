@@ -112,7 +112,7 @@ aes( fill = Gender), position = "stack") + coord_flip()
 schoolp = schoolp+ ggtitle("20 most popular medical schools") +xlab("Schools of medicine") +ylab("Number of graduates since 1951")
 schoolp= schoolp+theme(legend.position="right")
 
-timep=ggplot(data=time, aes(x=age, y = count)) +geom_point() + geom_line() +xlab("age") +ylab("Number")
+timep=ggplot(data=time, aes(x=age, y = num)) +geom_point() + geom_line() +xlab("age") +ylab("Number")
 timep = timep+ ggtitle("Age distribution of medicare staff") + 
   theme(axis.text = element_text(size = 14),
         legend.key = element_rect(fill = "navy"),
@@ -127,12 +127,12 @@ genderp = genderp + ggtitle("Most disparate male-female medical disciplines") +
   ylab("Percent of male/female") + xlab("Field") + theme_bw()
 
 changep = ggplot(data=change, aes(x=experience, y = grads)) +geom_line(aes(color=Primary.specialty)) +
-  xlab("Experience") +ylab("Number") +theme(legend.position="none")
+  xlab("Experience") +ylab("Number of professionals") +theme(legend.position="none")
 changep = changep + ggtitle("Experience distribution of 77 sectors")  
 
 changepisolate = ggplot(data=changefilter, aes(x=experience, y = grads)) +
   geom_line(aes(color=Primary.specialty)) +
-  xlab("Experience") +ylab("Number") +theme(legend.position="right")
+  xlab("Experience") +ylab("Number of professionals") +theme(legend.position="right")
 changepisolate = changepisolate + ggtitle("Top 10 highest experience fields")  +
   theme(axis.text = element_text(size = 14),
         legend.key = element_rect(fill = "white"),
