@@ -3,7 +3,7 @@ library(leaflet)
 
 library(markdown)
 
-setwd("/Users/boulenge/Desktop/Projects/Project2 - Shiny/Shiny-TomB")
+#setwd("/Users/boulenge/Desktop/Projects/Project2 - Shiny/Shiny-TomB")
 
 #source("/Users/boulenge/Desktop/Projects/Project2 - Shiny/Shiny-TomB/helpers.R")
 source("helpers.R")
