@@ -109,7 +109,16 @@ inspections_by_makename = insp_by_make  %>%
 
 inspections_by_makename_subset = inspections_by_makename[inspections_by_makename$Inspections > 500, ]
 
+inspections_by_makename = inspections_by_makename[order(inspections_by_makename$Inspections, decreasing = T),]
+crashes_by_makename = crashes_by_makename[order(crashes_by_makename$Crashes, decreasing = T),]
 
+inspections_by_makename[inspections_by_makename$Inspections >= 65000 & 
+                          inspections_by_makename$Inspections <= 1900000,]
+
+max(inspections_by_makename$Inspections)
+max(crashes_by_makename$Crashes)
+min(inspections_by_makename$Inspections)
+min(crashes_by_makename$Crashes)
 choice <- names(states)[-1]
 
 ui <- dashboardPage(
@@ -128,10 +137,10 @@ ui <- dashboardPage(
             ),
         sliderInput("crashrows",
                     "Makes for crashes:",
-                    min = 1,  max = 160, value = 15),
+                    min = 1,  max = 65000, value = c(10000,65000)),
         sliderInput("insprows",
                     "Makes for inspections:",
-                    min = 1,  max = 350, value = 15)
+                    min = 1,  max = 1900000, value = c(240000,1900000))
         ),
     
     dashboardBody(
@@ -164,8 +173,7 @@ ui <- dashboardPage(
           fluidRow(
                     infoBoxOutput("approvalBox11"),
                     infoBoxOutput("approvalBox12")
-          )
-          
+          )        
           ),
             tabItem(tabName = "map",
                     fluidRow(
@@ -330,7 +338,7 @@ server <- function(input, output) {
        "Unsafe Driving Insp", TotalUnsafeDrivingInsp, icon = icon("thumbs-down", lib = "glyphicon"),
        color = "yellow", fill = TRUE
      )
-   })   
+   })  
     output$geoChart <- renderGvis({
         gvisGeoChart(states, "state.name", input$selected, 
                      options=list(region="US", 
@@ -379,7 +387,11 @@ server <- function(input, output) {
     options=list(width=200, height=300)
     output$crashChart <- renderGvis({
       
-      gvisColumnChart(head(crashes_by_makename[order(crashes_by_makename$Crashes, decreasing = T),], n=input$crashrows),
+      gvisColumnChart(
+        crashes_by_makename[crashes_by_makename$Crashes >= input$crashrows[1] & 
+                              crashes_by_makename$Crashes <= input$crashrows[2],],
+        
+        #head(crashes_by_makename[order(crashes_by_makename$Crashes, decreasing = T),], n=input$crashrows),
 
         
         #crashes_by_makename_subset, 
@@ -401,7 +413,11 @@ server <- function(input, output) {
     })
     output$inspectionChart <- renderGvis({
       
-      gvisColumnChart(head(inspections_by_makename[order(inspections_by_makename$Inspections, decreasing = T),], n=input$insprows),
+      gvisColumnChart(
+        inspections_by_makename[inspections_by_makename$Inspections >= input$insprows[1] & 
+                                  inspections_by_makename$Inspections <= input$insprows[2],],
+    
+        #head(inspections_by_makename[order(inspections_by_makename$Inspections, decreasing = T),], n=input$insprows),
                       #gvisColumnChart(inspections_by_makename_subset, 
                       xvar="Make", yvar= "Inspections", 
                       options=list(title="Inspections by Make",
