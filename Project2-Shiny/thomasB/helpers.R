@@ -12,7 +12,7 @@ library(choroplethrZip)
 ####################################
 ##### Reading/working directory
 #edufull = read.csv('/Users/boulenge/Desktop/Projects/Project2 - Shiny/Shiny-TomB/edufull.csv')
-setwd('/Users/boulenge/Desktop/Projects/Project2 - Shiny/Shiny-TomB')
+#setwd('/Users/boulenge/Desktop/Projects/Project2 - Shiny/Shiny-TomB')
 
 
 ####################################
