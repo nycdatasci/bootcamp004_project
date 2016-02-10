@@ -109,16 +109,6 @@ inspections_by_makename = insp_by_make  %>%
 
 inspections_by_makename_subset = inspections_by_makename[inspections_by_makename$Inspections > 500, ]
 
-inspections_by_makename = inspections_by_makename[order(inspections_by_makename$Inspections, decreasing = T),]
-crashes_by_makename = crashes_by_makename[order(crashes_by_makename$Crashes, decreasing = T),]
-
-inspections_by_makename[inspections_by_makename$Inspections >= 65000 & 
-                          inspections_by_makename$Inspections <= 1900000,]
-
-max(inspections_by_makename$Inspections)
-max(crashes_by_makename$Crashes)
-min(inspections_by_makename$Inspections)
-min(crashes_by_makename$Crashes)
 choice <- names(states)[-1]
 
 ui <- dashboardPage(
@@ -130,6 +120,7 @@ ui <- dashboardPage(
 #                          label = "Search...",
 #                          icon = shiny::icon("search")),
         sidebarMenu(
+          menuItem("Home", tabName = "home", icon = icon("home")),
           menuItem("Summary", tabName = "summary", icon = icon("list")),
           menuItem("Maps", tabName = "map", icon = icon("map-marker")),
             menuItem("Charts", tabName = "chart", icon = icon("bar-chart")),
@@ -145,6 +136,22 @@ ui <- dashboardPage(
     
     dashboardBody(
         tabItems(
+          tabItem(tabName = "home",
+                  fluidRow(
+#                     column(4,
+#                            includeText("include.txt"),
+#                            br(),
+#                            pre(includeText("include.txt"))
+#                     ),
+#                     column(4,
+#                            includeHTML("include.html")
+#                     ),
+                    column(12,
+                           includeMarkdown("include.Rmd")
+                    )
+                  )
+
+          ),
           tabItem(tabName = "summary",
           fluidRow(
                    infoBoxOutput("TotalInspections"),
@@ -345,7 +352,7 @@ server <- function(input, output) {
                                   title="Chart1",
                                   displayMode="regions", 
                                   resolution="provinces",
-                                  width=260, height=200,
+                                  width=360, height=225,
                                   backgroundColor="lightbrown",
                                   colorAxis="{colors:['pink', 'red']}"
                                   ))
@@ -356,7 +363,7 @@ server <- function(input, output) {
                                 title="Chart2",
                                 displayMode="regions", 
                                 resolution="provinces",
-                                width=260, height=200,
+                                width=360, height=225,
                                 backgroundColor="lightbrown",
                                 colorAxis="{colors:['lightblue', 'darkblue']}"
                               ))
@@ -368,7 +375,7 @@ server <- function(input, output) {
                                 displayMode="regions", 
                                 resolution="provinces",
                                 backgroundColor="lightbrown",
-                                width=260, height=200,
+                                width=360, height=225,
                                 colorAxis="{colors:['lightgreen', 'darkgreen']}"
                                 ))
     })
