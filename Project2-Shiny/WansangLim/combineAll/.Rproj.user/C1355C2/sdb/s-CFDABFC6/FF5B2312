@@ -1,0 +1,17 @@
+{
+    "contents" : "\nlibrary(shiny)\n\n\nshinyUI(fluidPage(\n  \n  # Application title\n  titlePanel(\"NYC Job Posting Day\"),\n  \n  # Sidebar with a slider input for number of bins\n  radioButtons(\"radio\", label = h3(\"Whole or Part\"),\n               choices = list(\"Whole Histogram\" = 1, \"Histogram by Level\" = 2,\n                              \"Outlier or Not\" = 3, \"Salary by Time\" = 4), \n               selected = 1),  \n  \n  sidebarLayout(\n    sidebarPanel( \n      conditionalPanel(condition = \"input.radio == 1\",\n        sliderInput(\"bins\",\n          \"Number of bins:\",\n           min = 1,\n           max = 50,\n           value = 30),\n        selectInput(\"salary\", \"Choose a salary\",\n           choices = c(\"minimum\", \"maximum\", \"average\"))\n      ),\n      conditionalPanel(condition = \"input.radio == 2\",\n        selectInput(\"salaryByLevel\", \"Choose a salary\",\n        choices = c(\"minimum\", \"maximum\", \"average\"))\n      ),\n      conditionalPanel(condition = \"input.radio == 3\",\n        selectInput(\"OutNot\", \"Choose outlier or not\",\n        choices = c(\"Outlier\", \"No Outlier\"))\n      ),\n      conditionalPanel(condition = \"input.radio == 4\",\n         radioButtons(\"radioTime\", label = h3(\"Whole or Part\"),\n                      choices = list(\"Whole Data\" = 1, \"Part Data\" = 2 ), \n                      selected = 1),\n         #selectInput(\"wholePart\", \"Choose whole data or part data\",choices = c(\"whole\", \"part\")),\n         sliderInput(\"rowNum\",\n                     \"Start Year/Month:\",\n                     min = 1,\n                     max = 29,\n                     value = 1),\n         selectInput(\"salaryTime\", \"Choose a number or salary\",\n                     choices = c(\"total number\", \"minimum\", \"maximum\", \"average\"))\n      )\n      \n    ),\n    \n    # Show a plot of the generated distribution\n    mainPanel(\n      plotOutput(\"distPlot\")\n    )\n  )\n))\n",
+    "created" : 1454971076314.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2420950972",
+    "id" : "FF5B2312",
+    "lastKnownWriteTime" : 1455040386,
+    "path" : "/media/wan/64GB/NYC/project02/combineAll/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

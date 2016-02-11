@@ -1,0 +1,85 @@
+---
+title: "Trucking Crash and Inspection Data"
+author: "Satish"
+date: "February 11, 2016"
+output: html_document
+---
+
+Truck Inspections and Crashes 
+=============================
+<br>
+<br>
+## Sources of Data
+<br>
+<br>
+### Motor Carrier Inspection Information
+
+The inspection file contains identifying information for the inspection such as the U.S. DOT#, Report Number, Inspection Date, State, and Vehicle Information. It also includes information about the relationship of each inspection to SMS BASIC information, and violation counts by BASIC.
+<br>
+<br>
+### Motor Carrier Crash Information
+
+The file contains a record for each commercial motor vehicle involved in a crash including the U.S. DOT#, Report Number, Crash Date, State, and Vehicle Information. It also includes information about the severity of the crash (tow-away, injury, fatal) and the associated severity and time weights used in the SMS. 
+
+<br>
+<br>
+## Vehicle Informartion 
+<br>
+<br>
+17 digit VIN - basic vehicle info like Make, Model, Engine, Year, and Serial Number
+<br>
+<br>
+Data captured for VIN for inspections and crah files is pretty bad
+<br>
+<br>
+
+## VIN Decoding 
+<br>
+<br>
+**17 digit VIN to vehicle info**
+<br>
+<br>
+[VIN Decoder] (http://vpic.nhtsa.dot.gov/) - diffrent branch of government providing APIs
+<br>
+<br>
+Used it to map Make information for vehicles inspected and involved in crashes
+
+## VIN Decoding Sample
+<br>
+<br>
+<img src="SampleDecodeInfo.png" alt="output_option" width="800" height="600">
+
+<br>
+<br>
+## Truck market share by Brands
+<br>
+<br>
+<img src="BrandMarketShare.png" alt="output_option" width="800" height="600">
+<br>
+<br>
+Freightliner - 800 lb gorilla, owned by Daimler, German
+<br>
+Paccar       - owns two brands: Kenworth & Peterbilt
+<br>
+Volvo Trucks - owns two brands: Volvo and Mack
+<br>
+International- Navistar: International Harvest Company
+<br>
+_There are other manufacturers including Japanese brands like Isuzu and Hino_
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
