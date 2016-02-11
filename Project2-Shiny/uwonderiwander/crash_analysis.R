@@ -24,6 +24,13 @@ data(state)
 
 setwd("/Users/satishjoshi/DataBootcamp/ShinyProject")
 
+MakeDetails_tbl=read.csv("data/make_data_records.csv",  header=T, sep = ",", stringsAsFactors=FALSE)
+#MakeDetails_tbl = MakeDetails_tbl[,-1]
+MakeDetails_tbl2=read.csv("data/make_data2_records.csv",  header=T, sep = ",", stringsAsFactors=FALSE)
+#MakeDetails_tbl2 = MakeDetails_tbl2[,-1]
+MakeCode_Table = rbind(MakeDetails_tbl2,  MakeDetails_tbl)
+
+
 crash_data=read.csv("data/good_crash_records.csv",  header=T, sep = ",", stringsAsFactors=FALSE)
 census_data=read.csv("data/good_census_records.csv",  header=T, sep = ",", stringsAsFactors=FALSE)
 nrow(crash_data) #226287 of 226289 original
@@ -98,7 +105,7 @@ crash_data = mutate(crash_data, Report_Year = as.numeric(format(crash_data$Repor
 crash_data = mutate(crash_data, Report_Month = as.numeric(format(crash_data$Report_Date,'%m')))
 
 
-MakeCode_Table = MakeCode_Table[,-1]
+#MakeCode_Table = MakeCode_Table[,-1]
 MakeCode_Table[nrow(MakeCode_Table)+1] = c("UUU", "Invalid", "Invalid", "Invalid", "Invalid", "Invalid", "Invalid")
 
 crash_data[(nchar(crash_data$Vehicle_ID_Number) <= 3), "Vehicle_ID_Number"] = "UUU"
