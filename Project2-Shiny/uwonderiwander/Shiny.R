@@ -1,5 +1,9 @@
+
+#shiny::runApp(host="0.0.0.0",port=3168)
+
 choice <- names(states)[-1]
 
+app = shinyApp(
 ui <- dashboardPage(
   dashboardHeader(title = "Crashes & Inspections"),
   dashboardSidebar(
@@ -27,14 +31,6 @@ ui <- dashboardPage(
     tabItems(
       tabItem(tabName = "home",
               fluidRow(
-                #                     column(4,
-                #                            includeText("include.txt"),
-                #                            br(),
-                #                            pre(includeText("include.txt"))
-                #                     ),
-                #                     column(4,
-                #                            includeHTML("include.html")
-                #                     ),
                 column(12,
                        includeMarkdown("include.Rmd")
                 )
@@ -127,7 +123,7 @@ ui <- dashboardPage(
       
     ) # End of tabitems
   ) # End of dashboard body
-) # End of dashpage
+), # End of dashpage
 
 
 
@@ -137,28 +133,28 @@ server <- function(input, output) {
   # 
   # TotalFatalities = sum(crash_data$Fatalities)
   # TotalInjuries = sum(crash_data$Injuries)
-  
+  prettyNum(12345.678,big.mark=",",scientific=FALSE)
   output$TotalInspections <- renderInfoBox({
     infoBox(
-      "Total Inspections", TotalInspections, icon = icon("list"),
+      "Total Inspections", prettyNum(TotalInspections,big.mark=",",scientific=FALSE), icon = icon("list"),
       color = "purple", fill = TRUE
     )
   })
   output$progressBox <- renderInfoBox({
     infoBox(
-      "Total Crashes", TotalCrashes, icon = icon("list"),
+      "Total Crashes", prettyNum(TotalCrashes,big.mark=",",scientific=FALSE), icon = icon("list"),
       color = "purple", fill = TRUE
     )
   })
   output$approvalBox <- renderInfoBox({
     infoBox(
-      "Fatalities", TotalFatalities, icon = icon("thumbs-down", lib = "glyphicon"),
+      "Fatalities", prettyNum(TotalFatalities,big.mark=",",scientific=FALSE), icon = icon("thumbs-down", lib = "glyphicon"),
       color = "red", fill = TRUE
     )
   })
   output$approvalBox2 <- renderInfoBox({
     infoBox(
-      "Injuries", TotalInjuries, icon = icon("thumbs-down", lib = "glyphicon"),
+      "Injuries", prettyNum(TotalInjuries,big.mark=",",scientific=FALSE), icon = icon("thumbs-down", lib = "glyphicon"),
       color = "red", fill = TRUE
     )
   })
@@ -184,25 +180,25 @@ server <- function(input, output) {
   
   output$approvalBox5 <- renderInfoBox({
     infoBox(
-      "Total OOS Violation", TotalOOSViol, icon = icon("thumbs-down", lib = "glyphicon"),
+      "Total OOS Violation", prettyNum(TotalOOSViol,big.mark=",",scientific=FALSE), icon = icon("thumbs-down", lib = "glyphicon"),
       color = "blue", fill = TRUE
     )
   })
   output$approvalBox6 <- renderInfoBox({
     infoBox(
-      "Hazmat OOS Violation", TotalHazOOSViol, icon = icon("thumbs-down", lib = "glyphicon"),
+      "Hazmat OOS Violation", prettyNum(TotalHazOOSViol,big.mark=",",scientific=FALSE), icon = icon("thumbs-down", lib = "glyphicon"),
       color = "blue", fill = TRUE
     )
   })
   output$approvalBox7 <- renderInfoBox({
     infoBox(
-      "Vehicle OOS Violation", TotalVehOOSViol, icon = icon("thumbs-down", lib = "glyphicon"),
+      "Vehicle OOS Violation", prettyNum(TotalVehOOSViol,big.mark=",",scientific=FALSE), icon = icon("thumbs-down", lib = "glyphicon"),
       color = "blue", fill = TRUE
     )
   })
   output$approvalBox8 <- renderInfoBox({
     infoBox(
-      "Driver OOS Violation", TotalDriverOOSViol, icon = icon("thumbs-down", lib = "glyphicon"),
+      "Driver OOS Violation", prettyNum(TotalDriverOOSViol,big.mark=",",scientific=FALSE), icon = icon("thumbs-down", lib = "glyphicon"),
       color = "blue", fill = TRUE
     )
   })
@@ -213,25 +209,25 @@ server <- function(input, output) {
   # TotalMaintenanxeInsp = nrow(inspection_data[inspection_data$VH_MAINT_INSP == "Y",])
   output$approvalBox9 <- renderInfoBox({
     infoBox(
-      "Vehicle Maintenance Insp", TotalMaintenanxeInsp, icon = icon("thumbs-down", lib = "glyphicon"),
+      "Vehicle Maintenance Insp", prettyNum(TotalMaintenanxeInsp,big.mark=",",scientific=FALSE), icon = icon("thumbs-down", lib = "glyphicon"),
       color = "yellow", fill = TRUE
     )
   })
   output$approvalBox10 <- renderInfoBox({
     infoBox(
-      "Fatigued Driving Insp", TotalFatugueDrivingInsp, icon = icon("thumbs-down", lib = "glyphicon"),
+      "Fatigued Driving Insp", prettyNum(TotalFatugueDrivingInsp,big.mark=",",scientific=FALSE), icon = icon("thumbs-down", lib = "glyphicon"),
       color = "yellow", fill = TRUE
     )
   })
   output$approvalBox11 <- renderInfoBox({
     infoBox(
-      "Alcohol Substance Insp", TotalAlcoholDrivingInsp, icon = icon("thumbs-down", lib = "glyphicon"),
+      "Alcohol Substance Insp", prettyNum(TotalAlcoholDrivingInsp,big.mark=",",scientific=FALSE), icon = icon("thumbs-down", lib = "glyphicon"),
       color = "yellow", fill = TRUE
     )
   })
   output$approvalBox12 <- renderInfoBox({
     infoBox(
-      "Unsafe Driving Insp", TotalUnsafeDrivingInsp, icon = icon("thumbs-down", lib = "glyphicon"),
+      "Unsafe Driving Insp", prettyNum(TotalUnsafeDrivingInsp,big.mark=",",scientific=FALSE), icon = icon("thumbs-down", lib = "glyphicon"),
       color = "yellow", fill = TRUE
     )
   })  
@@ -330,5 +326,6 @@ server <- function(input, output) {
     
 })    
 }
+)
 
-shinyApp(ui, server)
+runApp(app, host = '0.0.0.0', port = 3168)
