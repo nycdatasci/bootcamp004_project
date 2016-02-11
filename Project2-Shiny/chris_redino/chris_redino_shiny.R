@@ -86,7 +86,7 @@ food=filter(food,zip!=11040)#outside the boundaries of UHF zones
 food=food[which(complete.cases(food)),]
 
 food_count=summarise(group_by(food,cuisine,uhf42),num_count=n())
-food_count=spread(food_count, cuisine, num_count)
+food_count=spread(food_count, cuisine, num_count)#reshape
 food_count[is.na(food_count)]=0# replace NA with zero (no counts for that cuisine in that UHF)
 
 #need to calculate areas for each UHF so I can scale my counts to be more comprable, can check totals by borough
@@ -95,6 +95,8 @@ food_count[is.na(food_count)]=0# replace NA with zero (no counts for that cuisin
 
 
 uhf_area=summarise(group_by(uhf_convert,uhf42),area=sum(area))
+
+
 
 #Now the data is mostly ready to be put together for analysis, which will be done in the app
 
@@ -106,6 +108,7 @@ ui <- dashboardPage(
         sidebarUserPanel("Christopher Redino"),
         sidebarMenu(
             menuItem("Map", tabName = "map", icon = icon("map")),
+            menuItem("Distribution Full", tabName = "distro_full", icon = icon("bar-chart")),
             menuItem("Distributions", tabName = "distro", icon = icon("bar-chart")),
             menuItem("Data", tabName = "data", icon = icon("database")),
             menuItem("Reference", tabName = "ref", icon = icon("book")),
@@ -125,8 +128,13 @@ ui <- dashboardPage(
                                                           "Donuts"=7,"Ice Cream"=8,"Italian"=9,
                                                           "Indian"=10,"Hotdogs"=11,"Bakery"=12),
                                            selected = list(1,2,3,4,5,6,7,8,9,10,11,12))
-                       )
+                       ),
+            menuSubItem(icon = NULL,
+                        radioButtons("scaling", label = h3("Predictor Scaling"),
+                                     choices = list("None" = 1, "Scale by Area" = 2), 
+                                     selected = 1)
             )
+        )
         ),
     
     dashboardBody(
@@ -141,9 +149,15 @@ ui <- dashboardPage(
                       fluidRow(column(3, verbatimTextOutput("value2")))
                     )
             ),
+            tabItem(tabName = "distro_full",
+                    fluidRow(
+                      plotOutput('plot1')
+                      
+                    )
+            ),
             tabItem(tabName = "distro",
                     fluidRow(
-                      plotOutput('plot')
+                      plotOutput('plot2')
                       
                     )
             ),
@@ -171,8 +185,9 @@ server <- function(input, output) {
 #have one very bigv reactive function. Maybe its just a bad consequence of how I designed my code,
   #but it seems as though I neccesarily have to a bunch of filtering/reshaping AFTER getting input. Use of an action button might be a big improvement here. . .
   big_reactive= reactive({
-
-
+        
+     
+  
     #do filters based on input check boxes
   sample=input$sample
   
@@ -246,6 +261,16 @@ server <- function(input, output) {
   #I can do the rest later, I got the big obvious ones that can be seen zoomed out. . .
   
   subdat2=spCbind(subdat,obese_rate)
+  
+  ####check if we should rescale by area of UHF
+  scaling=input$scaling
+  
+  if (scaling =="2"){
+    food_count=left_join(food_count,uhf_area,by="uhf42")
+    for(i in 2:80){
+      food_count[,i]=food_count[,i]/food_count[,81]
+    }
+  }
   
   #make a copy so we can start with the original each time the buttons are applied
   food_data=select(food_count, uhf42,Fastfood,Pizza,Hamburgers,Vegetarian,Chinese,Mexican,Donuts,IceCream,Italian,Indian,Hotdogs,Bakery)#This is enough categories to start with . . . 
@@ -363,7 +388,11 @@ server <- function(input, output) {
   })
   output$value1 <- renderPrint({list("Size of Study:",big_reactive()[[7]]) })#Return the size of the sample of the Study
   output$value2 <- renderPrint({ list("Quality of Model Fit:",big_reactive()[[8]])})
-  output$plot <- renderPlot({
+  output$plot1 <- renderPlot({
+    my_distro_data=big_reactive()[[5]]
+    qplot(bmi, data = my_distro_data,fill=obese)
+  },height=800)
+  output$plot2 <- renderPlot({
     my_distro_data=big_reactive()[[5]]
     qplot(bmi, data = my_distro_data,fill=obese)+facet_wrap(~uhf)
   },height=800)
