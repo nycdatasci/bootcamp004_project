@@ -97,7 +97,7 @@ shinyUI(
                                       selected = "Year"
                           ),
                            dateRangeInput('tr',
-                                          h5("Select Date Range:"),
+                                          h4("Select Date Range:"),
                                           start = "2008-10-06", end = "2015-09-02",
                                           min = "2008-10-06", max = "2015-09-02",
                                           separator = " to ", format = "yy/mm/dd",
