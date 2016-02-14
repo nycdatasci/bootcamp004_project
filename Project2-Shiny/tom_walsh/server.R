@@ -101,12 +101,12 @@ shinyServer(function(input, output) {
     writeLines(sprintf("Lineups in minute-filtered dataset: %d\n", nrow(data())))
     formula = as.formula(sprintf('(%s)~(%s)', dim_y_stat(), dim_base_stat()))
     linear_fit = lm(formula, data=dim_data())
-    direction = if (summary(linear_fit)$coefficients[1,1] > 0) 'diminishing' else 'increasing'
+    direction = (if (summary(linear_fit)$coefficients[1,1] > 0) 'diminishing' else 'increasing')
     p_value = anova(linear_fit)$`Pr(>F)`[1]
     if (p_value < 0.01) {
       writeLines(sprintf('There is evidence of %s returns for %s.\n', direction, input$diminishing_stat))
     } else {
-      writeLines(sprintf('We do not see evidence of diminishing returns for %s.\n', input$diminshing_stat))
+      writeLines(sprintf('We do not see evidence of diminishing returns for %s.\n', input$diminishing_stat))
     }
     writeLines(sprintf('Pr(>F): %f', p_value))
   })
