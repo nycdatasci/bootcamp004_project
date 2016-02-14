@@ -25,7 +25,8 @@ server <- function(input, output) {
         dyAnnotation("2015-5-19", text = "B") %>% # TUESDAY
         dyAnnotation("2015-8-6", text = "B.") %>% # THURSDAY
         dyAnnotation("2015-8-7", text = "B.")%>% # FRIDAY
-        dyRangeSelector()
+        dyRangeSelector()%>%
+        dyRoller(rollPeriod = 1)
 
     })
     
@@ -36,14 +37,14 @@ server <- function(input, output) {
                                   series="[{color:'green', targetAxisIndex: 0}]",
                                   gvis.editor="Make a change?"))
   })
-  
+wordcloud_rep <- repeatable(wordcloud)
 output$wordcloud<- renderPlot({
-    wordcloud(words = rwd()$word, freq = rwd()$X1, scale=c(5,1),
+  wordcloud_rep(words = rwd()$word, freq = rwd()$X1, scale=c(5,1),
                   min.freq = input$rfreq, 
                   max.words=input$rmax,
                   rot.per=0.2,
                   random.order=F, 
-                  colors=brewer.pal(20, "Dark2"))
+                  colors=brewer.pal(8, "Dark2"))
   })
 ## map
   mapdata <- reactive({
