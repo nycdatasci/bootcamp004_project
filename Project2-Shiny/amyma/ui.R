@@ -12,7 +12,7 @@ shinyUI(
 
           leafletOutput("map",width="100%", height="100%"),
           absolutePanel(id = "controls", class = "panel panel-default", fixed = FALSE,
-              draggable = TRUE, top = 20, left =30 , right ="auto" , bottom = "auto",
+              draggable = TRUE, top = 10, left =30 , right ="auto" , bottom = "auto",
               width = 280, height = "auto",
                       h2(img(src = "airbnb.png", height =40),
                         "Listing in NYC"),
@@ -30,13 +30,10 @@ shinyUI(
                                   max = 257, value = c(0, 257)),
                       sliderInput("rating",h4("Scores Rating"), min = 0, 
                                   max = 100, value = c(0, 100)),
-                    h4("Data: http://insideairbnb.com/"),
+                    h4(a("Inside Airbnb",href="http://insideairbnb.com/",target="_blank")),
                     h6("Data complied by 01 September, 2015")
-                     
-            
-               
              ),
-            absolutePanel(id = "plots", class = "panel panel-default", fixed = FALSE,
+            absolutePanel(id = "controls", class = "panel panel-default", fixed = FALSE,
                           draggable = TRUE, top = 300, left ="auto" , right =20 , bottom = "auto",
                           width = 300, height = "auto",
                           plotOutput("histroom",height = 150),
@@ -84,32 +81,51 @@ shinyUI(
                      titlePanel("Number of Reviews Over Time"),
                    fluidRow(
                      column(3,
-                            h4("the numer of reviews"),
-                           
+                            br(),
+                            br(),
+                            br(),
+                            br(),
+                            br(),
+                            br(),
+                            br(),
+                            br(),
+                            br(),
+                            br(),
+                            br(),
+                            br(),
+                            br(),
+                            br(),
                         checkboxInput("showgrid", label = "Show Grid ?", value = TRUE),
                             br(),
-                         selectInput("tm",
-                                     h5("Plot By: "),
-                                     choices = choice,
-                                     selected = "Year"
-                                     ),
-                         dateRangeInput('tr',
-                                        h5("Select Date Range:"),
-                                        start = "2008-10-06", end = "2015-09-02",
-                                        min = "2008-10-06", max = "2015-09-02",
-                                        separator = " to ", format = "yy/mm/dd",
-                                        startview = 'week',  weekstart = 1)),
-                   
-                       column(9,
-                         dygraphOutput("dygraph"),
-                         hr(),
-                         htmlOutput("geoChart")
+                            br(),
+                            br(),
+                            hr(),
+                            h4("the numer of reviews"),
+                            selectInput("tm",
+                                      h5("Plot By: "),
+                                      choices = choice,
+                                      selected = "Year"
+                          ),
+                           dateRangeInput('tr',
+                                          h5("Select Date Range:"),
+                                          start = "2008-10-06", end = "2015-09-02",
+                                          min = "2008-10-06", max = "2015-09-02",
+                                          separator = " to ", format = "yy/mm/dd",
+                                          startview = 'week',  weekstart = 1)),
+                     
+                         column(9,
+                           dygraphOutput("dygraph"),
+                           hr(),
+                           htmlOutput("geoChart")
                      )
                    )),
     tabPanel("Word Cloud: Reviews",   
              
              fluidRow(
                column(3,
+                      h2("Word Cloud"),
+                      br(),
+                      br(),
                       sliderInput("rfreq",
                                   "Minimum Frequency:",
                                   min = 1500,  max = 271428, value = c(5000,259086)),

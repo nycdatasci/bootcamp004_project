@@ -17,16 +17,22 @@ server <- function(input, output) {
     rwd<-reactive({review_txt})
 
     output$dygraph <- renderDygraph({
-      dygraph(reviewdate()) %>%
+      dygraph(reviewdate(),ylab = "Num. of Reviews / Day") %>%
         dyOptions(drawGrid = input$showgrid)%>%
+        dySeries("V1", label = "Num. of Reviews")%>%
+        dyAnnotation("2015-1-2", text = "A") %>%
+        dyAnnotation("2014-1-2", text = "A")%>%
+        dyAnnotation("2015-5-19", text = "B") %>% # TUESDAY
+        dyAnnotation("2015-8-6", text = "B.") %>% # THURSDAY
+        dyAnnotation("2015-8-7", text = "B.")%>% # FRIDAY
         dyRangeSelector()
 
     })
     
     
   output$geoChart <- renderGvis({
-    gvisLineChart(reviewdata(),options=list(legend="none",vAxis="{title:'Time'}",
-                                  hAxis="{title:'Number of Reviews'}",
+    gvisLineChart(reviewdata(),options=list(legend="none",hAxis="{title:'Time'}",
+                                  vAxis="{title:'Number of Reviews'}",
                                   series="[{color:'green', targetAxisIndex: 0}]",
                                   gvis.editor="Make a change?"))
   })
