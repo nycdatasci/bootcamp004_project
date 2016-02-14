@@ -1,0 +1,8 @@
+name: ShinyApp
+account: sriyoda
+server: shinyapps.io
+bundleId: 371923
+url: https://sriyoda.shinyapps.io/ShinyApp/
+when: 1455322711.67226
+asMultiple: FALSE
+asStatic: FALSE
