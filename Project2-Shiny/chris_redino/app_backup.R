@@ -3,8 +3,7 @@ library(shinydashboard)
 library(googleVis)
 require(datasets)
 library(dplyr)#for reshaping
-library(reshape2)#for even more reshaping
-#library(tidyr)#for more reshaping
+library(tidyr)#for more reshaping
 library(ggplot2)#for plotting
 library(leaflet)#for maps
 library(maptools)#also for maps
@@ -87,8 +86,7 @@ food=filter(food,zip!=11040)#outside the boundaries of UHF zones
 food=food[which(complete.cases(food)),]
 
 food_count=summarise(group_by(food,cuisine,uhf42),num_count=n())
-#food_count=spread(food_count, cuisine, num_count)#reshape
-food_count=dcast(food_count, uhf42~cuisine,value.var="num_count")
+food_count=spread(food_count, cuisine, num_count)#reshape
 food_count[is.na(food_count)]=0# replace NA with zero (no counts for that cuisine in that UHF)
 
 #need to calculate areas for each UHF so I can scale my counts to be more comprable, can check totals by borough
