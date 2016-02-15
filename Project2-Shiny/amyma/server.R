@@ -58,7 +58,7 @@ output$wordcloud<- renderPlot({
              review_scores_rating>=input$rating[1],
              review_scores_rating<=input$rating[2])
   })
-  
+
   pricedata<-reactive({
     df<-mapdata()%>%
       group_by(room_type)%>%
@@ -99,9 +99,9 @@ output$wordcloud<- renderPlot({
       geom_bar(aes(fill = room_type))+
       theme_hc()+
       scale_fill_manual(values = c("Entire home/apt"= "#EE3B3B",
-                                     "Private room" ="#0000EE",
-                                     "Shared room" ="#66CD00"),
-                                      guide=FALSE)+
+                                   "Private room" ="#0000EE",
+                                   "Shared room" ="#66CD00"),
+                        guide=FALSE)+
       labs(y="Count",x="Room Type")
     
   })
@@ -171,7 +171,7 @@ output$wordcloud<- renderPlot({
       filter(host_since>=input$hostt[1],
              host_since<=input$hostt[2])%>%
       arrange(.,desc(host_total_listings_count))
-    DT::datatable(head(df), class = 'cell-border stripe', escape = FALSE)
+    DT::datatable(head(df,input$hostn), class = 'cell-border stripe', escape = FALSE)
   })
 
 }

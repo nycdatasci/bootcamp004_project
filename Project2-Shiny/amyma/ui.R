@@ -55,7 +55,6 @@ shinyUI(
                           br(),
                           br(),
                           br(),
-                          br(),
                           hr(),
                           h3("Active Listings by Host"),
                           sliderInput("hostn",h4("Top n Super hosts"), min = 0, 
