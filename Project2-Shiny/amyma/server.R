@@ -81,16 +81,18 @@ output$wordcloud<- renderPlot({
                     title = "Room Type",
                     opacity = 1)  
   })
+  
+  
   observe({
     leafletProxy("map", data = mapdata()) %>%
       clearShapes() %>%
        addCircles(radius=45,stroke = FALSE, fillOpacity =0.5,color = ~pal(room_type), 
-                  popup = ~paste("Room Type:",room_type,"\n",
-                          "Neighbourhood:",neighbourhood_group_cleansed,"\n",
-                          "Price:",price,"\n",
-                         "Minimum Nights:", minimum_nights,"\n",
-                          "Num. of Reviews:",number_of_reviews,"\n",
-                          "Review Rating:",review_scores_rating,"\n"))
+                  popup = ~paste(sep = "<br/>","Room Type:",room_type,
+                          "Neighbourhood:",neighbourhood_group_cleansed,
+                          "Price:",price,
+                         "Minimum Nights:", minimum_nights,
+                          "Num. of Reviews:",number_of_reviews,
+                          "Review Rating:",review_scores_rating))
     
  })
   output$histroom <- renderPlot({

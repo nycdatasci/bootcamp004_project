@@ -74,11 +74,11 @@ review_txt<-as.data.frame(review_txt)
 
 listing<-read.csv("listings 2.csv")
 listing$review_scores_rating<-impute(listing$review_scores_rating,0)
-map<-listing[,c(17,19,20,21,31,38,46:47,50,58,65,74,77,91)]
+map<-listing[,c(21,38,46:47,50,58,74,77)]
 map$price<-as.numeric(map$price)
 map$review_scores_rating<-as.numeric(map$review_scores_rating)
 
-host<-listing[,c(17,19,20,21,31)]
+host<-listing[,c(17,19,20,21,31,72)]
 host<-unique(host)
 host<-host%>%
   arrange(desc(host_total_listings_count))
