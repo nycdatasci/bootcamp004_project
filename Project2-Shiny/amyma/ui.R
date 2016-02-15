@@ -2,7 +2,7 @@ shinyUI(
   navbarPage(
     title = "Airbnb Visual Search: New York",
     id = "nav",
-    theme = shinytheme("United"),
+    theme = shinytheme("united"),
     tabPanel("Map the Listing",
              div(class="outer",
             tags$head(
