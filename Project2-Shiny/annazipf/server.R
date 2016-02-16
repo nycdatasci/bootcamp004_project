@@ -86,41 +86,43 @@ shinyServer(function(input, output, session) {
       
       output$hover_info2 = renderText({
         if(!is.null(input$plot_hover2)) {
-        paste0("Number of new professionals=", input$plot_hover2$y, 
-               "\n Year=", round(input$plot_hover2$x)) }
+        paste0("Number=", input$plot_hover2$y, 
+               "\n Years of experience=", round(input$plot_hover2$x)) }
       })
       
        
       
-      addPopover(session=session, id="timespp", title="Gender based growth", 
-                 content='Plot of new male/female medical graduates in medicare from 1950-2015. Females 
-                 entered later: both experience a decline around 2007.', placement = "bottom",
+      addPopover(session=session, id="timespp", title="Distribution of age by gender", 
+                 content='Plot of new male/female medical graduates in medicare between 1950-2015. Females
+                 have a mean age of about 33: 15 years younger than males.', placement = "bottom",
                  trigger = "hover", options = NULL)
       addPopover(session=session, id="genderp", title="Male/female dominated fields", 
                  content='Top 26 most gender-segregated medical fields.', placement = "top",
                  trigger = "hover", options = NULL)
       
       
-      addPopover(session=session, id="changep", title="Variance in growth of all 77 medicare sectors", 
-                 content="Visualizing the number of new medicare professionals who join
-the industry each year. All 77 disciplines are plotted simultaneously:
-  we can pull out the top 10 most volatile fields in the lower graph.
-Note that the y-axis is not cumulative, so each drop/raise represents
-a shift in the number of new doctors.", placement = "bottom",
+      addPopover(session=session, id="changep", title="Distribution of experience within each medical sector", 
+                 content="Visualizing the mean experience within each medical field. All 77 disciplines are plotted simultaneously:
+  we then pull out the top 10 highest average fields in the lower graph.", placement = "bottom",
                  trigger = "hover", options = NULL)
       
-      addPopover(session=session, id="changepisolate", title="Most volatile sectors", 
-                 content="Growth of sectors with highest variance.", placement = "top",
+      addPopover(session=session, id="changepisolate", title="Most experienced sectors", 
+                 content="Fields with doctors who have the highest average experience: between 26-30 years. NB: the lowest
+                 mean experience fields are nurses and anesthesiology assistants, with 8 years average. The non-assistants with lowest
+                 mean experience? Midwives and physical therapists.", placement = "top",
                  trigger = "hover", options = NULL)
       
       
       addPopover(session=session, id="schoolp", title = "Popular schools",
 content="USA schools producing highest number of medicare
-                 doctors since 1951", 
+                 doctors since 1951, segregated by gender. The least popular? 
+Cleveland med. college, Gross College, 
+Eclectic Med. Univ., Fort Wayne, Restview Chiropractic, 
+University of Natural Healing Arts...", 
                 placement = "top",
                  trigger = "hover", options = NULL)
       
-      addPopover(session=session, id="plot", content="Largest medical fields", 
+      addPopover(session=session, id="plot", content="Most prolific medical fields", 
                  title = " ",
                 placement = "bottom",
                  trigger = "hover", options = NULL)
