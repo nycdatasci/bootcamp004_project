@@ -791,14 +791,6 @@ for (i in 1:length(insp_make_codes_found)) {
 
 write.csv(MakeDetails_tbl2, "data/make_data2_records.csv")
 
-MakeDetails_tbl=read.csv("data/make_data_records.csv",  header=T, sep = ",", stringsAsFactors=FALSE)
-MakeDetails_tbl = MakeDetails_tbl[,-1]
-MakeDetails_tbl2=read.csv("data/make_data2_records.csv",  header=T, sep = ",", stringsAsFactors=FALSE)
-MakeDetails_tbl2 = MakeDetails_tbl2[,-1]
-
-
-
-MakeCode_Table = rbind(MakeDetails_tbl2,  MakeDetails_tbl)
 
 write.csv(MakeCode_Table, "data/all_make_data_records.csv")
 

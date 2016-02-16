@@ -72,27 +72,72 @@ shinyServer(function(input, output, session) {
       output$plot = renderPlot(plot)     
       output$schoolp = renderPlot(schoolp)
       output$timep = renderPlot(timep)
-      output$genderp = renderPlot(genderp)
+      output$genderp = renderPlot({genderp})
       output$changep = renderPlot(changep)
       output$timespp = renderPlot(timespp)
       output$changepisolate = renderPlot(changepisolate)
-} )
+      
+     
+      ##Plot hovers and popovers
+      
+      output$hover_info1 = renderText({
+        paste0("Percent=", input$plot_hover1$x)
+      })
+      
+      output$hover_info2 = renderText({
+        if(!is.null(input$plot_hover2)) {
+        paste0("Number=", input$plot_hover2$y, 
+               "\n Years of experience=", round(input$plot_hover2$x)) }
+      })
+      
+       
+      
+      addPopover(session=session, id="timespp", title="Distribution of age by gender", 
+                 content='Plot of new male/female medical graduates in medicare between 1950-2015. Females
+                 have a mean age of about 33: 15 years younger than males.', placement = "bottom",
+                 trigger = "hover", options = NULL)
+      addPopover(session=session, id="genderp", title="Male/female dominated fields", 
+                 content='Top 26 most gender-segregated medical fields.', placement = "top",
+                 trigger = "hover", options = NULL)
+      
+      
+      addPopover(session=session, id="changep", title="Distribution of experience within each medical sector", 
+                 content="Visualizing the mean experience within each medical field. All 77 disciplines are plotted simultaneously:
+  we then pull out the top 10 highest average fields in the lower graph.", placement = "bottom",
+                 trigger = "hover", options = NULL)
+      
+      addPopover(session=session, id="changepisolate", title="Most experienced sectors", 
+                 content="Fields with doctors who have the highest average experience: between 26-30 years. NB: the lowest
+                 mean experience fields are nurses and anesthesiology assistants, with 8 years average. The non-assistants with lowest
+                 mean experience? Midwives and physical therapists.", placement = "top",
+                 trigger = "hover", options = NULL)
+      
+      
+      addPopover(session=session, id="schoolp", title = "Popular schools",
+content="USA schools producing highest number of medicare
+                 doctors since 1951, segregated by gender. The least popular? 
+Cleveland med. college, Gross College, 
+Eclectic Med. Univ., Fort Wayne, Restview Chiropractic, 
+University of Natural Healing Arts...", 
+                placement = "top",
+                 trigger = "hover", options = NULL)
+      
+      addPopover(session=session, id="plot", content="Most prolific medical fields", 
+                 title = " ",
+                placement = "bottom",
+                 trigger = "hover", options = NULL)
+      
 
       
-      #interactive plot
-#       
-#       finalInput <- reactive({
-#         changefilter = dplyr::filter(change, Primary.specialty %in% subset)
-#         
+#       output$text = renderText({
+#       paste(list(unique(as.character(drscity$Primary.specialty))), sep = ", ")
 #       })
-#       
-#       output$plot <- renderPlot({
-#         data <- getSymbols(input$symb, src = "yahoo", 
-#                            from = input$dates[1],
-#                            to = input$dates[2],
-#                            auto.assign = FALSE)
-#         
-#         chartSeries(data, theme = chartTheme("white"), 
-#                     type = "line", log.scale = input$log, TA = NULL)
-#       })
-      
+})
+
+
+ 
+
+
+
+
+
