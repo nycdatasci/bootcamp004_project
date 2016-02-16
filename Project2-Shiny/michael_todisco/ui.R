@@ -4,6 +4,7 @@ library(googleVis)
 library(ggplot2)
 library(ggvis)
 require(datasets)
+library(DT)
 
 mlb_data = read.csv('mlb_data.csv')
 
@@ -41,23 +42,27 @@ dashboardPage(
                 h4(box(width = 12, height = 50, status = 'info', solidHeader = TRUE, collapsible = FALSE,
                     textOutput('text1'))),
                 
-                valueBoxOutput('capacity', width = 3),
-                valueBoxOutput('average_attend', width = 3),
-                valueBoxOutput('max_attend', width = 3),
-                valueBoxOutput('min_attend', width = 3),
+                valueBoxOutput('win', width = 2),
+                valueBoxOutput('average_attend', width = 2),
+                valueBoxOutput('max_attend', width = 2),
+                valueBoxOutput('min_attend', width = 2),
+                valueBoxOutput('sd_attend', width = 2),
                 
                 box(title = '2012 Gameday Attendance', width = 12, status = 'success', solidHeader = TRUE, collapsible = FALSE,
-                    plotOutput('plot1'))
+                    plotOutput('plot1', click = 'plot_click'),
+                    verbatimTextOutput('info'),
+                    DT::dataTableOutput('plot_clicked_points'))
               )),
       tabItem(tabName = 'DOW',
             fluidRow(
               h4(box(width = 12, height = 50, status = 'info', solidHeader = TRUE, collapsible = FALSE,
                      textOutput('text2'))),
               
-              valueBoxOutput('capacity2', width = 3),
-              valueBoxOutput('average_attend2', width = 3),
-              valueBoxOutput('max_attend2', width = 3),
-              valueBoxOutput('min_attend2', width = 3),
+              valueBoxOutput('win2', width = 2),
+              valueBoxOutput('average_attend2', width = 2),
+              valueBoxOutput('max_attend2', width = 2),
+              valueBoxOutput('min_attend2', width = 2),
+              valueBoxOutput('sd_attend2', width = 2),
               
               box(title = 'Day of the Week', width = 6, status = 'success', solidHeader = TRUE, collapsible = FALSE,
                   plotOutput('plotDOW')),
@@ -69,10 +74,11 @@ dashboardPage(
                 h4(box(width = 12, height = 50, status = 'info', solidHeader = TRUE, collapsible = FALSE,
                        textOutput('text3'))),
                 
-                valueBoxOutput('capacity3', width = 3),
-                valueBoxOutput('average_attend3', width = 3),
-                valueBoxOutput('max_attend3', width = 3),
-                valueBoxOutput('min_attend3', width = 3),
+                valueBoxOutput('win3', width = 2),
+                valueBoxOutput('average_attend3', width = 2),
+                valueBoxOutput('max_attend3', width = 2),
+                valueBoxOutput('min_attend3', width = 2),
+                valueBoxOutput('sd_attend3', width = 2),
                 
                 box(title = 'Season Trending Attendance', width = 12, status = 'success', solidHeader = TRUE, collapsible = FALSE,
                     plotOutput('plotSeason'))
@@ -84,3 +90,4 @@ dashboardPage(
       )
   )
 )
+
