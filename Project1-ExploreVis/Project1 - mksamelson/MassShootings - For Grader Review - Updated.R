@@ -324,7 +324,7 @@ race.new[which(data$race == "White")] = "White"
 race.new[which(data$race != "White")] = "Other"
 race.new = as.factor(race.new)
 
-age.new = cut(data$Age, c(13, 30, 50, 66),
+age.new = cut(data$age, c(13, 30, 50, 66),
               labels = c("13 - 30", "31 - 50", "51 - 66"),
               include.lowest = TRUE)
 
