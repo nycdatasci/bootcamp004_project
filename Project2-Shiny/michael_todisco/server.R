@@ -4,6 +4,7 @@ library(googleVis)
 library(ggplot2)
 library(RColorBrewer)
 require(datasets)
+library(DT)
 
 mlb_data = read.csv('mlb_data.csv')
 mlb_data$day_of_week = factor(mlb_data$day_of_week, levels = c("Monday", "Tuesday", "Wednesday", 
@@ -23,45 +24,59 @@ function(input, output) {
                         visitor_W.L. >= input$opp_perc[1] &
                         visitor_W.L. <= input$opp_perc[2])
     })
-    
-  output$capacity = renderValueBox({
-    valueBox(new_data()$Capacity[1], "Ballpark Capacity", icon = icon('ticket'), color = 'green')
+
+  output$win = renderValueBox({
+    valueBox(new_data()$home_W.L.[1], "Win Percentage", icon = icon('star'), color = 'green')
   })
-  output$capacity2 = renderValueBox({
-    valueBox(new_data()$Capacity[1], "Ballpark Capacity", icon = icon('ticket'), color = 'green')
+  
+  output$win2 = renderValueBox({
+    valueBox(new_data()$home_W.L.[1], "Win Percentage", icon = icon('star'), color = 'green')
   })
-  output$capacity3 = renderValueBox({
-    valueBox(new_data()$Capacity[1], "Ballpark Capacity", icon = icon('ticket'), color = 'green')
+  
+  output$win3 = renderValueBox({
+    valueBox(new_data()$home_W.L.[1], "Win Percentage", icon = icon('star'), color = 'green')
   })
   
   output$average_attend = renderValueBox({
-    valueBox(prettyNum(round(mean(new_data()$attend)), big.mark = ','), "Average Attendance", icon = icon('ticket'), color = 'yellow')
+    valueBox(prettyNum(round(mean(new_data()$attend)), big.mark = ','), "Avg Attendance", icon = icon('ticket'), color = 'yellow')
     })
   output$average_attend2 = renderValueBox({
-    valueBox(prettyNum(round(mean(new_data()$attend)), big.mark = ','), "Average Attendance", icon = icon('ticket'), color = 'yellow')
+    valueBox(prettyNum(round(mean(new_data()$attend)), big.mark = ','), "Avg Attendance", icon = icon('ticket'), color = 'yellow')
   })
   output$average_attend3 = renderValueBox({
-    valueBox(prettyNum(round(mean(new_data()$attend)), big.mark = ','), "Average Attendance", icon = icon('ticket'), color = 'yellow')
+    valueBox(prettyNum(round(mean(new_data()$attend)), big.mark = ','), "Avg Attendance", icon = icon('ticket'), color = 'yellow')
   })
   
   output$max_attend = renderValueBox({
-    valueBox(prettyNum(round(max(new_data()$attend)), big.mark = ','), "Maximum Attendance", icon = icon('ticket'), color = 'yellow')
+    valueBox(prettyNum(round(max(new_data()$attend)), big.mark = ','), "Max Attendance", icon = icon('ticket'), color = 'yellow')
   })
   output$max_attend2 = renderValueBox({
-    valueBox(prettyNum(round(max(new_data()$attend)), big.mark = ','), "Maximum Attendance", icon = icon('ticket'), color = 'yellow')
+    valueBox(prettyNum(round(max(new_data()$attend)), big.mark = ','), "Max Attendance", icon = icon('ticket'), color = 'yellow')
   })
   output$max_attend3 = renderValueBox({
-    valueBox(prettyNum(round(max(new_data()$attend)), big.mark = ','), "Maximum Attendance", icon = icon('ticket'), color = 'yellow')
+    valueBox(prettyNum(round(max(new_data()$attend)), big.mark = ','), "Max Attendance", icon = icon('ticket'), color = 'yellow')
   })
   
   output$min_attend = renderValueBox({
-    valueBox(prettyNum(round(min(new_data()$attend)), big.mark = ','), "Minimum Attendance", icon = icon('ticket'), color = 'yellow')
+    valueBox(prettyNum(round(min(new_data()$attend)), big.mark = ','), "Min Attendance", icon = icon('ticket'), color = 'yellow')
   })
   output$min_attend2 = renderValueBox({
-    valueBox(prettyNum(round(min(new_data()$attend)), big.mark = ','), "Minimum Attendance", icon = icon('ticket'), color = 'yellow')
+    valueBox(prettyNum(round(min(new_data()$attend)), big.mark = ','), "Min Attendance", icon = icon('ticket'), color = 'yellow')
   })
   output$min_attend3 = renderValueBox({
-    valueBox(prettyNum(round(min(new_data()$attend)), big.mark = ','), "Minimum Attendance", icon = icon('ticket'), color = 'yellow')
+    valueBox(prettyNum(round(min(new_data()$attend)), big.mark = ','), "Min Attendance", icon = icon('ticket'), color = 'yellow')
+  })
+  
+  output$sd_attend = renderValueBox({
+    valueBox(prettyNum(round(sd(new_data()$attend)), big.mark = ','), "SD Attendance", icon = icon('ticket'), color = 'yellow')
+  })
+  
+  output$sd_attend2 = renderValueBox({
+    valueBox(prettyNum(round(sd(new_data()$attend)), big.mark = ','), "SD Attendance", icon = icon('ticket'), color = 'yellow')
+  })
+  
+  output$sd_attend3 = renderValueBox({
+    valueBox(prettyNum(round(sd(new_data()$attend)), big.mark = ','), "SD Attendance", icon = icon('ticket'), color = 'yellow')
   })
   
   output$text1 = renderText({
@@ -76,8 +91,9 @@ function(input, output) {
     paste(new_data()$Stadium.Name[1],'in',new_data()$City[1])
   })
   
+  
   output$plot1 = renderPlot({
-    ggplot(new_data(), aes(x = (attend / 1000), y = opponent, color = day_night, shape = promotion)) + 
+    ggplot(new_data(), aes(x = (attend / 1000), y = opponent, color = day_night, shape = promotion, click = 'plot_click')) + 
       geom_point(size = 3) +
       geom_vline(aes(xintercept = (mean(mlb_data$attend))/1000), lty = 2,
                                  color = 'red') +
@@ -89,19 +105,22 @@ function(input, output) {
       scale_x_continuous(limits = c(5,55), breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55))
   })
   
+  output$info = renderText({
+    paste0("Attendance = ", round(input$plot_click$x * 1000))
+  })
+  
   output$plotDOW = renderPlot({
-    qplot(day_of_week, (attend/1000), data = new_data(), 
-          geom = 'boxplot', fill = I('lightgray')) +
-      theme_bw() +
+    ggplot(new_data(), aes(day_of_week, (attend/1000))) +
+      geom_boxplot() +
       xlab('') +
       ylab('Attendance (thousands)') +
       scale_y_continuous(limits = c(5,55), breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55))
+    
   })
   
   output$plotMonth = renderPlot({
-    qplot(month, (attend/1000), data = new_data(), 
-          geom = 'boxplot', fill = I('lightgray')) +
-      theme_bw() +
+    ggplot(new_data(), aes(month, (attend/1000))) +
+      geom_boxplot() +
       xlab('') +
       ylab('Attendance (thousands)') +
       scale_y_continuous(limits = c(5,55), breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55))
@@ -124,5 +143,6 @@ function(input, output) {
     gvisTable(mlb_data[-1],
               options = list(page='enable'))
     })
+  
 }
 
