@@ -1,6 +1,5 @@
 library(dplyr)
 library(ggplot2)
-library(dplyr)
 library(maps)
 library(ggthemes)
 library(data.table)
@@ -10,7 +9,6 @@ library(raster)
 library(rvest)
 library(reshape2)
 library(DT)
-library(xlsx)
 library(sp)
 if (!(exists('drscity') & 
       exists('spec') & 
@@ -21,17 +19,17 @@ if (!(exists('drscity') &
       exists('timesp') &
       exists('usa') &
       exists('change'))) 
-{ setwd("Documents/DataSci/bootcamp004_project/Project2-Shiny/annazipf/")
+{ #setwd("Documents/DataSci/bootcamp004_project/Project2-Shiny/annazipf/")
   print('loading data')
-  print(getwd())
+  #print(getwd())
   drscity = read.csv('drscity.csv.bz2')
   states = read.csv("states.csv")
-  spec = read.xlsx("spec.xlsx",1)
+  spec = read.csv("spec.csv")
   school = read.csv("school.csv")
   time = read.csv("time.csv")
   timesp = read.csv('timesp.csv')
   subgender = read.csv("subgender.csv")
-  change = read.xlsx("change.xlsx",1)
+  change = read.csv("change.csv")
   usa = readOGR("usa.shp", layer = "usa")
     drscity$X = NULL
     timesp$X = NULL
