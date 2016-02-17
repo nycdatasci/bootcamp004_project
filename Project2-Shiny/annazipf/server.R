@@ -95,22 +95,22 @@ shinyServer(function(input, output, session) {
       addPopover(session=session, id="timespp", title="Distribution of age by gender", 
                  content='Plot of new male/female medical graduates in medicare between 1950-2015. Females
                  have a mean age of about 33: 15 years younger than males.', placement = "bottom",
-                 trigger = "hover", options = NULL)
+                 trigger = "hover")
       addPopover(session=session, id="genderp", title="Male/female dominated fields", 
                  content='Top 26 most gender-segregated medical fields.', placement = "top",
-                 trigger = "hover", options = NULL)
+                 trigger = "hover")
       
       
       addPopover(session=session, id="changep", title="Distribution of experience within each medical sector", 
                  content="Visualizing the mean experience within each medical field. All 77 disciplines are plotted simultaneously:
   we then pull out the top 10 highest average fields in the lower graph.", placement = "bottom",
-                 trigger = "hover", options = NULL)
+                 trigger = "hover")
       
       addPopover(session=session, id="changepisolate", title="Most experienced sectors", 
                  content="Fields with doctors who have the highest average experience: between 26-30 years. NB: the lowest
                  mean experience fields are nurses and anesthesiology assistants, with 8 years average. The non-assistants with lowest
                  mean experience? Midwives and physical therapists.", placement = "top",
-                 trigger = "hover", options = NULL)
+                 trigger = "hover")
       
       
       addPopover(session=session, id="schoolp", title = "Popular schools",
@@ -120,12 +120,12 @@ Cleveland med. college, Gross College,
 Eclectic Med. Univ., Fort Wayne, Restview Chiropractic, 
 University of Natural Healing Arts...", 
                 placement = "top",
-                 trigger = "hover", options = NULL)
+                 trigger = "hover")
       
       addPopover(session=session, id="plot", content="Most prolific medical fields", 
                  title = " ",
                 placement = "bottom",
-                 trigger = "hover", options = NULL)
+                 trigger = "hover")
       
 
       
