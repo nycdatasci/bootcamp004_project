@@ -6,7 +6,7 @@ library(ggvis)
 require(datasets)
 library(DT)
 
-mlb_data = read.csv('mlb_data.csv')
+
 
 dashboardPage(
   dashboardHeader(title = 'MLB 2012 Attendance'),
