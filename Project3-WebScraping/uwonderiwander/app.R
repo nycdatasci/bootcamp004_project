@@ -125,6 +125,43 @@ COMPrices <- rbind(COMPrices, TCheckWholesale)
 unique(COMPrices$Name)
 
 
+#Weeknumber calculations
+COM_Prices$Weeknum <- as.numeric( format(COM_Prices$FullDate+3, "%U"))
+DOE_Prices$Weeknum <- as.numeric( format(DOE_Prices$FullDate+3, "%U"))
+
+DOEPrices_Weeknum = DOE_Prices[!duplicated(DOE_Prices[,c('Weeknum','Year')]),]
+COMPrices_Weeknum = COM_Prices[!duplicated(COM_Prices[,c('Weeknum','Year')]),]
+
+nrow(DOEPrices_Weeknum)
+nrow(COMPrices_Weeknum)
+
+#results2 <- DOEPrices_Weeknum[(DOEPrices_Weeknum$Weeknum == COMPrices_Weeknum$Weeknum) & 
+#                             (DOEPrices_Weeknum$Year == COMPrices_Weeknum$Year), ]
+#COMPrices_Weeknum = COMPrices_Weeknum[(COMPrices_Weeknum$Weeknum %in% {DOEPrices_Weeknum$Weeknum}) &
+#                  (COMPrices_Weeknum$Year %in% {DOEPrices_Weeknum$Year}),   ]
+#COM_Unique = distinct(COMPrices_Weeknum[c("Weeknum","Year")])
+#DOE_Unique = distinct(DOEPrices_Weeknum[c("Weeknum","Year")])
+# DOE_Weeks = c()
+# for (i in 1:nrow(DOEPrices_Weeknum)) {
+#   DOE_Weeks[i] = paste(toString(DOEPrices_Weeknum$Weeknum[i]),toString(DOEPrices_Weeknum$Year[i]), sep = ",")
+#   print (paste(toString(DOEPrices_Weeknum$Weeknum[i]),toString(DOEPrices_Weeknum$Year[i]), sep = ","))
+# }
+# COM_Weeks = c()
+# for (i in 1:nrow(COMPrices_Weeknum)) {
+#   COM_Weeks[i] = paste(toString(COMPrices_Weeknum$Weeknum[i]),toString(COMPrices_Weeknum$Year[i]), sep = ",")
+#   print (paste(toString(COMPrices_Weeknum$Weeknum[i]),toString(COMPrices_Weeknum$Year[i]), sep = ","))
+# }
+# length(DOE_Weeks)
+# length(COM_Weeks)
+# length(unique(DOE_Weeks))
+# length(unique(COM_Weeks))
+# DOEPrices_Weeknum[(paste(toString(DOEPrices_Weeknum$Weeknum[i]),toString(DOEPrices_Weeknum$Year[i]), sep = ",")) ==
+#    (DOE_Weeks[DOE_Weeks %in% COM_Weeks])]
+# !(DOE_Weeks  %in% COM_Weeks)
+# subset(DOE_Weeks, !(DOE_Weeks %in% COM_Weeks))
+# subset(DOE_Weeks, (DOE_Weeks %in% COM_Weeks))
+
+
 ### PLOTTING ###
 
 ui <- dashboardPage(
@@ -238,10 +275,15 @@ ui <- dashboardPage(
 server <- function(input, output) {
     
     output$bubble <- renderGvis({
-        gvisMotionChart(DOEPrices, idvar="Name", timevar="FullDate")
+        gvisMotionChart(DOEPrices, idvar="Name", timevar="FullDate", sizevar = "Price", 
+                        options=list(state='{"colorOption":"_UNIQUE_COLOR"};'))
+#      gvisMotionChart(DOE_Prices, idvar = "Name", timevar = "FullDate", xvar = "GDP per Capita",
+#                      yvar = "Population Growth", colorvar = "Region", sizevar = "Total Population",
+#                      options = list(width= 850, showChartButtons=TRUE))
     })
     output$bubble2 <- renderGvis({
-         gvisMotionChart(COMPrices, idvar="Name", timevar="FullDate")
+         gvisMotionChart(COMPrices, idvar="Name", timevar="FullDate", sizevar = "Price", 
+                         options=list(state='{"colorOption":"_UNIQUE_COLOR"};'))
        
     })
     output$private <- renderGvis({
