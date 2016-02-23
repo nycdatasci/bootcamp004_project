@@ -68,6 +68,8 @@ Pythonsoup2.head()
 # In[ ]:
 
 
+
+
 # In[25]:
 
 from collections import defaultdict
@@ -186,7 +188,7 @@ text1
 # 
 # Choice B seems well worth it. We will give it a try, but not right now. Let's move onto Index Mundi. 
 
-# In[32]:
+# In[10]:
 
 #For Index Mundi, beef values:
 from bs4 import BeautifulSoup
@@ -197,21 +199,22 @@ soup = BeautifulSoup(response)
 Mundi =  open("results.txt","w")
 table = soup.find_all('table', class_="tblData")
 souptable = table[0]
-souptable
 
 
-# In[51]:
+
+
+# In[11]:
 
 type(souptable)
 
 
-# In[49]:
+# In[12]:
 
 soup_string = str(souptable)
 #converting bs4 element into string
 
 
-# In[64]:
+# In[14]:
 
 import requests
 from bs4 import BeautifulSoup
@@ -228,28 +231,26 @@ for i in souptable.findAll('tr'):
             Price.append(p.text)
         if s==2:
             Change.append(p.text)
-print Price
 print type (Price)
 
 
-# In[67]:
+# In[15]:
 
 #Right now, the above list is a list of unicode strings. 
 Date = [item.encode('utf-8') for item in Date]
 Price = [item.encode('utf-8') for item in Price]
 Change = [item.encode('utf-8') for item in Change]
-print Price
 
 
-# In[80]:
+# In[16]:
 
 Price2 = map(lambda item: float(item),Price)
-print Price2
-#Now, the below price values -- which are the most important -- are integers. 
+#Now, the price values -- which are the most important -- are integers. 
 
 
-# In[87]:
+# In[18]:
 
+import pandas as pd
 CPI_beef = pd.DataFrame({'Date' : Date,
  'Price' : Price,
  'Change':Change
@@ -263,14 +264,14 @@ print CPI_beef
 
 # In[89]:
 
-#The above data frame is good to go for exporting!
+#let's see how well this imports into a csv...
 import csv
 CPI_beef.to_csv("CPI_beef", sep='\t')
 
 
 # The above process can be applied for the remaining products necessary for analysis from Index Mundi: Coconut Oil, Palm Oil, and Pork(swine). 
 
-# In[109]:
+# In[33]:
 
 #For Pork(swine)
 from bs4 import BeautifulSoup
@@ -280,15 +281,16 @@ soup = BeautifulSoup(response)
 Mundi =  open("results.txt","w")
 table = soup.find_all('table', class_="tblData")
 souptable = table[0]
-souptable
 
 
-# In[113]:
+
+
+# In[34]:
 
 soup_string = str(souptable)
 
 
-# In[114]:
+# In[35]:
 
 import requests
 from bs4 import BeautifulSoup
@@ -307,7 +309,7 @@ for i in souptable.findAll('tr'):
             Change_Pork.append(p.text)
 
 
-# In[115]:
+# In[36]:
 
 #Right now, the above list is a list of unicode strings. 
 Date_Pork = [item.encode('utf-8') for item in Date_Pork]
@@ -315,18 +317,17 @@ Price_Pork = [item.encode('utf-8') for item in Price_Pork]
 Change_Pork = [item.encode('utf-8') for item in Change_Pork]
 
 
-# In[118]:
+# In[37]:
 
 Price_Pork2 = map(lambda item: float(item),Price_Pork)
 
 
-# In[119]:
+# In[38]:
 
 CPI_Pork = pd.DataFrame({'Date_Pork' : Date_Pork,
  'Price_Pork2' : Price_Pork,
  'Change_Pork':Change_Pork
   })
-print(CPI_Pork)
 
 
 # In[120]:
@@ -335,9 +336,11 @@ import csv
 CPI_Pork.to_csv("CPI_Pork", sep='\t')
 
 
-# In[129]:
+# In[3]:
 
 #For Coconut Oil
+from bs4 import BeautifulSoup
+import requests
 response = requests.get('http://www.indexmundi.com/commodities/?commodity=coconut-oil&months=360').text
 
 soup = BeautifulSoup(response)
@@ -360,36 +363,30 @@ for i in souptable.findAll('tr'):
         if s==2:
             Change_Coco.append(p.text)
 
-print Change_Coco
 
-
-# In[132]:
+# In[4]:
 
 
 Date_Coco = [item.encode('utf-8') for item in Date_Coco]
 Price_Coco = [item.encode('utf-8') for item in Price_Coco]
 Change_Coco = [item.encode('utf-8') for item in Change_Coco]
 
-print Price_Coco
+
+# In[6]:
+
+import pandas as pd
+CPI_Coco = pd.DataFrame({'Date_Coco' : Date_Coco,
+ 'Price_Coco2' : Price_Coco,
+ 'Change_Coco':Change_Coco
+  })
 
 
-
-# In[ ]:
+# In[7]:
 
 CPI_Coco = pd.DataFrame({'Date_Coco' : Date_Coco,
  'Price_Coco2' : Price_Coco,
  'Change_Coco':Change_Coco
   })
-print(CPI_Coco)
-
-
-# In[134]:
-
-CPI_Coco = pd.DataFrame({'Date_Coco' : Date_Coco,
- 'Price_Coco2' : Price_Coco,
- 'Change_Coco':Change_Coco
-  })
-print(CPI_Coco)
 
 
 # In[135]:
@@ -397,7 +394,7 @@ print(CPI_Coco)
 CPI_Coco.to_csv("CPI_Coco", sep='\t')
 
 
-# In[137]:
+# In[15]:
 
 #For Palm Oil
 response = requests.get('http://www.indexmundi.com/commodities/?commodity=palm-oil&months=360').text
@@ -431,12 +428,144 @@ CPI_Palm = pd.DataFrame({'Date_Palm' : Date_Palm,
  'Change_Palm':Change_Palm
   })
 
-print CPI_Palm
-
 
 # In[138]:
 
 CPI_Palm.to_csv("CPI_Palm", sep='\t')
+
+
+# In[42]:
+
+#In inspecting the original csv files, there's some cleaning to do 
+#before they are easily readable in R. Dataframes are:
+#CPI_Palm, CPI_Coco, CPI_beef, CPI_pork
+
+print type(CPI_Pork)
+print type(CPI_beef)
+print type(CPI_Coco)
+print type(CPI_Palm)
+
+
+# In[43]:
+
+CPI_Pork.head(10)
+
+
+# In[44]:
+
+#removing % sign
+CPI_Pork['Change_Pork'] = CPI_Pork['Change_Pork'].map(lambda x:x.rstrip
+        (' %'))
+
+
+# In[45]:
+
+CPI_Pork.head(10)
+
+
+# In[47]:
+
+CPI_Pork['Change_Pork'][0] = 0
+
+
+# In[48]:
+
+CPI_Pork.head(10)
+
+
+# In[49]:
+
+#extracting the month
+CPI_Pork['month'] = CPI_Pork['Date_Pork'].str.extract('([A-Z]\w{0,})')
+CPI_Pork.head(10)
+
+
+# In[51]:
+
+CPI_Pork['Year'] = CPI_Pork['Date_Pork'].str.extract('(\d\d\d\d)')
+CPI_Pork.head(10)
+#Now month and year are in different columns
+
+
+# In[53]:
+
+CPI_Pork = CPI_Pork.drop('Date_Pork', axis=1 )
+CPI_Pork.head(10)
+
+
+# In[54]:
+
+CPI_Pork.to_csv("CPI_Pork2", sep=',')
+
+
+# In[56]:
+
+#CPI_Pork reads properly in R. Will follow the same process for other three dataframes:
+#For CPI_beef
+CPI_beef['Change'] = CPI_beef['Change'].map(lambda x:x.rstrip
+        (' %'))
+CPI_beef['Change'][0] = 0
+CPI_beef['month'] = CPI_beef['Date'].str.extract('([A-Z]\w{0,})')
+CPI_beef['Year'] = CPI_beef['Date'].str.extract('(\d\d\d\d)')
+CPI_beef = CPI_beef.drop('Date', axis=1 )
+CPI_beef.head(10)
+
+
+# In[57]:
+
+CPI_beef.to_csv("CPI_beef2", sep=',')
+
+
+# In[61]:
+
+print CPI_Palm.head(10)
+print CPI_Coco.head(10)
+
+
+# In[16]:
+
+#For CPI_Palm
+CPI_Palm['Change'] = CPI_Palm['Change_Palm'].map(lambda x:x.rstrip
+        (' %'))
+CPI_Palm['Change'][0] = 0
+CPI_Palm['month'] = CPI_Palm['Date_Palm'].str.extract('([A-Z]\w{0,})')
+CPI_Palm['Year'] = CPI_Palm['Date_Palm'].str.extract('(\d\d\d\d)')
+CPI_Palm = CPI_Palm.drop('Date_Palm', axis=1 )
+CPI_Palm = CPI_Palm.drop('Change_Palm', axis=1)
+CPI_Palm.head(10)
+
+
+# In[8]:
+
+#For CPI_Coco
+CPI_Coco['Change'] = CPI_Coco['Change_Coco'].map(lambda x:x.rstrip
+        (' %'))
+CPI_Coco['Change'][0] = 0
+CPI_Coco['month'] = CPI_Coco['Date_Coco'].str.extract('([A-Z]\w{0,})')
+CPI_Coco['Year'] = CPI_Coco['Date_Coco'].str.extract('(\d\d\d\d)')
+CPI_Coco = CPI_Coco.drop('Date_Coco', axis=1 )
+CPI_Coco.head(10)
+
+
+# In[12]:
+
+CPI_Coco = CPI_Coco.drop('Change_Coco', axis=1 )
+CPI_Coco.head(10)
+
+
+# In[13]:
+
+CPI_Coco.to_csv("CPI_Coco2", sep=',')
+
+
+# In[17]:
+
+CPI_Palm.to_csv("CPI_Palm2", sep=',')
+
+
+# In[ ]:
+
+
 
 
 # In[ ]:
