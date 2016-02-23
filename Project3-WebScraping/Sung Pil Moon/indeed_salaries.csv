@@ -1,0 +1,635 @@
+,comp_name,comp_overall_link,sal_d,sal_hr,sal_m,sal_max,sal_min,sal_wk,sal_yr
+0,CyberCoders,http://www.indeed.com/cmp/Cybercoders,146.0,100.0,0.0,153063.0,109192.0,400.0,131128.0
+1,TechInMotion,http://www.indeed.com/cmp/Techinmotion,0.0,59.13,0.0,147052.0,109055.0,0.0,128054.0
+2,Workbridge Associates,http://www.indeed.com/cmp/Workbridge-Associates,0.0,59.29,0.0,152486.0,112000.0,0.0,132243.0
+3,Jobspring Partners,http://www.indeed.com/cmp/Jobspring-Partners,0.0,60.25,0.0,140725.0,105611.0,0.0,123168.0
+4,"Career Brokers, Inc.","http://www.indeed.com/cmp/Career-Brokers,-Inc.",0.0,0.0,0.0,134493.0,103243.0,0.0,118868.0
+5,National Security Agency,http://www.indeed.com/cmp/National-Security-Agency,0.0,0.0,0.0,100822.0,68553.0,0.0,84687.0
+6,harnham,http://www.indeed.com/cmp/Harnham,0.0,0.0,0.0,165528.0,137927.0,0.0,151728.0
+7,Job Juncture,http://www.indeed.com/cmp/Job-Juncture,0.0,0.0,0.0,142148.0,103343.0,0.0,122746.0
+8,Plastic Executive Recruiters,http://www.indeed.com/cmp/Plastic-Executive-Recruiters,0.0,0.0,0.0,164500.0,107700.0,0.0,136100.0
+9,Prosigo Executive Search,http://www.indeed.com/cmp/Prosigo-Executive-Search,0.0,0.0,0.0,167750.0,108100.0,0.0,137925.0
+10,Ploeger Recruiting Services,http://www.indeed.com/cmp/Ploeger-Recruiting-Services,0.0,0.0,0.0,165052.0,107732.0,0.0,136392.0
+11,CMD And Associates,http://www.indeed.com/cmp/Cmd-and-Associates,0.0,0.0,0.0,160368.0,107368.0,0.0,133868.0
+12,"Fowler Placement Services, Inc.","http://www.indeed.com/cmp/Fowler-Placement-Services,-Inc.",0.0,0.0,0.0,165108.0,107419.0,0.0,136263.0
+13,Onboard.jobs,http://www.indeed.com/cmp/Onboard.jobs,0.0,0.0,0.0,165380.0,107717.0,0.0,136549.0
+14,Systematic business consulting,http://www.indeed.com/cmp/Systematic-Business-Consulting,0.0,0.0,0.0,162056.0,107222.0,0.0,134639.0
+15,Bio-Partners,http://www.indeed.com/cmp/Bio--partners,0.0,0.0,0.0,157978.0,106966.0,0.0,132472.0
+16,Lodestar Executive Search,http://www.indeed.com/cmp/Lodestar-Executive-Search,0.0,0.0,0.0,166954.0,107816.0,0.0,137385.0
+17,"PSU Personnel Services Unlimited, Inc.","http://www.indeed.com/cmp/Psu-Personnel-Services-Unlimited,-Inc.",0.0,0.0,0.0,161552.0,107241.0,0.0,134397.0
+18,SearchStars,http://www.indeed.com/cmp/Searchstars,0.0,0.0,0.0,162151.0,107209.0,0.0,134680.0
+19,Client Staffing Solutions,http://www.indeed.com/cmp/Client-Staffing-Solutions,0.0,0.0,0.0,154826.0,106512.0,0.0,130669.0
+20,Tri-Force,http://www.indeed.com/cmp/Tri--force,0.0,0.0,0.0,158895.0,106628.0,0.0,132762.0
+21,True North Consultants,http://www.indeed.com/cmp/True-North-Consultants,0.0,0.0,0.0,154826.0,106512.0,0.0,130669.0
+22,Hire Horizons,http://www.indeed.com/cmp/Hire-Horizons,0.0,0.0,0.0,162151.0,107209.0,0.0,134680.0
+23,"Technology Recruiting Solutions, Inc.","http://www.indeed.com/cmp/Technology-Recruiting-Solutions,-Inc.",0.0,0.0,0.0,154353.0,106471.0,0.0,130412.0
+24,AutoPro Technical Recruiting,http://www.indeed.com/cmp/Autopro-Technical-Recruiting,0.0,0.0,0.0,154353.0,106471.0,0.0,130412.0
+25,"MJ Recruiters, LLC","http://www.indeed.com/cmp/Mj-Recruiters,-LLC",0.0,0.0,0.0,154353.0,106471.0,0.0,130412.0
+26,"Professional Recruiting Partners, LLC","http://www.indeed.com/cmp/Professional-Recruiting-Partners,-LLC",0.0,0.0,0.0,154881.0,106786.0,0.0,130833.0
+27,Prevalent Group,http://www.indeed.com/cmp/Prevalent-Group,0.0,0.0,0.0,155120.0,106627.0,0.0,130874.0
+28,Helffrich International,http://www.indeed.com/cmp/Helffrich-International,0.0,0.0,0.0,155488.0,106585.0,0.0,131037.0
+29,"Superior Search Consultants, Inc.","http://www.indeed.com/cmp/Superior-Search-Consultants,-Inc.",0.0,0.0,0.0,155494.0,106667.0,0.0,131080.0
+30,JDP Search Group,http://www.indeed.com/cmp/Jdp-Search-Group,0.0,0.0,0.0,155000.0,106000.0,0.0,130500.0
+31,Robert Half Technology,http://www.indeed.com/cmp/Robert-Half-Technology,75.84,64.61,0.0,136417.0,119717.0,0.0,128067.0
+32,Step Beyond,http://www.indeed.com/cmp/Step-Beyond,0.0,0.0,0.0,155705.0,106410.0,0.0,131058.0
+33,Huxley Associates,http://www.indeed.com/cmp/Huxley-Associates,0.0,0.0,0.0,192532.0,133312.0,650.0,162922.0
+34,Ability Professional Network,http://www.indeed.com/cmp/Ability-Professional-Network,0.0,0.0,0.0,169156.0,107792.0,0.0,138474.0
+35,Request Technology,http://www.indeed.com/cmp/Request-Technology,120.0,0.0,0.0,110137.0,97808.0,0.0,103973.0
+36,Bertram & Associates,http://www.indeed.com/cmp/Bertram-&-Associates,0.0,0.0,0.0,169521.0,107945.0,0.0,138733.0
+37,ICONSTAFF,http://www.indeed.com/cmp/Iconstaff,0.0,0.0,0.0,0.0,0.0,0.0,147463.0
+38,Analytic Recruiting,http://www.indeed.com/cmp/Analytic-Recruiting,140.0,0.0,0.0,151061.0,120000.0,0.0,135530.0
+39,"Smith Hanley Associates, LLC","http://www.indeed.com/cmp/Smith-Hanley-Associates,-LLC",127.0,0.0,0.0,119623.0,101887.0,0.0,110755.0
+40,Glocomms,http://www.indeed.com/cmp/Glocomms,139.0,0.0,0.0,163571.0,124694.0,0.0,144133.0
+41,"Clifton Johnson Associates, Inc.","http://www.indeed.com/cmp/Clifton-Johnson-Associates,-Inc.",0.0,0.0,0.0,151610.0,101102.0,0.0,126356.0
+42,GQR Global Markets,http://www.indeed.com/cmp/Gqr-Global-Markets,300.0,0.0,0.0,196500.0,172000.0,300.0,184250.0
+43,Affinity Executive Search,http://www.indeed.com/cmp/Affinity-Executive-Search,0.0,0.0,0.0,145769.0,106154.0,0.0,125962.0
+44,Selby Jennings,http://www.indeed.com/cmp/Selby-Jennings,0.0,0.0,0.0,179900.0,136100.0,0.0,158000.0
+45,Diversity Search,http://www.indeed.com/cmp/Diversity-Search,0.0,0.0,0.0,148700.0,107800.0,0.0,128250.0
+46,Ezra Penland Actuarial Recruitment,http://www.indeed.com/cmp/Ezra-Penland-Actuarial-Recruitment,0.0,0.0,0.0,0.0,0.0,0.0,132755.0
+47,ONESource Technical,http://www.indeed.com/cmp/Onesource-Technical,0.0,0.0,0.0,163659.0,107805.0,0.0,135732.0
+48,MMS Group,http://www.indeed.com/cmp/Mms-Group,0.0,0.0,0.0,162073.0,105854.0,0.0,133963.0
+49,Kforce,http://www.indeed.com/cmp/Kforce,95.0,95.0,0.0,134444.0,121528.0,0.0,127986.0
+50,Progressive Recruitment,http://www.indeed.com/cmp/Progressive-Recruitment,130.0,0.0,0.0,0.0,0.0,0.0,130000.0
+51,fulltimeGiGS,http://www.indeed.com/cmp/Fulltimegigs,0.0,0.0,0.0,138438.0,99375.0,0.0,118906.0
+52,The Bivium Group,http://www.indeed.com/cmp/The-Bivium-Group,0.0,0.0,0.0,133333.0,87667.0,0.0,110500.0
+53,Hirewell,http://www.indeed.com/cmp/Hirewell,0.0,0.0,0.0,0.0,0.0,0.0,135000.0
+54,Request Technology-Robyn Honquest,http://www.indeed.com/cmp/Request-Technology--robyn-Honquest,0.0,0.0,0.0,123704.0,95926.0,0.0,109815.0
+55,Burtch Works,http://www.indeed.com/cmp/Burtch-Works,0.0,0.0,0.0,135833.0,130000.0,0.0,132917.0
+56,Request Technology-Craig Johnson,http://www.indeed.com/cmp/Request-Technology--craig-Johnson,0.0,0.0,0.0,123913.0,105652.0,0.0,114783.0
+57,Selby Jennings Technology,http://www.indeed.com/cmp/Selby-Jennings-Technology,0.0,0.0,0.0,195714.0,150000.0,0.0,172857.0
+58,MCG Health System,http://www.indeed.com/cmp/Mcg-Health-System,0.0,0.0,0.0,0.0,0.0,0.0,120000.0
+59,Randstad,http://www.indeed.com/cmp/Randstad,98.16,0.0,0.0,146339.0,95742.0,0.0,118367.0
+60,BeecherMadden,http://www.indeed.com/cmp/Beechermadden,0.0,0.0,0.0,136042.0,129701.0,0.0,132834.0
+61,Gables Search Group,http://www.indeed.com/cmp/Gables-Search-Group,0.0,0.0,0.0,154304.0,128995.0,0.0,141084.0
+62,Request Technology-Craig Johnson,http://www.indeed.com/cmp/Request-Technology--craig-Johnson,0.0,0.0,0.0,131967.0,98958.0,0.0,114277.0
+63,Smith & Keller,http://www.indeed.com/cmp/Smith-&-Keller,0.0,0.0,0.0,162830.0,106067.0,0.0,131419.0
+64,Lawrence Harvey,http://www.indeed.com/cmp/Lawrence-Harvey,0.0,0.0,0.0,234230.0,123692.0,0.0,170213.0
+65,NORTH STAR,http://www.indeed.com/cmp/North-Star,0.0,0.0,0.0,212762.0,169725.0,0.0,190029.0
+66,Opus Recruitment Solutions Ltd,http://www.indeed.com/cmp/Opus-Recruitment-Solutions-Ltd,0.0,0.0,0.0,223372.0,76553.0,0.0,130767.0
+67,Nigel Frank International,http://www.indeed.com/cmp/Nigel-Frank-International,0.0,77.61,0.0,180483.0,127553.0,0.0,151727.0
+68,Hirewell,http://www.indeed.com/cmp/Hirewell,0.0,0.0,0.0,154494.0,118124.0,0.0,135090.0
+69,Zachary Piper,http://www.indeed.com/cmp/Zachary-Piper,0.0,0.0,0.0,264770.0,149121.0,0.0,198702.0
+70,"V Dart, Inc.","http://www.indeed.com/cmp/V-Dart,-Inc.",73.11,0.0,0.0,0.0,0.0,0.0,0.0
+71,Rinalytics Advisors,http://www.indeed.com/cmp/Rinalytics-Advisors,0.0,0.0,0.0,239053.0,126062.0,0.0,173596.0
+72,Request Technology-Stephanie Baker,http://www.indeed.com/cmp/Request-Technology--stephanie-Baker,0.0,0.0,0.0,129771.0,88155.0,0.0,106958.0
+73,Request Technology-Anthony Honquest,http://www.indeed.com/cmp/Request-Technology--anthony-Honquest,0.0,0.0,0.0,134687.0,96548.0,0.0,114034.0
+74,Betts Search Group,http://www.indeed.com/cmp/Betts-Search-Group,0.0,0.0,0.0,158229.0,100325.0,0.0,125994.0
+75,Mindbank,http://www.indeed.com/cmp/Mindbank,0.0,0.0,0.0,149055.0,121398.0,0.0,134518.0
+76,Oracle Recruiting,http://www.indeed.com/cmp/Oracle-Recruiting,0.0,0.0,0.0,158229.0,100325.0,0.0,125994.0
+77,Experis,http://www.indeed.com/cmp/Experis,0.0,39.04,0.0,0.0,0.0,0.0,0.0
+78,Selby Jennings Buyside,http://www.indeed.com/cmp/Selby-Jennings-Buyside,0.0,0.0,0.0,184958.0,137522.0,0.0,159486.0
+79,Gables Search Group,http://www.indeed.com/cmp/Gables-Search-Group,0.0,0.0,0.0,0.0,0.0,0.0,140833.0
+80,Rinalytics Advisors,http://www.indeed.com/cmp/Rinalytics-Advisors,0.0,0.0,0.0,0.0,0.0,0.0,175833.0
+81,The Big Game Hunter,http://www.indeed.com/cmp/The-Big-Game-Hunter,0.0,0.0,0.0,142500.0,115000.0,0.0,128750.0
+82,VOLT,http://www.indeed.com/cmp/Volt,0.0,62.69,0.0,140000.0,120000.0,0.0,130000.0
+83,Computer Futures Solutions,http://www.indeed.com/cmp/Computer-Futures-Solutions,0.0,0.0,0.0,136000.0,118000.0,0.0,127000.0
+84,BeecherMadden,http://www.indeed.com/cmp/Beechermadden,0.0,0.0,0.0,0.0,0.0,0.0,133000.0
+85,GMS Advisors,http://www.indeed.com/cmp/Gms-Advisors,0.0,0.0,0.0,0.0,0.0,0.0,231000.0
+86,PeopleStaff,http://www.indeed.com/cmp/Peoplestaff,0.0,0.0,0.0,223333.0,115556.0,0.0,169444.0
+87,"ANDOVER RESEARCH, LTD","http://www.indeed.com/cmp/Andover-Research,-Ltd",0.0,0.0,0.0,119444.0,80556.0,0.0,100000.0
+88,Ninjob | Employment Marketing,http://www.indeed.com/cmp/Ninjob-Employment-Marketing,0.0,0.0,0.0,0.0,0.0,0.0,125000.0
+89,Cameron Craig Group,http://www.indeed.com/cmp/Cameron-Craig-Group,0.0,0.0,0.0,0.0,0.0,0.0,128333.0
+90,IQ NOT FOR PROFIT,http://www.indeed.com/cmp/Iq-Not-For-Profit,0.0,0.0,0.0,171875.0,93750.0,0.0,132812.0
+91,Apex Systems,http://www.indeed.com/cmp/Apex-Systems,0.0,26.0,0.0,162500.0,147500.0,0.0,155000.0
+92,Snohomish County PUD,http://www.indeed.com/cmp/Snohomish-County-Pud,0.0,0.0,0.0,0.0,0.0,0.0,117000.0
+93,Opus Recruitment Solutions Ltd,http://www.indeed.com/cmp/Opus-Recruitment-Solutions-Ltd,0.0,0.0,0.0,168333.0,85000.0,0.0,126667.0
+94,The Talent Solution,http://www.indeed.com/cmp/The-Talent-Solution,0.0,0.0,0.0,150000.0,145000.0,0.0,147500.0
+95,University of Virginia Health System,http://www.indeed.com/cmp/University-of-Virginia-Health-System,0.0,0.0,0.0,127161.0,79474.0,0.0,103318.0
+96,Zachary Piper,http://www.indeed.com/cmp/Zachary-Piper,0.0,0.0,0.0,243750.0,168750.0,0.0,206250.0
+97,Experis,http://www.indeed.com/cmp/Experis,0.0,41.64,0.0,0.0,0.0,0.0,0.0
+98,Ascendo Resources,http://www.indeed.com/cmp/Ascendo-Resources,0.0,0.0,0.0,190000.0,112857.0,0.0,151429.0
+99,Lawrence Harvey IT & Change,http://www.indeed.com/cmp/Lawrence-Harvey-IT-&-Change,0.0,0.0,0.0,99533.0,93052.0,0.0,96292.0
+100,All In Analytics,http://www.indeed.com/cmp/All-in-Analytics,0.0,0.0,0.0,0.0,0.0,0.0,141429.0
+101,ZenDrive,http://www.indeed.com/cmp/Zendrive,0.0,0.0,0.0,108571.0,100000.0,0.0,104286.0
+102,nsa,http://www.indeed.com/cmp/NSA,0.0,0.0,0.0,105362.0,73170.0,0.0,89266.0
+103,CPS Recruitment,http://www.indeed.com/cmp/CPS-Recruitment,0.0,0.0,0.0,231429.0,114286.0,0.0,172857.0
+104,Chipton Ross,http://www.indeed.com/cmp/Chipton-Ross,0.0,34.06,0.0,0.0,0.0,0.0,0.0
+105,State Street Corporation.,http://www.indeed.com/cmp/State-Street-Corporation.,0.0,0.0,0.0,114286.0,100000.0,0.0,107143.0
+106,iKas International,http://www.indeed.com/cmp/Ikas-International,0.0,0.0,0.0,160000.0,140000.0,0.0,150000.0
+107,American Express,http://www.indeed.com/cmp/American-Express,0.0,0.0,0.0,200000.0,183333.0,0.0,191667.0
+108,Selby Jennings Buyside,http://www.indeed.com/cmp/Selby-Jennings-Buyside,0.0,0.0,0.0,178333.0,143333.0,0.0,160833.0
+109,Principle Solutions Group,http://www.indeed.com/cmp/Principle-Solutions-Group,0.0,85.0,0.0,134000.0,100000.0,0.0,117000.0
+110,"Benton Search Assoc., Inc.","http://www.indeed.com/cmp/Benton-Search-Assoc.,-Inc.",0.0,0.0,0.0,103333.0,96667.0,0.0,100000.0
+111,"Phil Ellis Associates, Inc","http://www.indeed.com/cmp/Phil-Ellis-Associates,-Inc",0.0,0.0,0.0,245000.0,115000.0,0.0,180000.0
+112,"Mindbank Consulting Group, LLC","http://www.indeed.com/cmp/Mindbank-Consulting-Group,-LLC",0.0,0.0,0.0,0.0,0.0,0.0,137667.0
+113,NORTH STAR,http://www.indeed.com/cmp/North-Star,0.0,0.0,0.0,183333.0,173333.0,0.0,178333.0
+114,Andex,http://www.indeed.com/cmp/Andex,0.0,0.0,0.0,0.0,0.0,0.0,138000.0
+115,The Centrics Group,http://www.indeed.com/cmp/The-Centrics-Group,0.0,100.0,0.0,0.0,0.0,0.0,120000.0
+116,Unifyze,http://www.indeed.com/cmp/Unifyze,0.0,0.0,0.0,183333.0,76667.0,0.0,130000.0
+117,TEKsystems,http://www.indeed.com/cmp/TEKsystems,110.0,55.33,0.0,50000.0,45000.0,0.0,47500.0
+118,Robert Half Technology,http://www.indeed.com/cmp/Robert-Half-Technology,73.76,64.51,0.0,183848.0,82556.0,0.0,123198.0
+119,Jim Crumpley & Associates,http://www.indeed.com/cmp/Jim-Crumpley-&-Associates,0.0,0.0,0.0,189305.0,86940.0,0.0,128290.0
+120,Ability Professional Network,http://www.indeed.com/cmp/Ability-Professional-Network,0.0,0.0,0.0,189305.0,86940.0,0.0,128290.0
+121,harnham,http://www.indeed.com/cmp/Harnham,0.0,0.0,0.0,198495.0,104189.0,0.0,143809.0
+122,ICONSTAFF,http://www.indeed.com/cmp/Iconstaff,0.0,0.0,0.0,153021.0,141611.0,0.0,147205.0
+123,Glocomms,http://www.indeed.com/cmp/Glocomms,137.0,0.0,0.0,205190.0,91272.0,0.0,136851.0
+124,Affinity Executive Search,http://www.indeed.com/cmp/Affinity-Executive-Search,0.0,0.0,0.0,153651.0,99014.0,0.0,123343.0
+125,Analytic Recruiting,http://www.indeed.com/cmp/Analytic-Recruiting,0.0,0.0,0.0,180298.0,103622.0,0.0,136685.0
+126,"Clifton Johnson Associates, Inc.","http://www.indeed.com/cmp/Clifton-Johnson-Associates,-Inc.",0.0,0.0,0.0,181332.0,84050.0,0.0,123454.0
+127,GQR Global Markets,http://www.indeed.com/cmp/Gqr-Global-Markets,0.0,0.0,0.0,262340.0,120123.0,300.0,177519.0
+128,ONESource Technical,http://www.indeed.com/cmp/Onesource-Technical,0.0,0.0,0.0,187442.0,86714.0,0.0,127491.0
+129,MMS Group,http://www.indeed.com/cmp/Mms-Group,0.0,0.0,0.0,187442.0,86714.0,0.0,127491.0
+130,Diversity Search,http://www.indeed.com/cmp/Diversity-Search,0.0,0.0,0.0,157564.0,99864.0,0.0,125439.0
+131,Kforce,http://www.indeed.com/cmp/Kforce,95.0,95.0,0.0,161350.0,96632.0,0.0,124866.0
+132,The Bivium Group,http://www.indeed.com/cmp/The-Bivium-Group,0.0,0.0,0.0,150129.0,73181.0,0.0,104817.0
+133,"Smith Hanley Associates, LLC","http://www.indeed.com/cmp/Smith-Hanley-Associates,-LLC",0.0,0.0,0.0,145322.0,74078.0,0.0,103756.0
+134,MCG Health System,http://www.indeed.com/cmp/Mcg-Health-System,0.0,0.0,0.0,0.0,0.0,0.0,120000.0
+135,Request Technology,http://www.indeed.com/cmp/Request-Technology,120.0,0.0,0.0,133275.0,92317.0,0.0,110921.0
+136,iStaff,http://www.indeed.com/cmp/Istaff,0.0,0.0,0.0,0.0,0.0,0.0,75000.0
+137,The Job Jobber,http://www.indeed.com/cmp/The-Job-Jobber,0.0,0.0,0.0,149376.0,91250.0,0.0,116750.0
+138,Selby Jennings Technology,http://www.indeed.com/cmp/Selby-Jennings-Technology,0.0,0.0,0.0,205604.0,143695.0,0.0,171884.0
+139,J&S Professional Recruiters,http://www.indeed.com/cmp/J&S-Professional-Recruiters,0.0,0.0,0.0,175306.0,147174.0,0.0,160626.0
+140,fulltimeGiGS,http://www.indeed.com/cmp/Fulltimegigs,0.0,0.0,0.0,149282.0,90104.0,0.0,115978.0
+141,Request Technology-Robyn Honquest,http://www.indeed.com/cmp/Request-Technology--robyn-Honquest,0.0,0.0,0.0,131996.0,87972.0,0.0,107759.0
+142,Career Development Partners,http://www.indeed.com/cmp/Career-Development-Partners,0.0,0.0,0.0,160384.0,102462.0,0.0,128193.0
+143,Burtch Works,http://www.indeed.com/cmp/Burtch-Works,0.0,0.0,0.0,160621.0,98032.0,0.0,125483.0
+144,Gables Search Group,http://www.indeed.com/cmp/Gables-Search-Group,0.0,0.0,0.0,154304.0,128995.0,0.0,141084.0
+145,BeecherMadden,http://www.indeed.com/cmp/Beechermadden,0.0,0.0,0.0,136042.0,129701.0,0.0,132834.0
+146,Request Technology-Craig Johnson,http://www.indeed.com/cmp/Request-Technology--craig-Johnson,0.0,0.0,0.0,131967.0,98958.0,0.0,114277.0
+147,Randstad,http://www.indeed.com/cmp/Randstad,98.16,0.0,0.0,146339.0,95742.0,0.0,118367.0
+148,Opus Recruitment Solutions Ltd,http://www.indeed.com/cmp/Opus-Recruitment-Solutions-Ltd,0.0,0.0,0.0,223372.0,76553.0,0.0,130767.0
+149,Lawrence Harvey,http://www.indeed.com/cmp/Lawrence-Harvey,0.0,0.0,0.0,234230.0,123692.0,0.0,170213.0
+150,NORTH STAR,http://www.indeed.com/cmp/North-Star,0.0,0.0,0.0,212762.0,169725.0,0.0,190029.0
+151,Smith & Keller,http://www.indeed.com/cmp/Smith-&-Keller,0.0,0.0,0.0,162830.0,106067.0,0.0,131419.0
+152,Hirewell,http://www.indeed.com/cmp/Hirewell,0.0,0.0,0.0,154494.0,118124.0,0.0,135090.0
+153,Nigel Frank International,http://www.indeed.com/cmp/Nigel-Frank-International,0.0,77.61,0.0,180483.0,127553.0,0.0,151727.0
+154,Zachary Piper,http://www.indeed.com/cmp/Zachary-Piper,0.0,0.0,0.0,264770.0,149121.0,0.0,198702.0
+155,Request Technology-Stephanie Baker,http://www.indeed.com/cmp/Request-Technology--stephanie-Baker,0.0,0.0,0.0,129771.0,88155.0,0.0,106958.0
+156,"V Dart, Inc.","http://www.indeed.com/cmp/V-Dart,-Inc.",73.11,0.0,0.0,0.0,0.0,0.0,0.0
+157,Rinalytics Advisors,http://www.indeed.com/cmp/Rinalytics-Advisors,0.0,0.0,0.0,239053.0,126062.0,0.0,173596.0
+158,SeatGeek,http://www.indeed.com/cmp/Seatgeek,0.0,0.0,0.0,127998.0,65942.0,0.0,91872.0
+159,"RightStaff, Inc.","http://www.indeed.com/cmp/Rightstaff,-Inc.",0.0,0.0,0.0,124701.0,118661.0,0.0,121644.0
+160,Patreon,http://www.indeed.com/cmp/Patreon,0.0,0.0,0.0,121472.0,108668.0,0.0,114891.0
+161,Crowdfunder,http://www.indeed.com/cmp/Crowdfunder,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+162,Ascendo Resources,http://www.indeed.com/cmp/Ascendo-Resources,0.0,0.0,0.0,214332.0,103379.0,0.0,148854.0
+163,21,http://www.indeed.com/cmp/21,0.0,0.0,0.0,157986.0,95097.0,0.0,122573.0
+164,Piper Companies,http://www.indeed.com/cmp/Piper-Companies,0.0,0.0,0.0,258442.0,141642.0,0.0,191327.0
+165,System Edge,http://www.indeed.com/cmp/System-Edge,0.0,80.0,0.0,0.0,0.0,0.0,0.0
+166,SupplyFrame,http://www.indeed.com/cmp/Supplyframe,0.0,0.0,0.0,132342.0,71285.0,0.0,97129.0
+167,TTS Staffing,http://www.indeed.com/cmp/Tts-Staffing,0.0,0.0,0.0,160794.0,123498.0,0.0,140918.0
+168,Vaco - San Francisco,http://www.indeed.com/cmp/Vaco---SAN-Francisco,0.0,78.9,0.0,0.0,0.0,0.0,0.0
+169,INDIVIDUAL,http://www.indeed.com/cmp/Individual,0.0,50.0,0.0,0.0,0.0,0.0,0.0
+170,NationalTechJobs,http://www.indeed.com/cmp/Nationaltechjobs,0.0,55.0,0.0,0.0,0.0,0.0,0.0
+171,Juno Search Partners,http://www.indeed.com/cmp/Juno-Search-Partners,0.0,0.0,0.0,0.0,0.0,0.0,40000.0
+172,Tata Consultancy Services (TCS),http://www.indeed.com/cmp/Tata-Consultancy-Services-(tcs),0.0,0.0,0.0,148292.0,83609.0,0.0,111349.0
+173,Eagle Technical Staffing,http://www.indeed.com/cmp/Eagle-Technical-Staffing,0.0,0.0,0.0,71502.0,61964.0,0.0,66563.0
+174,Situated Consulting LLC,http://www.indeed.com/cmp/Situated-Consulting-LLC,0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+175,ITR,http://www.indeed.com/cmp/Itr,0.0,0.0,0.0,0.0,0.0,0.0,75000.0
+176,Tandem Recruiting Group,http://www.indeed.com/cmp/Tandem-Recruiting-Group,0.0,0.0,0.0,193612.0,141323.0,0.0,165414.0
+177,TellApart,http://www.indeed.com/cmp/Tellapart,0.0,0.0,0.0,182398.0,127821.0,0.0,152690.0
+178,MD Insider,http://www.indeed.com/cmp/Md-Insider,0.0,0.0,0.0,148333.0,111667.0,0.0,130000.0
+179,Hobson Associates,http://www.indeed.com/cmp/Hobson-Associates,0.0,0.0,0.0,0.0,0.0,0.0,131667.0
+180,Georgia IT Inc.,http://www.indeed.com/cmp/Georgia-IT-Inc.,0.0,85.0,0.0,140000.0,80000.0,0.0,110000.0
+181,21,http://www.indeed.com/cmp/21,0.0,0.0,0.0,150000.0,100000.0,0.0,125000.0
+182,GEICO,http://www.indeed.com/cmp/Geico,0.0,0.0,0.0,123333.0,113333.0,0.0,118333.0
+183,Rinalytics,http://www.indeed.com/cmp/Rinalytics,0.0,0.0,0.0,160000.0,143333.0,0.0,151667.0
+184,Situated Consulting LLC,http://www.indeed.com/cmp/Situated-Consulting-LLC,0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+185,Tessella,http://www.indeed.com/cmp/Tessella,0.0,0.0,0.0,96667.0,63333.0,0.0,80000.0
+186,TTS Staffing,http://www.indeed.com/cmp/Tts-Staffing,0.0,0.0,0.0,146667.0,136667.0,0.0,141667.0
+187,Connections of New York,http://www.indeed.com/cmp/Connections-of-New-York,0.0,0.0,0.0,161667.0,141667.0,0.0,151667.0
+188,City Of Minneapolis,http://www.indeed.com/cmp/City-of-Minneapolis,0.0,0.0,0.0,90565.0,65803.0,0.0,78184.0
+189,"GATE Staffing, LLC","http://www.indeed.com/cmp/Gate-Staffing,-LLC",0.0,0.0,0.0,0.0,0.0,0.0,130000.0
+190,LaBine and Associates,http://www.indeed.com/cmp/Labine-and-Associates,0.0,0.0,0.0,0.0,0.0,0.0,155000.0
+191,AppleOne,http://www.indeed.com/cmp/AppleOne,0.0,0.0,0.0,0.0,0.0,0.0,175000.0
+192,Netmining IgnitionOne DISPLAY ADVERTISING,http://www.indeed.com/cmp/Netmining-Ignitionone-Display-Advertising,0.0,0.0,0.0,0.0,0.0,0.0,200000.0
+193,"Futures Group IT, llc","http://www.indeed.com/cmp/Futures-Group-It,-LLC",0.0,0.0,0.0,225000.0,150000.0,0.0,187500.0
+194,nexChange.in,http://www.indeed.com/cmp/Nexchange.in,0.0,0.0,0.0,0.0,0.0,0.0,120000.0
+195,Austin Fraser USA,http://www.indeed.com/cmp/Austin-Fraser-USA,0.0,77.5,0.0,150000.0,100000.0,0.0,125000.0
+196,Real Life Sciences,http://www.indeed.com/cmp/Real-Life-Sciences,0.0,52.5,0.0,80000.0,60000.0,0.0,70000.0
+197,Emerald Resource Group,http://www.indeed.com/cmp/Emerald-Resource-Group,0.0,0.0,0.0,120000.0,113333.0,0.0,116667.0
+198,"Itech US, Inc.","http://www.indeed.com/cmp/Itech-Us,-Inc.",0.0,0.0,0.0,136667.0,100000.0,0.0,118333.0
+199,Talent Partners Inc.,http://www.indeed.com/cmp/Talent-Partners-Inc.,0.0,0.0,0.0,0.0,0.0,0.0,191667.0
+200,"Prime Team Partners, Inc","http://www.indeed.com/cmp/Prime-Team-Partners,-Inc",0.0,0.0,0.0,0.0,0.0,0.0,148333.0
+201,National Science Foundation,http://www.indeed.com/cmp/National-Science-Foundation,0.0,0.0,0.0,118069.0,90823.0,0.0,104446.0
+202,#1 Display Advertising Company,http://www.indeed.com/cmp/1-Display-Advertising-Company,0.0,0.0,0.0,0.0,0.0,0.0,200000.0
+203,Company Confidential- MBCAA,http://www.indeed.com/cmp/Company-Confidential---Mbcaa-1,0.0,0.0,0.0,0.0,0.0,0.0,180000.0
+204,Assero Services,http://www.indeed.com/cmp/Assero-Services,0.0,0.0,0.0,0.0,0.0,0.0,40000.0
+205,ITR,http://www.indeed.com/cmp/Itr,0.0,0.0,0.0,0.0,0.0,0.0,75000.0
+206,"Smartlink, LLC (HQ)","http://www.indeed.com/cmp/Smartlink,-LLC-(hq)",0.0,56.67,0.0,0.0,0.0,0.0,0.0
+207,AVISPA LLC,http://www.indeed.com/cmp/Avispa-LLC,0.0,0.0,0.0,140000.0,133333.0,0.0,136667.0
+208,SeatGeek,http://www.indeed.com/cmp/Seatgeek,0.0,0.0,0.0,120000.0,70000.0,0.0,95000.0
+209,Department of the Interior,http://www.indeed.com/cmp/Department-of-the-Interior,0.0,0.0,0.0,81706.0,62850.0,0.0,72278.0
+210,Boomerang Commerce,http://www.indeed.com/cmp/Boomerang-Commerce,0.0,8.5,0.0,0.0,0.0,0.0,0.0
+211,NationalTechJobs,http://www.indeed.com/cmp/Nationaltechjobs,0.0,55.0,0.0,0.0,0.0,0.0,0.0
+212,City of New York,http://www.indeed.com/cmp/City-of-New-York,0.0,0.0,0.0,73837.0,52699.0,0.0,63268.0
+213,University of Idaho,http://www.indeed.com/cmp/University-of-Idaho,0.0,0.0,0.0,47438.0,37451.0,0.0,42444.0
+214,Brooks Rehabilitation,http://www.indeed.com/cmp/Brooks-Rehabilitation,0.0,0.0,0.0,0.0,0.0,0.0,117500.0
+215,"Antech Systems, Inc.","http://www.indeed.com/cmp/Antech-Systems,-Inc.",0.0,0.0,0.0,95000.0,90000.0,0.0,92500.0
+216,OnX Enterprise Solutions,http://www.indeed.com/cmp/Onx-Enterprise-Solutions,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+217,Eka finance,http://www.indeed.com/cmp/Eka-Finance,0.0,0.0,0.0,0.0,0.0,0.0,120000.0
+218,ZenDrive,http://www.indeed.com/cmp/Zendrive,0.0,0.0,0.0,123055.0,97524.0,0.0,109548.0
+219,Modis,http://www.indeed.com/cmp/Modis,0.0,92.2,0.0,117257.0,98078.0,0.0,107239.0
+220,Providence Partners & Associates,http://www.indeed.com/cmp/Providence-Partners-&-Associates,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+221,Tessella,http://www.indeed.com/cmp/Tessella,0.0,0.0,0.0,100327.0,61509.0,0.0,78556.0
+222,Veredus Corporation,http://www.indeed.com/cmp/Veredus-Corporation,0.0,63.81,0.0,166284.0,115513.0,0.0,138593.0
+223,Brooksource,http://www.indeed.com/cmp/Brooksource,0.0,0.0,0.0,176257.0,125424.0,0.0,148684.0
+224,Endemic,http://www.indeed.com/cmp/Endemic,0.0,0.0,0.0,0.0,0.0,0.0,85000.0
+225,Aerotek,http://www.indeed.com/cmp/Aerotek,0.0,44.72,0.0,0.0,0.0,0.0,165000.0
+226,"AURIONPRO SOLUTIONS, INC","http://www.indeed.com/cmp/Aurionpro-Solutions,-Inc",0.0,0.0,0.0,150717.0,144310.0,0.0,147479.0
+227,Techpeople,http://www.indeed.com/cmp/Techpeople,0.0,82.16,0.0,0.0,0.0,0.0,0.0
+228,Cyient,http://www.indeed.com/cmp/Cyient,0.0,30.0,0.0,0.0,0.0,0.0,0.0
+229,Nextgen Technologies Inc,http://www.indeed.com/cmp/Nextgen-Technologies-Inc,0.0,55.0,0.0,0.0,0.0,0.0,0.0
+230,405labs Inc.,http://www.indeed.com/cmp/405labs-Inc.,0.0,0.0,0.0,0.0,0.0,0.0,90000.0
+231,Patheon,http://www.indeed.com/cmp/Patheon,0.0,0.0,0.0,0.0,0.0,0.0,70000.0
+232,BIGCODE,http://www.indeed.com/cmp/Bigcode,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+233,Plum Placements Inc.,http://www.indeed.com/cmp/Plum-Placements-Inc.,0.0,0.0,0.0,133773.0,65826.0,0.0,93839.0
+234,Contently,http://www.indeed.com/cmp/Contently,0.0,0.0,0.0,129700.0,91589.0,0.0,108991.0
+235,"New Directions, IT Consulting & Staffing","http://www.indeed.com/cmp/New-Directions,-IT-Consulting-&-Staffing",0.0,0.0,0.0,113901.0,82111.0,0.0,96708.0
+236,Eka finance,http://www.indeed.com/cmp/Eka-Finance,0.0,0.0,0.0,0.0,0.0,0.0,120000.0
+237,"The Hagan-Ricci Group, Inc.","http://www.indeed.com/cmp/The-Hagan--ricci-Group,-Inc.",0.0,0.0,0.0,266014.0,141523.0,0.0,194028.0
+238,"Lodestar Consulting, LLC","http://www.indeed.com/cmp/Lodestar-Consulting,-LLC",0.0,0.0,0.0,184582.0,146286.0,0.0,164322.0
+239,Veredus Corporation,http://www.indeed.com/cmp/Veredus-Corporation,0.0,63.81,0.0,166284.0,115513.0,0.0,138593.0
+240,Pixability,http://www.indeed.com/cmp/Pixability,0.0,0.0,0.0,84805.0,47301.0,0.0,63335.0
+241,THEMESOFT,http://www.indeed.com/cmp/Themesoft,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+242,Central Intelligence Agency,http://www.indeed.com/cmp/Central-Intelligence-Agency,0.0,0.0,0.0,151444.0,57927.0,0.0,93663.0
+243,Providence Partners,http://www.indeed.com/cmp/Providence-Partners,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+244,"Vaco, LLC","http://www.indeed.com/cmp/Vaco,-LLC",83.0,0.0,0.0,0.0,0.0,0.0,0.0
+245,KirkSearch,http://www.indeed.com/cmp/Kirksearch,0.0,0.0,0.0,176817.0,139067.0,0.0,156810.0
+246,Harvey Nash,http://www.indeed.com/cmp/Harvey-Nash,0.0,0.0,0.0,213759.0,97419.0,0.0,144306.0
+247,Grand Rounds,http://www.indeed.com/cmp/Grand-Rounds,0.0,0.0,0.0,186983.0,94112.0,0.0,132655.0
+248,"Next Level Business Services, Inc.","http://www.indeed.com/cmp/Next-Level-Business-Services,-Inc.",130.0,0.0,0.0,0.0,0.0,0.0,170000.0
+249,Endemic,http://www.indeed.com/cmp/Endemic,0.0,0.0,0.0,0.0,0.0,0.0,85000.0
+250,Talent Hunt Group,http://www.indeed.com/cmp/Talent-Hunt-Group,0.0,0.0,0.0,0.0,0.0,0.0,200000.0
+251,University of Kentucky,http://www.indeed.com/cmp/University-of-Kentucky,0.0,0.0,0.0,89989.0,57660.0,0.0,72033.0
+252,ARROWCORE GROUP,http://www.indeed.com/cmp/Arrowcore-Group,0.0,0.0,0.0,0.0,0.0,0.0,165000.0
+253,The Intersect Group,http://www.indeed.com/cmp/The-Intersect-Group,0.0,0.0,0.0,189644.0,75273.0,0.0,119478.0
+254,Preferred Resources,http://www.indeed.com/cmp/Preferred-Resources,0.0,0.0,0.0,112262.0,93088.0,0.0,102227.0
+255,www.vasco-systems.com/,http://www.indeed.com/cmp/Www.vasco--systems.com-1,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+256,Futures Group IT,http://www.indeed.com/cmp/Futures-Group-IT,0.0,0.0,0.0,236979.0,142646.0,0.0,183859.0
+257,Liberty Mutual,http://www.indeed.com/cmp/Liberty-Mutual,0.0,0.0,0.0,163515.0,88184.0,0.0,120081.0
+258,Systemsamerica,http://www.indeed.com/cmp/Systemsamerica,0.0,61.62,0.0,0.0,0.0,0.0,0.0
+259,21,http://www.indeed.com/cmp/21,0.0,0.0,0.0,157986.0,95097.0,0.0,122573.0
+260,National Science Foundation,http://www.indeed.com/cmp/National-Science-Foundation,0.0,0.0,0.0,122325.0,87688.0,0.0,103569.0
+261,OPTOMI LLC,http://www.indeed.com/cmp/Optomi-LLC,0.0,60.0,0.0,0.0,0.0,0.0,120000.0
+262,"Accelerated Innovators Inc,","http://www.indeed.com/cmp/Accelerated-Innovators-Inc,",0.0,0.0,0.0,0.0,0.0,0.0,80000.0
+263,"Itech US, Inc.","http://www.indeed.com/cmp/Itech-Us,-Inc.",0.0,0.0,0.0,151035.0,88818.0,0.0,115822.0
+264,ACT 1,http://www.indeed.com/cmp/Act-1,0.0,53.0,0.0,0.0,0.0,0.0,0.0
+265,Patreon,http://www.indeed.com/cmp/Patreon,0.0,0.0,0.0,121472.0,108668.0,0.0,114891.0
+266,"Futures Group IT, llc","http://www.indeed.com/cmp/Futures-Group-It,-LLC",0.0,0.0,0.0,236979.0,142646.0,0.0,183859.0
+267,LaBine and Associates,http://www.indeed.com/cmp/Labine-and-Associates,0.0,0.0,0.0,0.0,0.0,0.0,155000.0
+268,Emerald Resource Group,http://www.indeed.com/cmp/Emerald-Resource-Group,0.0,0.0,0.0,126353.0,107285.0,0.0,116429.0
+269,National Security Agency,http://www.indeed.com/cmp/National-Security-Agency,0.0,0.0,0.0,145180.0,99594.0,0.0,120246.0
+270,"Lodestar Consulting, LLC","http://www.indeed.com/cmp/Lodestar-Consulting,-LLC",0.0,0.0,0.0,184582.0,146286.0,0.0,164322.0
+271,Orbital Insight,http://www.indeed.com/cmp/Orbital-Insight,0.0,0.0,0.0,157986.0,95097.0,0.0,122573.0
+272,Radley James,http://www.indeed.com/cmp/Radley-James,0.0,0.0,0.0,242796.0,142374.0,0.0,185924.0
+273,Tessella,http://www.indeed.com/cmp/Tessella,0.0,0.0,0.0,100327.0,61509.0,0.0,78556.0
+274,Modis,http://www.indeed.com/cmp/Modis,0.0,92.2,0.0,117257.0,98078.0,0.0,107239.0
+275,GKS Associates,http://www.indeed.com/cmp/Gks-Associates,0.0,50.0,0.0,0.0,0.0,0.0,0.0
+276,Pinnacle Partners,http://www.indeed.com/cmp/Pinnacle-Partners,0.0,0.0,0.0,162500.0,150000.0,0.0,156250.0
+277,Gambit Technologies,http://www.indeed.com/cmp/Gambit-Technologies,0.0,0.0,0.0,0.0,0.0,0.0,160000.0
+278,Michael Resource Group LLC,http://www.indeed.com/cmp/Michael-Resource-Group-LLC,0.0,0.0,0.0,0.0,0.0,0.0,210000.0
+279,Amazon.com,http://www.indeed.com/cmp/Amazon.com,0.0,0.0,0.0,0.0,0.0,0.0,140000.0
+280,Asquare.com,http://www.indeed.com/cmp/Asquare.com,73.0,75.0,0.0,0.0,0.0,0.0,0.0
+281,Paradigm Infotech,http://www.indeed.com/cmp/Paradigm-Infotech,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+282,"David Hite Executive Recruiting, LLC","http://www.indeed.com/cmp/David-Hite-Executive-Recruiting,-LLC",0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+283,Datanyze,http://www.indeed.com/cmp/Datanyze,0.0,0.0,0.0,140000.0,80000.0,0.0,110000.0
+284,Acro Service Corporation,http://www.indeed.com/cmp/Acro-Service-Corporation,0.0,49.5,0.0,0.0,0.0,0.0,0.0
+285,Eagle Technical Staffing,http://www.indeed.com/cmp/Eagle-Technical-Staffing,0.0,0.0,0.0,70000.0,65000.0,0.0,67500.0
+286,"Promantus, Inc","http://www.indeed.com/cmp/Promantus,-Inc",0.0,0.0,0.0,0.0,0.0,0.0,80000.0
+287,MATRIX Resources,http://www.indeed.com/cmp/Matrix-Resources,0.0,0.0,0.0,0.0,0.0,0.0,95000.0
+288,Impact Business Group,http://www.indeed.com/cmp/Impact-Business-Group,0.0,0.0,0.0,0.0,0.0,0.0,105000.0
+289,Analytics,http://www.indeed.com/cmp/Analytics,0.0,0.0,0.0,125000.0,80000.0,0.0,102500.0
+290,Carewise Health,http://www.indeed.com/cmp/Carewise-Health,0.0,0.0,0.0,150000.0,100000.0,0.0,125000.0
+291,Synergis,http://www.indeed.com/cmp/Synergis,0.0,0.0,0.0,0.0,0.0,0.0,80000.0
+292,Sense360,http://www.indeed.com/cmp/Sense360,0.0,0.0,2500.0,0.0,0.0,0.0,0.0
+293,Sigma-Aldrich,http://www.indeed.com/cmp/Sigma--aldrich,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+294,3P Technology Staffing LLC,http://www.indeed.com/cmp/3p-Technology-Staffing-LLC,0.0,0.0,0.0,0.0,0.0,0.0,90000.0
+295,CountR,http://www.indeed.com/cmp/Countr,95.0,0.0,0.0,0.0,0.0,0.0,0.0
+296,"Right-On Hire, LLC","http://www.indeed.com/cmp/Right--on-Hire,-LLC",0.0,0.0,0.0,126357.0,67223.0,0.0,92164.0
+297,SoNoted,http://www.indeed.com/cmp/Sonoted,0.0,82.46,0.0,0.0,0.0,0.0,0.0
+298,TRIAD Group,http://www.indeed.com/cmp/Triad-Group,0.0,84.85,0.0,0.0,0.0,0.0,0.0
+299,Brightwing,http://www.indeed.com/cmp/Brightwing,0.0,47.43,0.0,0.0,0.0,0.0,0.0
+300,3coast,http://www.indeed.com/cmp/3coast,0.0,0.0,0.0,183775.0,151821.0,0.0,167036.0
+301,Vurb,http://www.indeed.com/cmp/Vurb,0.0,0.0,0.0,157986.0,95097.0,0.0,122573.0
+302,Exponent,http://www.indeed.com/cmp/Exponent,0.0,0.0,0.0,0.0,0.0,0.0,105000.0
+303,XLSolutions,http://www.indeed.com/cmp/Xlsolutions,0.0,105.0,0.0,0.0,0.0,0.0,0.0
+304,"Health Diagnostic Laboratory, Inc","http://www.indeed.com/cmp/Health-Diagnostic-Laboratory,-Inc",0.0,0.0,0.0,0.0,0.0,0.0,77000.0
+305,Data Scientist - Entry Level,http://www.indeed.com/cmp/Data-Scientist---Entry-Level,0.0,0.0,0.0,86714.0,62738.0,0.0,73758.0
+306,Ginas Tech Jobs,http://www.indeed.com/cmp/Ginas-Tech-Jobs,0.0,0.0,0.0,126389.0,76078.0,0.0,98058.0
+307,Elevano,http://www.indeed.com/cmp/Elevano,0.0,0.0,0.0,138010.0,75600.0,0.0,102145.0
+308,Miracle,http://www.indeed.com/cmp/Miracle,0.0,0.0,0.0,91491.0,78697.0,0.0,84853.0
+309,Swoon Technology,http://www.indeed.com/cmp/Swoon-Technology,0.0,0.0,0.0,0.0,0.0,0.0,70000.0
+310,BLT Recruiting,http://www.indeed.com/cmp/Blt-Recruiting,125.0,0.0,0.0,0.0,0.0,0.0,0.0
+311,Kamis,http://www.indeed.com/cmp/Kamis,0.0,0.0,0.0,0.0,0.0,0.0,155000.0
+312,People Pattern,http://www.indeed.com/cmp/People-Pattern,0.0,0.0,0.0,0.0,0.0,0.0,135000.0
+313,Mission Health System,http://www.indeed.com/cmp/Mission-Health-System,0.0,0.0,0.0,170196.0,74068.0,0.0,112277.0
+314,Point to Point Consulting,http://www.indeed.com/cmp/Point-to-Point-Consulting,0.0,0.0,0.0,0.0,0.0,0.0,145000.0
+315,BCBSKS,http://www.indeed.com/cmp/Bcbsks,0.0,0.0,0.0,0.0,0.0,0.0,73630.0
+316,DEPT OF INFO TECH & TELECOMM,http://www.indeed.com/cmp/Dept-of-Info-Tech-&-Telecomm,0.0,0.0,0.0,73837.0,52699.0,0.0,63268.0
+317,IHS Global (Malaysia) Sdn Bhd,http://www.indeed.com/cmp/Ihs-Global-(malaysia)-Sdn-Bhd,0.0,0.0,0.0,0.0,0.0,0.0,75000.0
+318,Lucas Group,http://www.indeed.com/cmp/Lucas-Group,0.0,0.0,0.0,0.0,0.0,0.0,120000.0
+319,ArgoSight,http://www.indeed.com/cmp/Argosight,0.0,0.0,0.0,150000.0,80000.0,0.0,115000.0
+320,Systemsamerica,http://www.indeed.com/cmp/Systemsamerica,0.0,62.5,0.0,0.0,0.0,0.0,0.0
+321,GCS,http://www.indeed.com/cmp/Gcs,0.0,0.0,0.0,170000.0,110000.0,0.0,140000.0
+322,SimplePart,http://www.indeed.com/cmp/Simplepart,0.0,0.0,0.0,50000.0,40000.0,0.0,45000.0
+323,Startekk,http://www.indeed.com/cmp/Startekk,0.0,62.5,0.0,0.0,0.0,0.0,0.0
+324,Data Sciences Gobal,http://www.indeed.com/cmp/Data-Sciences-Gobal,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+325,Odesus,http://www.indeed.com/cmp/Odesus,0.0,85.0,0.0,0.0,0.0,0.0,100000.0
+326,"Max Populi, LLC.","http://www.indeed.com/cmp/Max-Populi,-Llc.",0.0,0.0,0.0,200000.0,180000.0,0.0,190000.0
+327,Orbital Insight,http://www.indeed.com/cmp/Orbital-Insight,0.0,0.0,0.0,150000.0,100000.0,0.0,125000.0
+328,Global Management Resources Corp,http://www.indeed.com/cmp/Global-Management-Resources-Corp,0.0,0.0,0.0,170000.0,140000.0,0.0,155000.0
+329,Networking People,http://www.indeed.com/cmp/Networking-People,0.0,0.0,0.0,0.0,0.0,0.0,90000.0
+330,Dataline,http://www.indeed.com/cmp/Dataline,0.0,0.0,0.0,0.0,0.0,0.0,125000.0
+331,"Next Level Business Services, Inc.","http://www.indeed.com/cmp/Next-Level-Business-Services,-Inc.",130.0,0.0,0.0,0.0,0.0,0.0,170000.0
+332,Tessella Inc.,http://www.indeed.com/cmp/Tessella-Inc.,0.0,0.0,0.0,100000.0,60000.0,0.0,80000.0
+333,"Central Business Solutions, Inc.","http://www.indeed.com/cmp/Central-Business-Solutions,-Inc.",0.0,0.0,0.0,0.0,0.0,0.0,225000.0
+334,Endemic,http://www.indeed.com/cmp/Endemic,0.0,0.0,0.0,0.0,0.0,0.0,85000.0
+335,Nielsen Associates,http://www.indeed.com/cmp/Nielsen-Associates,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+336,Mainz Brady Group,http://www.indeed.com/cmp/Mainz-Brady-Group,75.0,0.0,0.0,0.0,0.0,0.0,0.0
+337,Point to Point Consulting,http://www.indeed.com/cmp/Point-to-Point-Consulting,0.0,0.0,0.0,0.0,0.0,0.0,145000.0
+338,XLSolutions,http://www.indeed.com/cmp/Xlsolutions,0.0,105.0,0.0,0.0,0.0,0.0,0.0
+339,GTechNY,http://www.indeed.com/cmp/Gtechny,0.0,0.0,0.0,189583.0,114117.0,0.0,147087.0
+340,"Central Business Solutions,Inc","http://www.indeed.com/cmp/Central-Business-Solutions,inc",0.0,55.0,0.0,0.0,0.0,0.0,0.0
+341,Technical Connections,http://www.indeed.com/cmp/Technical-Connections,0.0,0.0,0.0,0.0,0.0,0.0,165000.0
+342,Techead,http://www.indeed.com/cmp/Techead,0.0,0.0,0.0,0.0,0.0,0.0,125000.0
+343,Groupon,http://www.indeed.com/cmp/Groupon,0.0,0.0,0.0,0.0,0.0,0.0,185000.0
+344,Nityo Infotech Services Pvt. Ltd.,http://www.indeed.com/cmp/Nityo-Infotech-Services-Pvt.-Ltd.,0.0,0.0,0.0,0.0,0.0,0.0,110000.0
+345,Insource Performance Solutions,http://www.indeed.com/cmp/Insource-Performance-Solutions,0.0,0.0,0.0,131467.0,118661.0,0.0,124900.0
+346,"Scottrade, Inc","http://www.indeed.com/cmp/Scottrade,-Inc",0.0,0.0,0.0,0.0,0.0,0.0,115000.0
+347,DynCorp International Inc,http://www.indeed.com/cmp/Dyncorp-International-Inc,0.0,0.0,0.0,0.0,0.0,0.0,90000.0
+348,WinWire Technologies,http://www.indeed.com/cmp/Winwire-Technologies,0.0,0.0,0.0,0.0,0.0,0.0,110000.0
+349,Swoon Technology,http://www.indeed.com/cmp/Swoon-Technology,0.0,0.0,0.0,0.0,0.0,0.0,70000.0
+350,Blue Ocean Ventures,http://www.indeed.com/cmp/Blue-Ocean-Ventures,0.0,0.0,0.0,164619.0,126367.0,0.0,144230.0
+351,Redbrick Health,http://www.indeed.com/cmp/Redbrick-Health,0.0,0.0,0.0,92291.0,73143.0,0.0,82161.0
+352,Philips Research,http://www.indeed.com/cmp/Philips-Research,0.0,0.0,0.0,0.0,0.0,0.0,110000.0
+353,Tommy John,http://www.indeed.com/cmp/Tommy-John,0.0,0.0,0.0,0.0,0.0,0.0,115000.0
+354,"OUTSOURCE Consulting Services, Inc.","http://www.indeed.com/cmp/Outsource-Consulting-Services,-Inc.",0.0,62.05,0.0,0.0,0.0,0.0,0.0
+355,InSite Search,http://www.indeed.com/cmp/Insite-Search,149.0,0.0,0.0,0.0,0.0,0.0,0.0
+356,SanDisk,http://www.indeed.com/cmp/Sandisk,0.0,0.0,0.0,0.0,0.0,0.0,250000.0
+357,Staffmark,http://www.indeed.com/cmp/Staffmark,0.0,0.0,0.0,80000.0,55000.0,0.0,67500.0
+358,Tescra Software Pvt. Ltd,http://www.indeed.com/cmp/Tescra-Software-Pvt.-Ltd,0.0,0.0,0.0,180000.0,140000.0,0.0,160000.0
+359,EdgeRock Technologies,http://www.indeed.com/cmp/Edgerock-Technologies,75.0,0.0,0.0,0.0,0.0,0.0,0.0
+360,Piper Companies,http://www.indeed.com/cmp/Piper-Companies,0.0,0.0,0.0,240000.0,150000.0,0.0,195000.0
+361,Swoon Technology Resources LLC,http://www.indeed.com/cmp/Swoon-Technology-Resources-LLC,0.0,0.0,0.0,0.0,0.0,0.0,70000.0
+362,USM Business Systems,http://www.indeed.com/cmp/Usm-Business-Systems,0.0,57.5,0.0,0.0,0.0,0.0,0.0
+363,"Donahue & Moore Associates, LTD.","http://www.indeed.com/cmp/Donahue-&-Moore-Associates,-Ltd.",0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+364,IT MNC,http://www.indeed.com/cmp/IT-Mnc,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+365,Ethan Alexander Group,http://www.indeed.com/cmp/Ethan-Alexander-Group,0.0,0.0,0.0,200000.0,150000.0,0.0,175000.0
+366,Ed Wallach Search Group,http://www.indeed.com/cmp/Ed-Wallach-Search-Group,0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+367,Washington State Health Care Authority,http://www.indeed.com/cmp/Washington-State-Health-Care-Authority,0.0,0.0,0.0,112416.0,80304.0,0.0,96360.0
+368,SimpleRelevance,http://www.indeed.com/cmp/Simplerelevance,0.0,0.0,0.0,150000.0,75000.0,0.0,112500.0
+369,Bridge Noble,http://www.indeed.com/cmp/Bridge-Noble,0.0,0.0,0.0,140000.0,120000.0,0.0,130000.0
+370,Elevano,http://www.indeed.com/cmp/Elevano,0.0,0.0,0.0,130000.0,80000.0,0.0,105000.0
+371,Compunnel Software Group Inc.,http://www.indeed.com/cmp/Compunnel-Software-Group-Inc.,0.0,0.0,0.0,0.0,0.0,0.0,140000.0
+372,"Anonymous, LLC","http://www.indeed.com/cmp/Anonymous,-LLC",0.0,0.0,10000.0,0.0,0.0,0.0,0.0
+373,Tail Wind Technologies Corp.,http://www.indeed.com/cmp/Tail-Wind-Technologies-Corp.,0.0,75.0,0.0,0.0,0.0,0.0,0.0
+374,Providence Partners & Associates,http://www.indeed.com/cmp/Providence-Partners-&-Associates,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+375,Idc Technologies Inc,http://www.indeed.com/cmp/Idc-Technologies-Inc,0.0,52.5,0.0,0.0,0.0,0.0,0.0
+376,"CPS, Inc.","http://www.indeed.com/cmp/Cps,-Inc.",0.0,0.0,0.0,0.0,0.0,0.0,120000.0
+377,"Roberts Recruiting, LLC","http://www.indeed.com/cmp/Roberts-Recruiting,-LLC",0.0,0.0,0.0,130000.0,90000.0,0.0,110000.0
+378,FUELX,http://www.indeed.com/cmp/Fuelx,0.0,0.0,0.0,99000.0,80000.0,0.0,89500.0
+379,ISPA Technology,http://www.indeed.com/cmp/Ispa-Technology,0.0,0.0,0.0,150000.0,125000.0,0.0,137500.0
+380,Stefanini IT Solutions,http://www.indeed.com/cmp/Stefanini-IT-Solutions,0.0,30.0,0.0,0.0,0.0,0.0,0.0
+381,Kabam,http://www.indeed.com/cmp/Kabam,0.0,0.0,0.0,0.0,0.0,0.0,250000.0
+382,Samba TV,http://www.indeed.com/cmp/Samba-Tv,0.0,0.0,0.0,120000.0,80000.0,0.0,100000.0
+383,"Vaco, LLC","http://www.indeed.com/cmp/Vaco,-LLC",83.0,0.0,0.0,0.0,0.0,0.0,0.0
+384,Technology Search International,http://www.indeed.com/cmp/Technology-Search-International,0.0,0.0,0.0,160000.0,80000.0,0.0,120000.0
+385,KRG Technologies Inc,http://www.indeed.com/cmp/Krg-Technologies-Inc,0.0,70.0,0.0,0.0,0.0,0.0,0.0
+386,Atlanta Regional Commission,http://www.indeed.com/cmp/Atlanta-Regional-Commission,0.0,0.0,0.0,82438.0,49182.0,0.0,65810.0
+387,Quant Systems,http://www.indeed.com/cmp/Quant-Systems,0.0,65.0,0.0,0.0,0.0,0.0,0.0
+388,American Red Cross,http://www.indeed.com/cmp/American-Red-Cross,0.0,0.0,0.0,0.0,0.0,0.0,70000.0
+389,Institute for Life Science Entrepreneurship,http://www.indeed.com/cmp/Institute-For-Life-Science-Entrepreneurship,0.0,0.0,0.0,0.0,0.0,0.0,50000.0
+390,"It Staffing, Inc.","http://www.indeed.com/cmp/IT-Staffing,-Inc.",0.0,0.0,0.0,0.0,0.0,0.0,200000.0
+391,systems Tech Intl,http://www.indeed.com/cmp/Systems-Tech-Intl,0.0,0.0,0.0,200000.0,110000.0,0.0,155000.0
+392,Kane Partners Staffing,http://www.indeed.com/cmp/Kane-Partners-Staffing,0.0,0.0,0.0,175000.0,100000.0,0.0,137500.0
+393,Flexton Inc.,http://www.indeed.com/cmp/Flexton-Inc.,0.0,0.0,0.0,0.0,0.0,0.0,140000.0
+394,Swoon Technology,http://www.indeed.com/cmp/Swoon-Technology,0.0,0.0,0.0,0.0,0.0,0.0,70000.0
+395,Andisol Consulting,http://www.indeed.com/cmp/Andisol-Consulting,0.0,10.0,0.0,0.0,0.0,0.0,0.0
+396,IDC Technologies,http://www.indeed.com/cmp/Idc-Technologies,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+397,Inventure,http://www.indeed.com/cmp/Inventure,0.0,0.0,0.0,90000.0,80000.0,0.0,85000.0
+398,Coda Search,http://www.indeed.com/cmp/Coda-Search,0.0,0.0,0.0,0.0,0.0,0.0,135000.0
+399,"Cybersearch, Ltd.","http://www.indeed.com/cmp/Cybersearch,-Ltd.",0.0,54.0,0.0,0.0,0.0,0.0,0.0
+400,Department of Veterans Affairs,http://www.indeed.com/cmp/Department-of-Veterans-Affairs,0.0,0.0,0.0,89280.0,66420.0,0.0,77850.0
+401,"Midwest Consulting Group, Inc.","http://www.indeed.com/cmp/Midwest-Consulting-Group,-Inc.",0.0,0.0,0.0,0.0,0.0,0.0,130000.0
+402,"Consultnet, LLC","http://www.indeed.com/cmp/Consultnet,-LLC",0.0,0.0,0.0,140000.0,110000.0,0.0,125000.0
+403,App Annie,http://www.indeed.com/cmp/App-Annie,0.0,0.0,0.0,160000.0,100000.0,0.0,130000.0
+404,Jim Crumpley & Associates,http://www.indeed.com/cmp/Jim-Crumpley-&-Associates,0.0,0.0,0.0,120000.0,90000.0,0.0,105000.0
+405,Venture Soft Global,http://www.indeed.com/cmp/Venture-Soft-Global,0.0,100.0,0.0,0.0,0.0,0.0,0.0
+406,Kane Partners LLC,http://www.indeed.com/cmp/Kane-Partners-LLC,0.0,0.0,0.0,125000.0,75000.0,0.0,100000.0
+407,CER Group NA,http://www.indeed.com/cmp/Cer-Group-Na,63.0,0.0,0.0,0.0,0.0,0.0,0.0
+408,Nextgen Technologies Inc,http://www.indeed.com/cmp/Nextgen-Technologies-Inc,0.0,55.0,0.0,0.0,0.0,0.0,0.0
+409,Oculus Search Partners LLC,http://www.indeed.com/cmp/Oculus-Search-Partners-LLC,0.0,0.0,0.0,0.0,0.0,0.0,175000.0
+410,NPD,http://www.indeed.com/cmp/Npd,0.0,0.0,0.0,90000.0,70000.0,0.0,80000.0
+411,Data Governance & Research Trinity Health Trinity Information Services - Livonia,http://www.indeed.com/cmp/Data-Governance-&-Research-Trinity-Health-Trinity-Information-Services---Livonia,0.0,0.0,0.0,100891.0,80690.0,0.0,90790.0
+412,Advance Search,http://www.indeed.com/cmp/Advance-Search,0.0,0.0,0.0,150000.0,140000.0,0.0,145000.0
+413,"Envision, LLC","http://www.indeed.com/cmp/Envision,-LLC",0.0,70.0,0.0,0.0,0.0,0.0,0.0
+414,AGS International,http://www.indeed.com/cmp/Ags-International,0.0,0.0,0.0,0.0,0.0,0.0,200000.0
+415,"PetaSecure, Inc.","http://www.indeed.com/cmp/Petasecure,-Inc.",0.0,0.0,0.0,180000.0,150000.0,0.0,165000.0
+416,Kane Partners Staffing,http://www.indeed.com/cmp/Kane-Partners-Staffing,0.0,0.0,0.0,186983.0,94112.0,0.0,132655.0
+417,Advancement Alternatives,http://www.indeed.com/cmp/Advancement-Alternatives,0.0,0.0,0.0,128866.0,97014.0,0.0,111812.0
+418,KRG Technologies Inc,http://www.indeed.com/cmp/Krg-Technologies-Inc,0.0,70.0,0.0,0.0,0.0,0.0,0.0
+419,NPD,http://www.indeed.com/cmp/Npd,0.0,0.0,0.0,93116.0,67674.0,0.0,79382.0
+420,"Numeric, LLC","http://www.indeed.com/cmp/Numeric,-LLC",0.0,0.0,0.0,134687.0,96548.0,0.0,114034.0
+421,BCBSKS,http://www.indeed.com/cmp/Bcbsks,0.0,0.0,0.0,0.0,0.0,0.0,73630.0
+422,State of Washington,http://www.indeed.com/cmp/State-of-Washington,0.0,0.0,0.0,92877.0,63877.0,0.0,77024.0
+423,Wattudo,http://www.indeed.com/cmp/Wattudo,0.0,22.26,0.0,0.0,0.0,0.0,0.0
+424,Spencer Ogden,http://www.indeed.com/cmp/Spencer-Ogden,85.5,0.0,0.0,0.0,0.0,0.0,0.0
+425,venturesoft Global,http://www.indeed.com/cmp/Venturesoft-Global,0.0,105.0,0.0,0.0,0.0,0.0,0.0
+426,Valintry Services,http://www.indeed.com/cmp/Valintry-Services,0.0,72.12,0.0,0.0,0.0,0.0,0.0
+427,University of Wisconsin-Madison,http://www.indeed.com/cmp/University-of-Wisconsin--madison,0.0,0.0,0.0,0.0,0.0,0.0,50400.0
+428,TAKE Enterprise Services Inc,http://www.indeed.com/cmp/Take-Enterprise-Services-Inc,0.0,80.0,0.0,0.0,0.0,0.0,0.0
+429,National,http://www.indeed.com/cmp/National,0.0,0.0,0.0,118889.0,87075.0,0.0,101746.0
+430,MojoPages,http://www.indeed.com/cmp/Mojopages,0.0,0.0,0.0,0.0,0.0,0.0,130000.0
+431,Binary Computer Int'l Corp.,http://www.indeed.com/cmp/Binary-Computer-Int'l-Corp.,75.0,0.0,0.0,0.0,0.0,0.0,0.0
+432,ISPA Technology,http://www.indeed.com/cmp/Ispa-Technology,0.0,0.0,0.0,153819.0,121905.0,0.0,136935.0
+433,CSI Consulting Group,http://www.indeed.com/cmp/Csi-Consulting-Group,65.0,0.0,0.0,0.0,0.0,0.0,0.0
+434,Zions Bancorporation,http://www.indeed.com/cmp/Zions-Bancorporation,0.0,23.0,0.0,0.0,0.0,0.0,0.0
+435,GCS,http://www.indeed.com/cmp/Gcs,0.0,0.0,0.0,179601.0,104340.0,0.0,136892.0
+436,"Human Capital Resource, LLC.","http://www.indeed.com/cmp/Human-Capital-Resource,-Llc.",0.0,0.0,0.0,0.0,0.0,0.0,120000.0
+437,Asquare.com,http://www.indeed.com/cmp/Asquare.com,0.0,73.0,0.0,0.0,0.0,0.0,0.0
+438,Technology Resource Group,http://www.indeed.com/cmp/Technology-Resource-Group,0.0,0.0,0.0,171170.0,84647.0,0.0,120370.0
+439,Framed Data,http://www.indeed.com/cmp/Framed-Data,0.0,0.0,0.0,83142.0,57757.0,0.0,69296.0
+440,Virtual Tech Gurus Inc,http://www.indeed.com/cmp/Virtual-Tech-Gurus-Inc,0.0,70.0,0.0,0.0,0.0,0.0,0.0
+441,3P Technology Staffing LLC,http://www.indeed.com/cmp/3p-Technology-Staffing-LLC,0.0,0.0,0.0,0.0,0.0,0.0,90000.0
+442,"Donahue & Moore Associates, LTD.","http://www.indeed.com/cmp/Donahue-&-Moore-Associates,-Ltd.",0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+443,ConsultNet,http://www.indeed.com/cmp/Consultnet,0.0,0.0,0.0,0.0,0.0,0.0,140000.0
+444,Novell,http://www.indeed.com/cmp/Novell,0.0,0.0,0.0,0.0,0.0,0.0,175000.0
+445,Griffin Global Systems,http://www.indeed.com/cmp/Griffin-Global-Systems,0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+446,Department of Veterans Affairs,http://www.indeed.com/cmp/Department-of-Veterans-Affairs,0.0,0.0,0.0,92877.0,63877.0,0.0,77024.0
+447,JBCCONNECT,http://www.indeed.com/cmp/Jbcconnect,0.0,0.0,0.0,0.0,0.0,0.0,130000.0
+448,Point to Point Consulting,http://www.indeed.com/cmp/Point-to-Point-Consulting,0.0,0.0,0.0,0.0,0.0,0.0,145000.0
+449,BCBSKS,http://www.indeed.com/cmp/Bcbsks,0.0,0.0,0.0,0.0,0.0,0.0,73630.0
+450,Ethan Alexander Group,http://www.indeed.com/cmp/Ethan-Alexander-Group,0.0,0.0,0.0,207855.0,144392.0,0.0,173241.0
+451,OnX Enterprise Solutions,http://www.indeed.com/cmp/Onx-Enterprise-Solutions,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+452,Principle Solutions Group,http://www.indeed.com/cmp/Principle-Solutions-Group,0.0,0.0,0.0,134687.0,96548.0,0.0,114034.0
+453,Retroficiency,http://www.indeed.com/cmp/Retroficiency,0.0,0.0,0.0,144662.0,106477.0,0.0,124110.0
+454,Bluestone,http://www.indeed.com/cmp/Bluestone,0.0,0.0,0.0,0.0,0.0,0.0,170000.0
+455,CandidateXchange,http://www.indeed.com/cmp/Candidatexchange,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+456,Idc Technologies Inc,http://www.indeed.com/cmp/Idc-Technologies-Inc,0.0,52.44,0.0,0.0,0.0,0.0,0.0
+457,Mindbank Consulting Group,http://www.indeed.com/cmp/Mindbank-Consulting-Group,0.0,0.0,0.0,137016.0,96374.0,0.0,114912.0
+458,"The Matlen Silver Group, Inc.","http://www.indeed.com/cmp/The-Matlen-Silver-Group,-Inc.",600.0,0.0,0.0,0.0,0.0,0.0,0.0
+459,3coast,http://www.indeed.com/cmp/3coast,0.0,0.0,0.0,183775.0,151821.0,0.0,167036.0
+460,BCBSKS,http://www.indeed.com/cmp/Bcbsks,0.0,0.0,0.0,0.0,0.0,0.0,73630.0
+461,Group A LLC,http://www.indeed.com/cmp/Group-A-LLC,0.0,0.0,0.0,182983.0,157394.0,0.0,169707.0
+462,Bond Street,http://www.indeed.com/cmp/Bond-Street,0.0,0.0,0.0,156311.0,105618.0,0.0,128488.0
+463,Valintry Services,http://www.indeed.com/cmp/Valintry-Services,0.0,72.12,0.0,0.0,0.0,0.0,0.0
+464,JBCCONNECT,http://www.indeed.com/cmp/Jbcconnect,0.0,0.0,0.0,0.0,0.0,0.0,130000.0
+465,Framed Data,http://www.indeed.com/cmp/Framed-Data,0.0,0.0,0.0,83142.0,57757.0,0.0,69296.0
+466,Beacon Hill Staffing,http://www.indeed.com/cmp/Beacon-Hill-Staffing,0.0,0.0,0.0,0.0,0.0,0.0,155000.0
+467,ArgoSight,http://www.indeed.com/cmp/Argosight,0.0,0.0,0.0,161107.0,75129.0,0.0,110018.0
+468,"Myriddian, LLC","http://www.indeed.com/cmp/Myriddian,-LLC",0.0,0.0,0.0,123055.0,97524.0,0.0,109548.0
+469,Johns Hopkins University,http://www.indeed.com/cmp/Johns-Hopkins-University,0.0,0.0,0.0,79242.0,53064.0,0.0,64845.0
+470,Binary Computer Int'l Corp.,http://www.indeed.com/cmp/Binary-Computer-Int'l-Corp.,75.0,0.0,0.0,0.0,0.0,0.0,0.0
+471,"Midwest Consulting Group, Inc.","http://www.indeed.com/cmp/Midwest-Consulting-Group,-Inc.",0.0,0.0,0.0,0.0,0.0,0.0,130000.0
+472,Technology Resource Group,http://www.indeed.com/cmp/Technology-Resource-Group,0.0,0.0,0.0,171170.0,84647.0,0.0,120370.0
+473,Search Leaders,http://www.indeed.com/cmp/Search-Leaders,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+474,Miracle,http://www.indeed.com/cmp/Miracle,0.0,0.0,0.0,91491.0,78697.0,0.0,84853.0
+475,Point to Point Consulting,http://www.indeed.com/cmp/Point-to-Point-Consulting,0.0,0.0,0.0,0.0,0.0,0.0,145000.0
+476,XLSolutions,http://www.indeed.com/cmp/Xlsolutions,0.0,105.0,0.0,0.0,0.0,0.0,0.0
+477,ARGO,http://www.indeed.com/cmp/Argo,0.0,0.0,0.0,134687.0,96548.0,0.0,114034.0
+478,"Central Business Solutions,Inc","http://www.indeed.com/cmp/Central-Business-Solutions,inc",0.0,55.0,0.0,0.0,0.0,0.0,0.0
+479,Rimrock Associates,http://www.indeed.com/cmp/Rimrock-Associates,0.0,0.0,0.0,153819.0,121905.0,0.0,136935.0
+480,Sierra Infosys Inc,http://www.indeed.com/cmp/Sierra-Infosys-Inc,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+481,Beneath The Ink,http://www.indeed.com/cmp/Beneath-the-Ink,0.0,0.0,0.0,94791.0,57058.0,0.0,73544.0
+482,Manpower,http://www.indeed.com/cmp/Manpower,0.0,22.36,0.0,0.0,0.0,0.0,0.0
+483,Spyglass Partners LLC,http://www.indeed.com/cmp/Spyglass-Partners-LLC,0.0,0.0,0.0,0.0,0.0,0.0,140000.0
+484,Infojini Consulting Inc,http://www.indeed.com/cmp/Infojini-Consulting-Inc,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+485,Huxley IT,http://www.indeed.com/cmp/Huxley-IT,0.0,0.0,0.0,0.0,0.0,650.0,0.0
+486,Nyansa,http://www.indeed.com/cmp/Nyansa,0.0,0.0,0.0,156311.0,105618.0,0.0,128488.0
+487,Knox and Associates,http://www.indeed.com/cmp/Knox-and-Associates,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+488,"OUTSOURCE Consulting Services, Inc.","http://www.indeed.com/cmp/Outsource-Consulting-Services,-Inc.",0.0,62.05,0.0,0.0,0.0,0.0,0.0
+489,Networking People,http://www.indeed.com/cmp/Networking-People,0.0,0.0,0.0,0.0,0.0,0.0,90000.0
+490,"Anonymous, LLC","http://www.indeed.com/cmp/Anonymous,-LLC",0.0,0.0,10000.0,0.0,0.0,0.0,0.0
+491,Design Interactive,http://www.indeed.com/cmp/Design-Interactive,0.0,0.0,0.0,115579.0,71471.0,0.0,90888.0
+492,Blue Ocean Ventures,http://www.indeed.com/cmp/Blue-Ocean-Ventures,0.0,0.0,0.0,164619.0,126367.0,0.0,144230.0
+493,Path Insights,http://www.indeed.com/cmp/Path-Insights,0.0,75.0,0.0,0.0,0.0,0.0,0.0
+494,Compunnel Software Group Inc.,http://www.indeed.com/cmp/Compunnel-Software-Group-Inc.,0.0,0.0,0.0,0.0,0.0,0.0,140000.0
+495,newcareers,http://www.indeed.com/cmp/Newcareers,0.0,0.0,0.0,0.0,0.0,0.0,80000.0
+496,Principle Solutions Group,http://www.indeed.com/cmp/Principle-Solutions-Group,0.0,0.0,0.0,134687.0,96548.0,0.0,114034.0
+497,DropThought,http://www.indeed.com/cmp/Dropthought,0.0,0.0,0.0,0.0,0.0,0.0,80000.0
+498,"Donahue & Moore Associates, LTD.","http://www.indeed.com/cmp/Donahue-&-Moore-Associates,-Ltd.",0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+499,Retroficiency,http://www.indeed.com/cmp/Retroficiency,0.0,0.0,0.0,144662.0,106477.0,0.0,124110.0
+500,Geneia,http://www.indeed.com/cmp/Geneia,0.0,19.0,0.0,0.0,0.0,0.0,0.0
+501,Bluestone,http://www.indeed.com/cmp/Bluestone,0.0,0.0,0.0,0.0,0.0,0.0,170000.0
+502,Griffin Global Systems,http://www.indeed.com/cmp/Griffin-Global-Systems,0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+503,CandidateXchange,http://www.indeed.com/cmp/Candidatexchange,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+504,Department of Veterans Affairs,http://www.indeed.com/cmp/Department-of-Veterans-Affairs,0.0,0.0,0.0,92877.0,63877.0,0.0,77024.0
+505,"Promantus, Inc","http://www.indeed.com/cmp/Promantus,-Inc",0.0,0.0,0.0,0.0,0.0,0.0,80000.0
+506,NPD,http://www.indeed.com/cmp/Npd,0.0,0.0,0.0,93116.0,67674.0,0.0,79382.0
+507,Sierra Infosys Inc,http://www.indeed.com/cmp/Sierra-Infosys-Inc,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+508,"The Matlen Silver Group, Inc.","http://www.indeed.com/cmp/The-Matlen-Silver-Group,-Inc.",600.0,0.0,0.0,0.0,0.0,0.0,0.0
+509,Microsoft Devices Group,http://www.indeed.com/cmp/Microsoft-Devices-Group,0.0,28.0,0.0,0.0,0.0,0.0,0.0
+510,IDC Technologies,http://www.indeed.com/cmp/Idc-Technologies,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+511,DynCorp International Inc,http://www.indeed.com/cmp/Dyncorp-International-Inc,0.0,0.0,0.0,0.0,0.0,0.0,90000.0
+512,Bloomberg,http://www.indeed.com/cmp/Bloomberg,0.0,0.0,0.0,0.0,0.0,0.0,90000.0
+513,"Scottrade, Inc","http://www.indeed.com/cmp/Scottrade,-Inc",0.0,0.0,0.0,0.0,0.0,0.0,115000.0
+514,"Joseph Associates, Inc.","http://www.indeed.com/cmp/Joseph-Associates,-Inc.",0.0,0.0,0.0,0.0,0.0,0.0,125000.0
+515,CER Group NA,http://www.indeed.com/cmp/Cer-Group-Na,63.0,0.0,0.0,0.0,0.0,0.0,0.0
+516,ValoreBooks,http://www.indeed.com/cmp/Valorebooks,0.0,0.0,0.0,80000.0,50000.0,0.0,65000.0
+517,"Digital Intelligence Systems, LLC","http://www.indeed.com/cmp/Digital-Intelligence-Systems,-LLC-1",100.0,0.0,0.0,0.0,0.0,0.0,0.0
+518,Huxley IT,http://www.indeed.com/cmp/Huxley-IT,0.0,0.0,0.0,0.0,0.0,650.0,0.0
+519,Binary Computer Int'l Corp.,http://www.indeed.com/cmp/Binary-Computer-Int'l-Corp.,75.0,0.0,0.0,0.0,0.0,0.0,0.0
+520,The Connors Group,http://www.indeed.com/cmp/The-Connors-Group,0.0,0.0,0.0,0.0,0.0,0.0,140000.0
+521,Los Alamos National Laboratory,http://www.indeed.com/cmp/Los-Alamos-National-Laboratory,0.0,0.0,0.0,136000.0,83000.0,0.0,109500.0
+522,Infotek Consulting Services Inc.,http://www.indeed.com/cmp/Infotek-Consulting-Services-Inc.,0.0,61.0,0.0,0.0,0.0,0.0,0.0
+523,Galvanize,http://www.indeed.com/cmp/Galvanize,0.0,0.0,3000.0,0.0,0.0,0.0,0.0
+524,Griffin Global Systems,http://www.indeed.com/cmp/Griffin-Global-Systems,0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+525,"TekPartners, a P2P Company","http://www.indeed.com/cmp/Tekpartners,-A-P2p-Company",0.0,80.0,0.0,0.0,0.0,0.0,0.0
+526,TechTalent Consulting Inc,http://www.indeed.com/cmp/Techtalent-Consulting-Inc,0.0,0.0,0.0,175000.0,100000.0,0.0,137500.0
+527,Atrium Staffing,http://www.indeed.com/cmp/Atrium-Staffing,0.0,19.0,0.0,0.0,0.0,0.0,0.0
+528,Sophus It Solutions Llc,http://www.indeed.com/cmp/Sophus-IT-Solutions-LLC,80.0,0.0,0.0,0.0,0.0,0.0,0.0
+529,ReSource Technology Partners LLC,http://www.indeed.com/cmp/Resource-Technology-Partners-LLC,0.0,0.0,0.0,0.0,0.0,0.0,130000.0
+530,Retroficiency,http://www.indeed.com/cmp/Retroficiency,0.0,0.0,0.0,140000.0,110000.0,0.0,125000.0
+531,Jackson Noble LLC,http://www.indeed.com/cmp/Jackson-Noble-LLC,0.0,0.0,0.0,135000.0,120000.0,0.0,127500.0
+532,GKS Associates,http://www.indeed.com/cmp/Gks-Associates,0.0,50.0,0.0,0.0,0.0,0.0,0.0
+533,Managed Staffing,http://www.indeed.com/cmp/Managed-Staffing,0.0,0.0,0.0,130000.0,120000.0,0.0,125000.0
+534,Oliver James Associates,http://www.indeed.com/cmp/Oliver-James-Associates,0.0,0.0,0.0,200000.0,170000.0,0.0,185000.0
+535,venturesoft Global,http://www.indeed.com/cmp/Venturesoft-Global,0.0,105.0,0.0,0.0,0.0,0.0,0.0
+536,University of Wisconsin-Madison,http://www.indeed.com/cmp/University-of-Wisconsin--madison,0.0,0.0,0.0,0.0,0.0,0.0,50400.0
+537,BlueStaff Inc,http://www.indeed.com/cmp/Bluestaff-Inc,0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+538,Department of Finance,http://www.indeed.com/cmp/Department-of-Finance,0.0,0.0,0.0,83142.0,57757.0,0.0,69296.0
+539,TAKE Enterprise Services Inc,http://www.indeed.com/cmp/Take-Enterprise-Services-Inc,0.0,80.0,0.0,0.0,0.0,0.0,0.0
+540,Tessella Inc.,http://www.indeed.com/cmp/Tessella-Inc.,0.0,0.0,0.0,106406.0,56609.0,0.0,77611.0
+541,National,http://www.indeed.com/cmp/National,0.0,0.0,0.0,118889.0,87075.0,0.0,101746.0
+542,Oculus Search Partners LLC,http://www.indeed.com/cmp/Oculus-Search-Partners-LLC,0.0,0.0,0.0,0.0,0.0,0.0,175000.0
+543,ISPA Technology,http://www.indeed.com/cmp/Ispa-Technology,0.0,0.0,0.0,153819.0,121905.0,0.0,136935.0
+544,CSI Consulting Group,http://www.indeed.com/cmp/Csi-Consulting-Group,65.0,0.0,0.0,0.0,0.0,0.0,0.0
+545,Search Technology,http://www.indeed.com/cmp/Search-Technology,0.0,0.0,0.0,0.0,0.0,0.0,110000.0
+546,Accion Labs Inc,http://www.indeed.com/cmp/Accion-Labs-Inc,0.0,73.54,0.0,0.0,0.0,0.0,0.0
+547,HireStrategy,http://www.indeed.com/cmp/Hirestrategy,0.0,0.0,0.0,0.0,0.0,0.0,70000.0
+548,Data Scientist - Entry Level,http://www.indeed.com/cmp/Data-Scientist---Entry-Level,0.0,0.0,0.0,86714.0,62738.0,0.0,73758.0
+549,Paradigm Infotech,http://www.indeed.com/cmp/Paradigm-Infotech,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+550,BlueFlame Energy Finance LLC,http://www.indeed.com/cmp/Blueflame-Energy-Finance-LLC,0.0,0.0,0.0,161783.0,70407.0,0.0,106727.0
+551,Oregon Health Sciences University,http://www.indeed.com/cmp/Oregon-Health-Sciences-University,0.0,0.0,0.0,91491.0,78697.0,0.0,84853.0
+552,"Donahue & Moore Associates, LTD.","http://www.indeed.com/cmp/Donahue-&-Moore-Associates,-Ltd.",0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+553,ValoreBooks,http://www.indeed.com/cmp/Valorebooks,0.0,0.0,0.0,84805.0,47301.0,0.0,63335.0
+554,"Myriddian, LLC","http://www.indeed.com/cmp/Myriddian,-LLC",0.0,0.0,0.0,120000.0,100000.0,0.0,110000.0
+555,ShareThis,http://www.indeed.com/cmp/Sharethis,0.0,0.0,0.0,160000.0,110000.0,0.0,135000.0
+556,Stack Overflow,http://www.indeed.com/cmp/Stack-Overflow,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+557,"ADNET Systems, Inc","http://www.indeed.com/cmp/Adnet-Systems,-Inc",0.0,0.0,0.0,0.0,0.0,0.0,70000.0
+558,Bluestone,http://www.indeed.com/cmp/Bluestone,0.0,0.0,0.0,0.0,0.0,0.0,170000.0
+559,Apidel Technologies,http://www.indeed.com/cmp/Apidel-Technologies,0.0,0.0,0.0,0.0,0.0,0.0,135000.0
+560,Knox and Associates,http://www.indeed.com/cmp/Knox-and-Associates,0.0,0.0,0.0,0.0,0.0,0.0,100000.0
+561,Global Executive Solutions Group,http://www.indeed.com/cmp/Global-Executive-Solutions-Group,0.0,0.0,0.0,0.0,0.0,0.0,110000.0
+562,"DIVERSANT, LLC","http://www.indeed.com/cmp/Diversant,-LLC",0.0,0.0,2000.0,0.0,0.0,0.0,0.0
+563,Nyansa,http://www.indeed.com/cmp/Nyansa,0.0,0.0,0.0,150000.0,110000.0,0.0,130000.0
+564,Southwest Airlines,http://www.indeed.com/cmp/Southwest-Airlines,0.0,17.0,0.0,0.0,0.0,0.0,0.0
+565,BlueFlame Energy Finance LLC,http://www.indeed.com/cmp/Blueflame-Energy-Finance-LLC,0.0,0.0,0.0,150000.0,75000.0,0.0,112500.0
+566,United Software Group Inc.,http://www.indeed.com/cmp/United-Software-Group-Inc.,0.0,0.0,0.0,0.0,0.0,0.0,125000.0
+567,CompIT Consultants,http://www.indeed.com/cmp/Compit-Consultants,0.0,0.0,6500.0,0.0,0.0,0.0,0.0
+568,Butte College,http://www.indeed.com/cmp/Butte-College,0.0,0.0,0.0,0.0,0.0,0.0,102549.0
+569,ProCom Services,http://www.indeed.com/cmp/Procom-Services,0.0,0.0,0.0,0.0,0.0,0.0,136000.0
+570,Good World Solutions,http://www.indeed.com/cmp/Good-World-Solutions,0.0,0.0,0.0,48000.0,43000.0,0.0,45500.0
+571,Aditi Staffing,http://www.indeed.com/cmp/Aditi-Staffing,0.0,65.0,0.0,0.0,0.0,0.0,0.0
+572,Vurb,http://www.indeed.com/cmp/Vurb,0.0,0.0,0.0,150000.0,100000.0,0.0,125000.0
+573,Compunnel,http://www.indeed.com/cmp/Compunnel,0.0,0.0,0.0,130000.0,120000.0,0.0,125000.0
+574,The University of Michigan,http://www.indeed.com/cmp/The-University-of-Michigan,0.0,0.0,0.0,100000.0,80000.0,0.0,90000.0
+575,ProductBio,http://www.indeed.com/cmp/Productbio,0.0,0.0,0.0,0.0,0.0,0.0,60000.0
+576,BLT Recruiting,http://www.indeed.com/cmp/Blt-Recruiting,125.0,0.0,0.0,0.0,0.0,0.0,0.0
+577,nextSource,http://www.indeed.com/cmp/Nextsource,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+578,Technology Resource Group,http://www.indeed.com/cmp/Technology-Resource-Group,0.0,0.0,0.0,160000.0,90000.0,0.0,125000.0
+579,PeopleWorld Consulting Solutions Pvt Ltd,http://www.indeed.com/cmp/Peopleworld-Consulting-Solutions-Pvt-Ltd,65.0,0.0,0.0,0.0,0.0,0.0,0.0
+580,New Dimensions in Technology (NDT),http://www.indeed.com/cmp/New-Dimensions-in-Technology-(ndt),0.0,0.0,0.0,0.0,0.0,0.0,130000.0
+581,Smith Arnold Partners,http://www.indeed.com/cmp/Smith-Arnold-Partners,0.0,0.0,0.0,165000.0,150000.0,0.0,157500.0
+582,Ginas Tech Jobs,http://www.indeed.com/cmp/Ginas-Tech-Jobs,0.0,0.0,0.0,120000.0,80000.0,0.0,100000.0
+583,"AnthroTronix, Inc.","http://www.indeed.com/cmp/Anthrotronix,-Inc.",0.0,0.0,0.0,0.0,0.0,0.0,75000.0
+584,Valintry Services,http://www.indeed.com/cmp/Valintry-Services,0.0,72.5,0.0,0.0,0.0,0.0,0.0
+585,THEMESOFT,http://www.indeed.com/cmp/Themesoft,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+586,"Mangrum Career Solutions, LLC","http://www.indeed.com/cmp/Mangrum-Career-Solutions,-LLC",0.0,0.0,0.0,0.0,0.0,0.0,110000.0
+587,JEG Search,http://www.indeed.com/cmp/Jeg-Search,0.0,0.0,0.0,150000.0,135000.0,0.0,142500.0
+588,Office of the Director of National Intelligence,http://www.indeed.com/cmp/Office-of-the-Director-of-National-Intelligence,0.0,0.0,0.0,139523.0,107325.0,0.0,123424.0
+589,Narvar,http://www.indeed.com/cmp/Narvar,0.0,0.0,0.0,120000.0,80000.0,0.0,100000.0
+590,"ICONMA, LLC.","http://www.indeed.com/cmp/Iconma,-Llc.",0.0,43.0,0.0,0.0,0.0,0.0,0.0
+591,Playlist,http://www.indeed.com/cmp/Playlist,0.0,0.0,0.0,130000.0,100000.0,0.0,115000.0
+592,ARGO,http://www.indeed.com/cmp/Argo,0.0,0.0,0.0,130000.0,100000.0,0.0,115000.0
+593,Non Specific Employer,http://www.indeed.com/cmp/Non-Specific-Employer,0.0,50.0,0.0,0.0,0.0,0.0,0.0
+594,RockIT Recruiting,http://www.indeed.com/cmp/Rockit-Recruiting,0.0,0.0,0.0,120000.0,90000.0,0.0,105000.0
+595,LoanNow,http://www.indeed.com/cmp/Loannow,0.0,0.0,0.0,100000.0,80000.0,0.0,90000.0
+596,Privicee,http://www.indeed.com/cmp/Privicee,0.0,0.0,0.0,100000.0,50000.0,0.0,75000.0
+597,Hudson Data,http://www.indeed.com/cmp/Hudson-Data,0.0,0.0,0.0,125000.0,90000.0,0.0,107500.0
+598,IntePros Northeast,http://www.indeed.com/cmp/Intepros-Northeast,0.0,60.0,0.0,0.0,0.0,0.0,0.0
+599,"Red Oak Technologies, Inc.","http://www.indeed.com/cmp/Red-Oak-Technologies,-Inc.",110.0,0.0,0.0,0.0,0.0,0.0,0.0
+600,Paul May and Associates,http://www.indeed.com/cmp/Paul-May-and-Associates,0.0,0.0,0.0,0.0,0.0,0.0,120000.0
+601,"The Matlen Silver Group, Inc.","http://www.indeed.com/cmp/The-Matlen-Silver-Group,-Inc.",600.0,0.0,0.0,0.0,0.0,0.0,0.0
+602,Nucleus10,http://www.indeed.com/cmp/Nucleus10,0.0,75.0,0.0,0.0,0.0,0.0,0.0
+603,3coast,http://www.indeed.com/cmp/3coast,0.0,0.0,0.0,180000.0,155000.0,0.0,167500.0
+604,"RightPlace Consulting, LLC","http://www.indeed.com/cmp/Rightplace-Consulting,-LLC",0.0,100.0,0.0,0.0,0.0,0.0,0.0
+605,Group A LLC,http://www.indeed.com/cmp/Group-A-LLC,0.0,0.0,0.0,180000.0,160000.0,0.0,170000.0
+606,Debian Systems Inc,http://www.indeed.com/cmp/Debian-Systems-Inc,0.0,0.0,0.0,0.0,0.0,0.0,150000.0
+607,Beneath The Ink,http://www.indeed.com/cmp/Beneath-the-Ink,0.0,0.0,0.0,90000.0,60000.0,0.0,75000.0
+608,Ved Software Services Inc.,http://www.indeed.com/cmp/Ved-Software-Services-Inc.,65.0,0.0,0.0,0.0,0.0,0.0,0.0
+609,CAC Services,http://www.indeed.com/cmp/Cac-Services,0.0,0.0,0.0,120000.0,100000.0,0.0,110000.0
+610,Snohomish County Public Utilities,http://www.indeed.com/cmp/Snohomish-County-Public-Utilities,0.0,0.0,0.0,0.0,0.0,0.0,117000.0
+611,Big Data Careers,http://www.indeed.com/cmp/Big-Data-Careers,0.0,0.0,0.0,180000.0,100000.0,0.0,140000.0
+612,"Veritis Group, Inc.","http://www.indeed.com/cmp/Veritis-Group,-Inc.",65.0,0.0,0.0,0.0,0.0,0.0,0.0
+613,"Numeric, LLC","http://www.indeed.com/cmp/Numeric,-LLC",0.0,0.0,0.0,130000.0,100000.0,0.0,115000.0
+614,CyberCoders,http://www.indeed.com/cmp/Cybercoders,146.0,100.0,0.0,153063.0,109192.0,400.0,131128.0
+615,TechInMotion,http://www.indeed.com/cmp/Techinmotion,0.0,59.13,0.0,147052.0,109055.0,0.0,128054.0
+616,Workbridge Associates,http://www.indeed.com/cmp/Workbridge-Associates,0.0,59.29,0.0,152486.0,112000.0,0.0,132243.0
+617,Jobspring Partners,http://www.indeed.com/cmp/Jobspring-Partners,0.0,60.25,0.0,140725.0,105611.0,0.0,123168.0
+618,"Career Brokers, Inc.","http://www.indeed.com/cmp/Career-Brokers,-Inc.",0.0,0.0,0.0,134493.0,103243.0,0.0,118868.0
+619,National Security Agency,http://www.indeed.com/cmp/National-Security-Agency,0.0,0.0,0.0,100822.0,68553.0,0.0,84687.0
+620,harnham,http://www.indeed.com/cmp/Harnham,0.0,0.0,0.0,165528.0,137927.0,0.0,151728.0
+621,Job Juncture,http://www.indeed.com/cmp/Job-Juncture,0.0,0.0,0.0,142148.0,103343.0,0.0,122746.0
+622,Plastic Executive Recruiters,http://www.indeed.com/cmp/Plastic-Executive-Recruiters,0.0,0.0,0.0,164500.0,107700.0,0.0,136100.0
+623,Prosigo Executive Search,http://www.indeed.com/cmp/Prosigo-Executive-Search,0.0,0.0,0.0,167750.0,108100.0,0.0,137925.0
+624,Ploeger Recruiting Services,http://www.indeed.com/cmp/Ploeger-Recruiting-Services,0.0,0.0,0.0,165052.0,107732.0,0.0,136392.0
+625,CMD And Associates,http://www.indeed.com/cmp/Cmd-and-Associates,0.0,0.0,0.0,160368.0,107368.0,0.0,133868.0
+626,"Fowler Placement Services, Inc.","http://www.indeed.com/cmp/Fowler-Placement-Services,-Inc.",0.0,0.0,0.0,165108.0,107419.0,0.0,136263.0
+627,Onboard.jobs,http://www.indeed.com/cmp/Onboard.jobs,0.0,0.0,0.0,165380.0,107717.0,0.0,136549.0
+628,Systematic business consulting,http://www.indeed.com/cmp/Systematic-Business-Consulting,0.0,0.0,0.0,162056.0,107222.0,0.0,134639.0
+629,Bio-Partners,http://www.indeed.com/cmp/Bio--partners,0.0,0.0,0.0,157978.0,106966.0,0.0,132472.0
+630,Lodestar Executive Search,http://www.indeed.com/cmp/Lodestar-Executive-Search,0.0,0.0,0.0,166954.0,107816.0,0.0,137385.0
+631,"PSU Personnel Services Unlimited, Inc.","http://www.indeed.com/cmp/Psu-Personnel-Services-Unlimited,-Inc.",0.0,0.0,0.0,161552.0,107241.0,0.0,134397.0
+632,SearchStars,http://www.indeed.com/cmp/Searchstars,0.0,0.0,0.0,162151.0,107209.0,0.0,134680.0
+633,Client Staffing Solutions,http://www.indeed.com/cmp/Client-Staffing-Solutions,0.0,0.0,0.0,154826.0,106512.0,0.0,130669.0
