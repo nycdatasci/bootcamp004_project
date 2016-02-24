@@ -14,6 +14,8 @@ shinyServer(function(input, output, session) {
   yearInterest <- reactive(input$yearInterest)
   yearMonth <- reactive(input$yearMonth)
   monthInterest <- reactive(input$monthInterest)
+  pageInput <- reactive(input$pageInput)
+  addressInput <- reactive(input$typeAdd)
 
   #renderPrint, renderPlot
   output$graphHit <-renderPlot({
@@ -82,6 +84,7 @@ shinyServer(function(input, output, session) {
         articleContent08 <- fromJSON(articleAPI08)
         articleContent07 <- fromJSON(articleAPI07)
         articleContent06 <- fromJSON(articleAPI06)
+        Sys.sleep(1)
         articleContent05 <- fromJSON(articleAPI05)
         articleContent04 <- fromJSON(articleAPI04)
         articleContent03 <- fromJSON(articleAPI03)
@@ -95,6 +98,7 @@ shinyServer(function(input, output, session) {
         normalContent08 <- fromJSON(aboutAPI08)
         normalContent07 <- fromJSON(aboutAPI07)
         normalContent06 <- fromJSON(aboutAPI06)
+        Sys.sleep(1)
         normalContent05 <- fromJSON(aboutAPI05)
         normalContent04 <- fromJSON(aboutAPI04)
         normalContent03 <- fromJSON(aboutAPI03)
@@ -161,67 +165,70 @@ shinyServer(function(input, output, session) {
   output$graphMonth <- renderPlot({
     input$yearMonthButton
     isolate({
-      articleSearch <- articleSearch()
-      yearMonth <- yearMonth()
-      
-      month12End <- paste(yearMonth, "1231", sep = "")
-      month12 <- paste(yearMonth, "1201", sep = "")
-      month11 <- paste(yearMonth, "1101", sep = "")
-      month10 <- paste(yearMonth, "1001", sep = "")
-      month09 <- paste(yearMonth, "0901", sep = "")
-      month08 <- paste(yearMonth, "0801", sep = "")
-      month07 <- paste(yearMonth, "0701", sep = "")
-      month06 <- paste(yearMonth, "0601", sep = "")
-      month05 <- paste(yearMonth, "0501", sep = "")
-      month04 <- paste(yearMonth, "0401", sep = "")
-      month03 <- paste(yearMonth, "0301", sep = "")
-      month02 <- paste(yearMonth, "0201", sep = "")
-      month01 <- paste(yearMonth, "0101", sep = "")
-      
-      articleAddress <- "http://api.nytimes.com/svc/search/v2/articlesearch.json?q="
-      
-      articleKey <- "&api-key=48c66fa2c448eda40826487d4f19a018:0:71658152"
-      hitMon12 <- paste(articleAddress, articleSearch,"&begin_date=",month12,"&end_date=",month12End,articleKey, sep = "")
-      hitMon11 <- paste(articleAddress, articleSearch,"&begin_date=",month11,"&end_date=",month12,articleKey, sep = "")
-      hitMon10 <- paste(articleAddress, articleSearch,"&begin_date=",month10,"&end_date=",month11,articleKey, sep = "")
-      hitMon09 <- paste(articleAddress, articleSearch,"&begin_date=",month09,"&end_date=",month10,articleKey, sep = "")
-      hitMon08 <- paste(articleAddress, articleSearch,"&begin_date=",month08,"&end_date=",month09,articleKey, sep = "")
-      hitMon07 <- paste(articleAddress, articleSearch,"&begin_date=",month07,"&end_date=",month08,articleKey, sep = "")
-      hitMon06 <- paste(articleAddress, articleSearch,"&begin_date=",month06,"&end_date=",month07,articleKey, sep = "")
-      hitMon05 <- paste(articleAddress, articleSearch,"&begin_date=",month05,"&end_date=",month06,articleKey, sep = "")
-      hitMon04 <- paste(articleAddress, articleSearch,"&begin_date=",month04,"&end_date=",month05,articleKey, sep = "")
-      hitMon03 <- paste(articleAddress, articleSearch,"&begin_date=",month03,"&end_date=",month04,articleKey, sep = "")
-      hitMon02 <- paste(articleAddress, articleSearch,"&begin_date=",month02,"&end_date=",month03,articleKey, sep = "")
-      hitMon01 <- paste(articleAddress, articleSearch,"&begin_date=",month01,"&end_date=",month02,articleKey, sep = "")
-      
-      articleMonth12 <- fromJSON(hitMon12)
-      articleMonth11 <- fromJSON(hitMon11)
-      articleMonth10 <- fromJSON(hitMon10)
-      articleMonth09 <- fromJSON(hitMon09)
-      articleMonth08 <- fromJSON(hitMon08)
-      articleMonth07 <- fromJSON(hitMon07)
-      Sys.sleep(1.1)
-      articleMonth06 <- fromJSON(hitMon06)
-      articleMonth05 <- fromJSON(hitMon05)
-      articleMonth04 <- fromJSON(hitMon04)
-      articleMonth03 <- fromJSON(hitMon03)
-      articleMonth02 <- fromJSON(hitMon02)
-      articleMonth01 <- fromJSON(hitMon01)
-      
-      hitMonVec <- c( articleMonth12$response$meta$hits, articleMonth11$response$meta$hits, articleMonth10$response$meta$hits,
-            articleMonth09$response$meta$hits, articleMonth08$response$meta$hits, articleMonth07$response$meta$hits, articleMonth06$response$meta$hits,
-            articleMonth05$response$meta$hits, articleMonth04$response$meta$hits, articleMonth03$response$meta$hits, articleMonth02$response$meta$hits,
-            articleMonth01$response$meta$hits)
-      
-      monthVec <- c(month12, month11, month10, month09, month08, month07, month06, month05, month04, month03,
-                    month02, month01)
-      graphMonthTable <- data.frame(monthVec, hitMonVec)
-      
-      barMonthGraph <- ggplot(graphMonthTable, aes(x=monthVec, y=hitMonVec)) + geom_bar(stat="identity")
-      barMonthGraph + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
-                            axis.text.y = element_text(size = 12),
-                            panel.background = element_blank())
-      
+        articleSearch <- articleSearch()
+        if (articleSearch != "") {
+                yearMonth <- yearMonth()
+                
+                month12End <- paste(yearMonth, "1231", sep = "")
+                month12 <- paste(yearMonth, "1201", sep = "")
+                month11 <- paste(yearMonth, "1101", sep = "")
+                month10 <- paste(yearMonth, "1001", sep = "")
+                month09 <- paste(yearMonth, "0901", sep = "")
+                month08 <- paste(yearMonth, "0801", sep = "")
+                month07 <- paste(yearMonth, "0701", sep = "")
+                month06 <- paste(yearMonth, "0601", sep = "")
+                month05 <- paste(yearMonth, "0501", sep = "")
+                month04 <- paste(yearMonth, "0401", sep = "")
+                month03 <- paste(yearMonth, "0301", sep = "")
+                month02 <- paste(yearMonth, "0201", sep = "")
+                month01 <- paste(yearMonth, "0101", sep = "")
+                
+                articleAddress <- "http://api.nytimes.com/svc/search/v2/articlesearch.json?q="
+                
+                articleKey <- "&api-key=48c66fa2c448eda40826487d4f19a018:0:71658152"
+                hitMon12 <- paste(articleAddress, articleSearch,"&begin_date=",month12,"&end_date=",month12End,articleKey, sep = "")
+                hitMon11 <- paste(articleAddress, articleSearch,"&begin_date=",month11,"&end_date=",month12,articleKey, sep = "")
+                hitMon10 <- paste(articleAddress, articleSearch,"&begin_date=",month10,"&end_date=",month11,articleKey, sep = "")
+                hitMon09 <- paste(articleAddress, articleSearch,"&begin_date=",month09,"&end_date=",month10,articleKey, sep = "")
+                hitMon08 <- paste(articleAddress, articleSearch,"&begin_date=",month08,"&end_date=",month09,articleKey, sep = "")
+                hitMon07 <- paste(articleAddress, articleSearch,"&begin_date=",month07,"&end_date=",month08,articleKey, sep = "")
+                hitMon06 <- paste(articleAddress, articleSearch,"&begin_date=",month06,"&end_date=",month07,articleKey, sep = "")
+                hitMon05 <- paste(articleAddress, articleSearch,"&begin_date=",month05,"&end_date=",month06,articleKey, sep = "")
+                hitMon04 <- paste(articleAddress, articleSearch,"&begin_date=",month04,"&end_date=",month05,articleKey, sep = "")
+                hitMon03 <- paste(articleAddress, articleSearch,"&begin_date=",month03,"&end_date=",month04,articleKey, sep = "")
+                hitMon02 <- paste(articleAddress, articleSearch,"&begin_date=",month02,"&end_date=",month03,articleKey, sep = "")
+                hitMon01 <- paste(articleAddress, articleSearch,"&begin_date=",month01,"&end_date=",month02,articleKey, sep = "")
+                
+                articleMonth12 <- fromJSON(hitMon12)
+                articleMonth11 <- fromJSON(hitMon11)
+                articleMonth10 <- fromJSON(hitMon10)
+                Sys.sleep(0.5)
+                articleMonth09 <- fromJSON(hitMon09)
+                articleMonth08 <- fromJSON(hitMon08)
+                articleMonth07 <- fromJSON(hitMon07)
+                Sys.sleep(1.1)
+                articleMonth06 <- fromJSON(hitMon06)
+                articleMonth05 <- fromJSON(hitMon05)
+                articleMonth04 <- fromJSON(hitMon04)
+                Sys.sleep(0.5)
+                articleMonth03 <- fromJSON(hitMon03)
+                articleMonth02 <- fromJSON(hitMon02)
+                articleMonth01 <- fromJSON(hitMon01)
+                
+                hitMonVec <- c( articleMonth12$response$meta$hits, articleMonth11$response$meta$hits, articleMonth10$response$meta$hits,
+                      articleMonth09$response$meta$hits, articleMonth08$response$meta$hits, articleMonth07$response$meta$hits, articleMonth06$response$meta$hits,
+                      articleMonth05$response$meta$hits, articleMonth04$response$meta$hits, articleMonth03$response$meta$hits, articleMonth02$response$meta$hits,
+                      articleMonth01$response$meta$hits)
+                
+                monthVec <- c(month12, month11, month10, month09, month08, month07, month06, month05, month04, month03,
+                              month02, month01)
+                graphMonthTable <- data.frame(monthVec, hitMonVec)
+                
+                barMonthGraph <- ggplot(graphMonthTable, aes(x=monthVec, y=hitMonVec)) + geom_bar(stat="identity")
+                barMonthGraph + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+                                      axis.text.y = element_text(size = 12),
+                                      panel.background = element_blank())
+        } # End of articleSearch != 0
     })#end of isolate
   })#End of graphMonth
   
@@ -232,6 +239,8 @@ shinyServer(function(input, output, session) {
       yearInterest <- yearInterest()
       yearInterest01 <- yearInterest - 1
       monthInterest <- monthInterest()
+      pageInput <- pageInput()
+      pageInput <- paste("&page=", pageInput, sep = "")
       
       yearForMonth <- yearInterest
       yearInterest01 <- paste(yearInterest01, "0217", sep = "") 
@@ -241,56 +250,81 @@ shinyServer(function(input, output, session) {
       articleAddress <- "http://api.nytimes.com/svc/search/v2/articlesearch.json?q="
       
       articleKey <- "&api-key=48c66fa2c448eda40826487d4f19a018:0:71658152"
-      articleAPI10 <- paste(articleAddress, articleSearch,"&begin_date=",yearInterest01,"&end_date=",yearInterest,articleKey, sep = "")
+      articleAPI10 <- paste(articleAddress, articleSearch,"&begin_date=",yearInterest01,"&end_date=",yearInterest,pageInput,articleKey, sep = "")
       
-      articleContent10 <- fromJSON(articleAPI10)
-      
-      artiConDoc10 <- articleContent10$response$docs
-      
-      artiURL10 <- artiConDoc10$web_url
-      artiConSnippet10 <- artiConDoc10$snippet
-      
-      table10 <- data.frame(artiConSnippet10, artiURL10)
-      
-      #Articlae Table
-      if (input$radioMonth == 1) {
-        table10
-      } else if (input$radioMonth == 2) {
-          if (monthInterest <= 9) {
-            monthInterest <- paste("0", monthInterest, sep = "")
-          } else if (monthInterest >10) {
-            monthInterest <- as.character(monthInterest)
-          } 
-          beginMon <- paste(yearForMonth, monthInterest, "01", sep = "" )
-          endMon <- paste(yearForMonth, monthInterest, "30", sep = "")
-          articleMonthAPI <- paste(articleAddress, articleSearch,"&begin_date=",beginMon,"&end_date=",endMon,articleKey, sep = "")
-          monthContent <- fromJSON(articleMonthAPI)
-          monConDoc <- monthContent$response$docs
-          monURL <- monConDoc$web_url
-          monSnippet <- monConDoc$snippet
-          tableMonth <- data.frame(monSnippet, monURL)
-          tableMonth
-      }
-      
+      if (articleSearch != "") {
+                
+                articleContent10 <- fromJSON(articleAPI10)
+                
+                artiConDoc10 <- articleContent10$response$docs
+                
+                artiURL10 <- artiConDoc10$web_url
+                artiConSnippet10 <- artiConDoc10$snippet
+                
+                table10 <- data.frame(artiConSnippet10, artiURL10)
+                
+                #Articlae Table
+                if (input$radioMonth == 1 ) {
+                  table10
+                } else if (input$radioMonth == 2) {
+                    if (monthInterest <= 9) {
+                      monthInterest <- paste("0", monthInterest, sep = "")
+                    } else if (monthInterest >10) {
+                      monthInterest <- as.character(monthInterest)
+                    } 
+                  
+                    beginMon <- paste(yearForMonth, monthInterest, "01", sep = "" )
+                    endMon <- paste(yearForMonth, monthInterest, "30", sep = "")
+                    articleMonthAPI <- paste(articleAddress, articleSearch,"&begin_date=",beginMon,"&end_date=",endMon,articleKey, sep = "")
+                    monthContent <- fromJSON(articleMonthAPI)
+                    monConDoc <- monthContent$response$docs
+                    
+                    
+                    #your_link <- monConDoc$web_url
+                    #your_link <- paste0("<a href='",your_link,"' target='_blank'>link</a>")
+                    #monURL <- your_link
+                    monSnippet <- monConDoc$snippet
+                    tableMonth <- data.frame(monSnippet, monConDoc$web_url)
+                    tableMonth
+                }
+      }# end of if articleSearch != ""
     }) # End of isolate
-  })
+    
+  }
+  , options = list(columnDefs = list(list(
+    targets = 2,
+    render = JS(
+      "function(data, type, row, meta) {",
+      "return type === 'display' && data.length > 6 ?",
+      "'<span title=\"' + data + '\">' + data.substr(0, 20) + '...</span>' : data;",
+      "}")
+  )))
+  )
   
   output$rawAPI <- renderPrint({
     articleSearch <- articleSearch()
-    yearInterest <- yearInterest()
-    yearInterest01 <- yearInterest - 1
-    
-    yearInterest <- paste(yearInterest, "0217", sep = "") 
-    yearInterest01 <- paste(yearInterest01, "0217", sep = "") 
-    
-    articleAddress <- "http://api.nytimes.com/svc/search/v2/articlesearch.json?q="
-    
-    articleKey <- "&api-key=48c66fa2c448eda40826487d4f19a018:0:71658152"
-    articleAPI10 <- paste(articleAddress, articleSearch,"&begin_date=",yearInterest01,"&end_date=",yearInterest,"&sort=newest",articleKey, sep = "")
-    
-    articleContent10 <- fromJSON(articleAPI10)
-    infoRawAPI <- c(yearInterest, articleSearch, articleContent10)
-    infoRawAPI
+      if (articleSearch != "") {
+            yearInterest <- yearInterest()
+            yearInterest01 <- yearInterest - 1
+            
+            yearInterest <- paste(yearInterest, "0217", sep = "") 
+            yearInterest01 <- paste(yearInterest01, "0217", sep = "") 
+            
+            articleAddress <- "http://api.nytimes.com/svc/search/v2/articlesearch.json?q="
+            
+            articleKey <- "&api-key=48c66fa2c448eda40826487d4f19a018:0:71658152"
+            articleAPI10 <- paste(articleAddress, articleSearch,"&begin_date=",yearInterest01,"&end_date=",yearInterest,"&sort=newest",articleKey, sep = "")
+            
+            articleContent10 <- fromJSON(articleAPI10)
+            infoRawAPI <- c(yearInterest, articleSearch, articleContent10)
+            infoRawAPI
+      } #End of articleSearch
+  })
+
+  output$test02 <- renderPrint({
+    fsAddress <- "https://api.foursquare.com/v2/venues/search?ll=40.7,-74&oauth_token=MJOLVR2X02FDQXFHENNZPHSBG12RUT5MHKEKSE2LKIYGAWX4&v=20160215"
+    fsResult <- fromJSON(fsAddress)
+    fsResult
   })
   
   output$test03 <- renderPrint({
@@ -306,11 +340,59 @@ shinyServer(function(input, output, session) {
     aa 
   })
   
-  output$summary <- renderPrint({
-    summary(cars)
-  })
-  
   output$table <- DT::renderDataTable({
     DT::datatable(cars)
   })
+  
+  output$textGeo <- renderDataTable({
+    input$goLonLat
+    isolate({
+      addressInput <- addressInput()
+      #https://maps.googleapis.com/maps/api/geocode/json?address=4620%20parsons%20blvd%20flushing%20ny%20%20key=AIzaSyANifkybPlJWYynG_FSwzwSn-CunJTE4N0
+      if (addressInput != "") {
+        #geoWeb <- paste("https://maps.googleapis.com/maps/api/geocode/json?address=", addressInput, "&key=AIzaSyANifkybPlJWYynG_FSwzwSn-CunJTE4N0", sep = "")
+        #geoAPI <- fromJSON(geoWeb)
+        #latAPI <- geoAPI$results$geometry$location$lat
+        #lntAPI <- geoAPI$results$geometry$location$lnt
+        #location <- c(latAPI, lntAPI)
+        #addressInput
+        jobsAdd <- paste("https://api.usa.gov/jobs/search.json?query=", addressInput, sep = "")
+        jobsAPI <- fromJSON(jobsAdd)
+        
+        Sys.sleep(1)
+        
+        addressVec <- unlist(jobsAPI$locations)
+        lonlatVec <-c()
+        latt <- c()
+        lont <- c()
+        
+        i = 1
+        while (i <= length(addressVec)) {
+          address = as.character(addressVec[i])
+          address = gsub(" ", "", address)
+          geoWeb <- paste("https://maps.googleapis.com/maps/api/geocode/json?address=", address, "&key=AIzaSyANifkybPlJWYynG_FSwzwSn-CunJTE4N0", sep = "")
+          geoAPI <- fromJSON(geoWeb)
+          latt[i] <- geoAPI$results$geometry$location$lat
+          lont[i] <- geoAPI$results$geometry$location$lng
+          Sys.sleep(0.2)
+          i = i + 1
+        }
+        jobsAPI$locations <- unlist(jobsAPI$locations)
+        
+        Title <- jobsAPI$position_title
+        MinWage <- jobsAPI$minimum
+        MaxWage <- jobsAPI$maximum
+        Organization <- jobsAPI$organization_name
+        
+        Locations <- as.character(jobsAPI$locations)
+        #Locations <- unique(Locations)
+        jobTable <- data.frame(Title, Organization, MinWage, MaxWage, Locations,latt, lont)
+        jobTable
+        
+      }# end of if 
+
+      
+    })# end of isolate
+    
+  })# end of output$textGeo
 })
