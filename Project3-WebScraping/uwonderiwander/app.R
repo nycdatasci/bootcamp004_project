@@ -18,7 +18,7 @@ library(DT)
 library(reshape2)
 library(stringr)
 
-setwd('/Users/satishjoshi/DataBootcamp/bootcamp004_project/Project3-WebScraping/uwonderiwander')
+#setwd('/Users/satishjoshi/DataBootcamp/bootcamp004_project/Project3-WebScraping/uwonderiwander')
 
 #price table
 price_table <- read.csv("price_table.csv", stringsAsFactors = F)
@@ -125,6 +125,44 @@ COMPrices <- rbind(COMPrices, TCheckWholesale)
 unique(COMPrices$Name)
 
 
+#Weeknumber calculations
+COM_Prices$Weeknum <- as.numeric( format(COM_Prices$FullDate+3, "%U"))
+DOE_Prices$Weeknum <- as.numeric( format(DOE_Prices$FullDate+3, "%U"))
+
+DOEPrices_Weeknum = DOE_Prices[!duplicated(DOE_Prices[,c('Weeknum','Year')]),]
+COMPrices_Weeknum = COM_Prices[!duplicated(COM_Prices[,c('Weeknum','Year')]),]
+
+nrow(DOEPrices_Weeknum)
+nrow(COMPrices_Weeknum)
+
+#results2 <- DOEPrices_Weeknum[(DOEPrices_Weeknum$Weeknum == COMPrices_Weeknum$Weeknum) & 
+#                             (DOEPrices_Weeknum$Year == COMPrices_Weeknum$Year), ]
+#COMPrices_Weeknum = COMPrices_Weeknum[(COMPrices_Weeknum$Weeknum %in% {DOEPrices_Weeknum$Weeknum}) &
+#                  (COMPrices_Weeknum$Year %in% {DOEPrices_Weeknum$Year}),   ]
+#COM_Unique = distinct(COMPrices_Weeknum[c("Weeknum","Year")])
+#DOE_Unique = distinct(DOEPrices_Weeknum[c("Weeknum","Year")])
+# DOE_Weeks = c()
+# for (i in 1:nrow(DOEPrices_Weeknum)) {
+#   DOE_Weeks[i] = paste(toString(DOEPrices_Weeknum$Weeknum[i]),toString(DOEPrices_Weeknum$Year[i]), sep = ",")
+#   print (paste(toString(DOEPrices_Weeknum$Weeknum[i]),toString(DOEPrices_Weeknum$Year[i]), sep = ","))
+# }
+# COM_Weeks = c()
+# for (i in 1:nrow(COMPrices_Weeknum)) {
+#   COM_Weeks[i] = paste(toString(COMPrices_Weeknum$Weeknum[i]),toString(COMPrices_Weeknum$Year[i]), sep = ",")
+#   print (paste(toString(COMPrices_Weeknum$Weeknum[i]),toString(COMPrices_Weeknum$Year[i]), sep = ","))
+# }
+# length(DOE_Weeks)
+# length(COM_Weeks)
+# length(unique(DOE_Weeks))
+# length(unique(COM_Weeks))
+# DOEPrices_Weeknum[(paste(toString(DOEPrices_Weeknum$Weeknum[i]),toString(DOEPrices_Weeknum$Year[i]), sep = ",")) ==
+#    (DOE_Weeks[DOE_Weeks %in% COM_Weeks])]
+# !(DOE_Weeks  %in% COM_Weeks)
+# subset(DOE_Weeks, !(DOE_Weeks %in% COM_Weeks))
+# subset(DOE_Weeks, (DOE_Weeks %in% COM_Weeks))
+
+logistics[5:30,]
+
 ### PLOTTING ###
 
 ui <- dashboardPage(
@@ -141,6 +179,7 @@ ui <- dashboardPage(
             menuItem("Calendar", tabName = "calendar", icon = icon("calendar")),
             menuItem("Data", tabName = "data", icon = icon("table")) 
         )
+    
     ),
     
     dashboardBody(
@@ -185,12 +224,18 @@ ui <- dashboardPage(
             tabItem(tabName = "global",
                     h2("Global Freight"),
                     fluidRow(
-                      box(htmlOutput("global"), width=12))
+                      box(htmlOutput("global"), width=12)
+                    )
+                    
             ),
             tabItem(tabName = "private",
                     h2("Private Fleets"),
                     fluidRow(
-                      box(htmlOutput("private"), width=10)),
+                      box(htmlOutput("private"), width=10),
+                      sliderInput("private_slider", label = h4("Top Companies "), min = 0, 
+                                  max = 100, value = c(0, 100))
+                    ),
+                    
                     fluidRow(
                       box(width = 10, status = "info", solidHeader = F,
                           title = "Private Fleet", DT::dataTableOutput("pvt_flt_tbl")))
@@ -198,7 +243,11 @@ ui <- dashboardPage(
             tabItem(tabName = "forhire",
                     h2("For Hire Fleets"),
                     fluidRow(
-                    box(htmlOutput("forhire"), width=10)),
+                    box(htmlOutput("forhire"), width=10),
+                    sliderInput("forhire_slider", label = h4("Top Companies "), min = 0, 
+                                max = 100, value = c(0, 100))
+                    ),
+                    
                     fluidRow(
                       box(width = 10, status = "info", solidHeader = F,
                           title = "For Hire Fleet", DT::dataTableOutput("for_hire_tbl")))
@@ -206,7 +255,11 @@ ui <- dashboardPage(
             tabItem(tabName = "logistics",
                     h2("Logistics Companies"),
                     fluidRow(
-                    box(htmlOutput("logistics"), width=10)),
+                    box(htmlOutput("logistics"), width=10),
+                    sliderInput("logistics_slider", label = h4("Top Companies "), min = 0, 
+                                max = 50, value = c(0, 50))
+                    ),
+                    
                     fluidRow(
                       box(width = 10, status = "info", solidHeader = F,
                           title = "Logistics Companies", DT::dataTableOutput("logistics_tbl")))
@@ -238,44 +291,55 @@ ui <- dashboardPage(
 server <- function(input, output) {
     
     output$bubble <- renderGvis({
-        gvisMotionChart(DOEPrices, idvar="Name", timevar="FullDate")
+        gvisMotionChart(DOEPrices, idvar="Name", timevar="FullDate", sizevar = "Price", 
+                        options=list(state='{"colorOption":"_UNIQUE_COLOR"};'))
+#      gvisMotionChart(DOE_Prices, idvar = "Name", timevar = "FullDate", xvar = "GDP per Capita",
+#                      yvar = "Population Growth", colorvar = "Region", sizevar = "Total Population",
+#                      options = list(width= 850, showChartButtons=TRUE))
     })
     output$bubble2 <- renderGvis({
-         gvisMotionChart(COMPrices, idvar="Name", timevar="FullDate")
+         gvisMotionChart(COMPrices, idvar="Name", timevar="FullDate", sizevar = "Price", 
+                         options=list(state='{"colorOption":"_UNIQUE_COLOR"};'))
        
     })
     output$private <- renderGvis({
-       gvisComboChart(private_fleet, xvar="CompanyName",
+      gvisComboChart(private_fleet[input$private_slider[1]:input$private_slider[2],], 
+                             xvar="CompanyName",
                              yvar=c(  "Rank2015Reverse", "TruckAssets", "TrailerAssets"),
                              options=list(seriesType="bars",
-                                          series='{1: {type:"line"},
-                                          2: {type:"line"}}',
-                                          width=800, height=600))
-
+                                          series='{
+                                          0: {type:"line",color:"green"},
+                                          1: {type:"line", color:"red"},
+                                          2: {type:"line", color:"blue"}}',
+                                          width=800, height=500))
+    
      })
      output$logistics <- renderGvis({
-       gvisColumnChart(logistics, xvar="CompanyName", yvar=c("NetRevenue", "Employees"),
-                       options=list(width=800, height=600))
+       print ("testing")
+       #logistics = logistics[input$logistics_slider[1]:input$logistics_slider[2],]
+       gvisColumnChart(logistics[input$logistics_slider[1]:input$logistics_slider[2],], 
+                       xvar="CompanyName", yvar=c("NetRevenue", "Employees"),
+                       options=list(width=800, height=500))
        
      })     
      output$forhire <- renderGvis({
-       gvisBubbleChart(forhire, idvar="CompanyName", 
+       gvisBubbleChart(forhire[input$forhire_slider[1]:input$forhire_slider[2],], 
+                       idvar="CompanyName", 
                        xvar="NetIncome", yvar="Employees",
                        colorvar="Tractors", sizevar="Revenue",
                        
                        options=list(title='For Hire Fleets', 
-                                    width=800, height=600)
-                        # hAxis='{minValue:75, maxValue:125}')
+                                    width=800, height=500)
                        )
      
      }) 
      
      output$global <- renderGvis({
        G <- gvisGeoChart(global_freight_by_country, "Headquarters", "FreightRevenue", 
-                        options=list(width=300, height=600))
+                        options=list(width=300, height=500))
        
        T <- gvisTable(global_freight, 
-                        options=list(page='enable',width=800, height=600))
+                        options=list(page='enable',width=800, height=550))
 
        GT <- gvisMerge(G,T, horizontal=TRUE) 
        
