@@ -64,6 +64,8 @@ shinyUI(pageWithSidebar(
     ),# end of tabsetPanel
     tags$a(href="http://github.com/nycdatasci/bootcamp004_project/blob/master/Project3-WebScraping/WansagLim/prac05/ui.R", "ur.R Link"),
     tags$br(),
-    tags$a(href="https://github.com/nycdatasci/bootcamp004_project/blob/master/Project3-WebScraping/WansagLim/prac05/server.R", "server.R Link")
+    tags$a(href="https://github.com/nycdatasci/bootcamp004_project/blob/master/Project3-WebScraping/WansagLim/prac05/server.R", "server.R Link"),
+    tags$br(),
+    tags$a(href="http://www.billboard.com/charts/hot-100", "Billboard Singles")
   )
 ))
