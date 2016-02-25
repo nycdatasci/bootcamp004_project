@@ -9,13 +9,10 @@ def urlopen_with_retry(some_url):
     return urlopen(some_url)
 #initialize a dataframe with no rows
 marvel_df = pd.DataFrame({'character': [],'title': [],'date': []} )
-
 # make a list (manually) of the characters I am interested in
-characters=["http://marvel.wikia.com/wiki/Category:Steven_Rodgers_%28Earth-616%29/Appearances","http://marvel.wikia.com/wiki/Category:Peter_Parker_%28Earth-616%29/Appearances",
+characters=["http://marvel.wikia.com/wiki/Category:Steven_Rogers_%28Earth-616%29/Appearances","http://marvel.wikia.com/wiki/Category:Peter_Parker_%28Earth-616%29/Appearances",
 'http://marvel.wikia.com/wiki/Category:James_Howlett_%28Earth-616%29/Appearances','http://marvel.wikia.com/wiki/Category:Anthony_Stark_%28Earth-616%29/Appearances',
-'http://marvel.wikia.com/wiki/Category:Thor_Odinson_%28Earth-616%29/Appearances','http://marvel.wikia.com/wiki/Category:Benjamin_Grimm_%28Earth-616%29/Appearances',
-'http://marvel.wikia.com/wiki/Category:Reed_Richards_%28Earth-616%29/Appearances','http://marvel.wikia.com/wiki/Category:Robert_Bruce_Banner_%28Earth-616%29/Appearances',
-'http://marvel.wikia.com/wiki/Category:Scott_Summers_%28Earth-616%29/Appearances','http://marvel.wikia.com/wiki/Category:Jonathan_Storm_%28Earth-616%29/Appearances']
+'http://marvel.wikia.com/wiki/Category:Thor_Odinson_%28Earth-616%29/Appearances']
 for char in range(len(characters)):
     current_url=characters[char]
     print current_url#debug
