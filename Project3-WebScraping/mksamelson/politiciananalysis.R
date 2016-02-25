@@ -4,6 +4,7 @@ library(maps)
 library(USAboundaries)
 library(sp)
 library(DT)
+library(RColorBrewer)
 
 setwd('c:/Users/Matt/Dropbox/DataScienceBootcamp/projects/WebScrape')
 
@@ -30,6 +31,12 @@ politicians$debts = as.numeric(gsub('[$,]','',politicians$debts))
 
 politicians_h = filter(politicians,chamber == "H")
 politicians_s = filter(politicians,chamber == "S")
+
+# get a list of states
+
+states = unique(politicians$state)
+rows_to_drop = c("American Samoa","Guam","Virgin Islands","Puerto Rico","District of Columbia")
+states = subset(states,!(states %in% rows_to_drop))
 
 #Remove Non-Voting Representatives from Guam Puerto Rico American Samoa and the Virgin Islands
 
@@ -146,14 +153,24 @@ for (i in 1:nrow(powertable)){
 
 
 data=data.frame(grouping = powertable$grouping, state = tolower(powertable$state))
-map = map_data("state")
-ggplot(data,aes(fill=as.factor(grouping)))+
-geom_map(aes(map_id = state),map=map)+
-expand_limits(x=map$long,y=map$lat)+
-ggtitle("US Senate: Democratic, Republican, and Split States")+
-xlab("longitude")+ylab("latitude")+
-scale_fill_discrete(name="Controlling Party",labels=c("Democrats", "Republicans", "Split"))+
-scale_fill_manual(values=c("blue", "red", "gray"))
+us = map_data("state")
+  
+aa <- ggplot(data=data,aes(fill=grouping))+
+  geom_map(aes(map_id=state),map=us, color="black")+
+  expand_limits(x = us$long, y = us$lat)+
+  scale_fill_manual(values=c("blue", "red", "grey"),
+                    name="Power Split",
+                    labels=c("Democrats", "Republicans", "Split"))+
+  coord_map("albers", 39, 42)+
+  theme(legend.position = "right",
+        panel.background= element_rect(fill = "white"),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        axis.text =  element_blank())+
+  ggtitle("US Senate: Republican/Democratic Power Balance")
+
+aa
+
 
 #plot party in power by state - House
 
@@ -178,57 +195,82 @@ powertable_h = group_by(powertable_h,state) %>%
      summarise(., Freq_h = sum(grouping))
 
 data=data.frame(grouping = powertable_h$Freq_h, state = tolower(powertable_h$state))
-map = map_data("state")
-ggplot(data,aes(fill=grouping))+
-  geom_map(aes(map_id = state),map=map)+
-  expand_limits(x=map$long,y=map$lat)+
-  scale_fill_gradient2(low="darkblue", high="darkred", guide="colorbar")+
-  ggtitle("US Congress: Democratic and Republican States")+
-  xlab("longitude")+ylab("latitude")
+us = map_data("state")
 
-#Show me the money in the Senate:
+bb <- ggplot()+
+  geom_map(data=us, map=us, 
+           aes(x=long, y=lat, map_id=region),
+           color="#7f7f7f", size=0.15, fill="white")+
+  geom_map(data=data, map=us,aes(fill=grouping, map_id=state),color="black")+
+  scale_fill_gradient2(name="Balance",midpoint=0,high = "#EF8A62", mid ="#F7F7F7",low = "#67A9CF",guide="colourbar")+
+  coord_map("albers", 39, 42)+
+  theme(legend.position = "right",
+        panel.background= element_rect(fill = "white"),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        axis.text =  element_blank())+
+  ggtitle("US Congress: Republican/Democratic Power Balance")
 
-#Which Democrat states have the most cash on hand
+bb
 
-cash.s.d = filter(politicians_s,party=="D") %>%
-     select(.,state,cash.on.hand) %>%
-     group_by(.,state)%>%
-     summarise(., cash = sum(cash.on.hand))
-  
-data=data.frame(cash_on_hand = cash.s.d$cash, state = tolower(cash.s.d$state))
-map = map_data("state")
-ggplot(data,aes(fill=cash_on_hand))+
-geom_map(aes(map_id = state),map=map)+
-expand_limits(x=map$long,y=map$lat)+
-#scale_colour_gradient(low="white", high="red")+
-scale_fill_gradient2(low="red", guide="colorbar")+
-  ggtitle("US Senate: Democrat Cash on Hand")+
-  xlab("longitude")+ylab("latitude")
 
-#Show me the money in the Senate:
-
-#Which Republican states have the most cash on hand
+#Senate - Republican cash on hand by state
 
 cash.s.r = filter(politicians_s,party=="R") %>%
   select(.,state,cash.on.hand) %>%
   group_by(.,state)%>%
   summarise(., cash = sum(cash.on.hand))
 
-#data.frame((politicians_s,state, cash = sum(cash.on.hand)))
-#states_cash_s
 data=data.frame(cash_on_hand = cash.s.r$cash, state = tolower(cash.s.r$state))
-map = map_data("state")
-ggplot(data,aes(fill=cash_on_hand))+
-  geom_map(aes(map_id = state),map=map)+
-  expand_limits(x=map$long,y=map$lat)+
-  #scale_colour_gradient(low="white", high="red")+
-  scale_fill_gradient2(low="red", guide="colorbar")+
-  ggtitle("US Senate: Republican Cash on Hand")+
-  xlab("longitude")+ylab("latitude")
+us = map_data("state")
+
+cc <- ggplot()+
+  geom_map(data=us, map=us, 
+           aes(x=long, y=lat, map_id=region),
+           color="#7f7f7f", size=0.15, fill="white")+
+  geom_map(data=data, map=us,
+           aes(fill=cash_on_hand, map_id=state),color="black")+
+  scale_fill_distiller(name="Cash on Hand",palette=18,direction=1)+
+  coord_map("albers", 39, 42)+
+  theme(legend.position = "right",
+        panel.background= element_rect(fill = "white"),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        axis.text =  element_blank())+
+  ggtitle("US Senate: Republican Cash on Hand")
+
+cc
+
+#Senate - Democrat cash on hand by state
+
+cash.s.d = filter(politicians_s,party=="D") %>%
+  select(.,state,cash.on.hand) %>%
+  group_by(.,state)%>%
+  summarise(., cash = sum(cash.on.hand))
+
+data=data.frame(cash_on_hand = cash.s.d$cash, state = tolower(cash.s.d$state))
+us = map_data("state")
+
+dd <- ggplot()+
+  geom_map(data=us, map=us, 
+           aes(x=long, y=lat, map_id=region),
+           color="#7f7f7f", size=0.15, fill="white")+
+  geom_map(data=data, map=us,
+           aes(fill=cash_on_hand, map_id=state),color="black")+
+  scale_fill_distiller(name="Cash on Hand",palette=9,label=dollar,direction=1)+
+  coord_map("albers", 39, 42)+
+  theme(legend.position = "right",
+        panel.background= element_rect(fill = "white"),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        axis.text =  element_blank())+
+  ggtitle("US Senate: Democratic Cash on Hand")
+
+dd
 
 #House of Representatives
 
-#Which Republican states have the most cash on hand
+#Congress - Republican cash on hand by state
 
 cash.h.r = filter(politicians_h,party=="R") %>%
   select(.,state,cash.on.hand) %>%
@@ -236,33 +278,30 @@ cash.h.r = filter(politicians_h,party=="R") %>%
   summarise(., cash = sum(cash.on.hand))
 
 data=data.frame(cash_on_hand = cash.h.r$cash, state = tolower(cash.h.r$state))
-map = map_data("state")
-ggplot(data,aes(fill=cash_on_hand))+
-  geom_map(aes(map_id = state),map=map)+
-  expand_limits(x=map$long,y=map$lat)+
-  #scale_colour_gradient(low="white", high="red")+
-  scale_fill_gradient2(low="red", guide="colorbar")+
-  ggtitle("US Congress: Republican Cash on Hand")+
-  xlab("longitude")+ylab("latitude")
+us = map_data("state")
 
-#Which Democratic states have the most cash on hand
+ee <- ggplot()+
+  geom_map(data=us, map=us, 
+           aes(x=long, y=lat, map_id=region),
+           color="#7f7f7f", size=0.15, fill="white")+
+  geom_map(data=data, map=us,
+           aes(fill=cash_on_hand, map_id=state),color="black")+
+  scale_fill_distiller(name="Cash on Hand",palette=18,label=dollar,direction=1)+
+  coord_map("albers", 39, 42)+
+  theme(legend.position = "right",
+        panel.background= element_rect(fill = "white"),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        axis.text =  element_blank())+
+  ggtitle("US Congress: Republican Cash on Hand")
 
-cash.h.d = filter(politicians_h,party=="D") %>%
-  select(.,state,cash.on.hand) %>%
-  group_by(.,state)%>%
-  summarise(., cash = sum(cash.on.hand))
+ee
 
-data=data.frame(cash_on_hand = cash.h.d$cash, state = tolower(cash.h.d$state))
-map = map_data("state")
-ggplot(data,aes(fill=cash_on_hand))+
-  geom_map(aes(map_id = state),map=map)+
-  expand_limits(x=map$long,y=map$lat)+
-  #scale_colour_gradient(low="white", high="red")+
-  scale_fill_gradient2(low="red", guide="colorbar")+
-  ggtitle("US Congress: Democratic Cash on Hand")+
-  xlab("longitude")+ylab("latitude")
 
-#Which Democratic states have the most cash on hand
+
+
+#Congress - Democrat cash on hand by state
+
 
 cash.h.d = filter(politicians_h,party=="D") %>%
   select(.,state,cash.on.hand) %>%
@@ -270,12 +309,24 @@ cash.h.d = filter(politicians_h,party=="D") %>%
   summarise(., cash = sum(cash.on.hand))
 
 data=data.frame(cash_on_hand = cash.h.d$cash, state = tolower(cash.h.d$state))
-map = map_data("state")
-ggplot(data,aes(fill=cash_on_hand))+
-  scale_color_gradient(low="white", high="red")+
-  geom_map(aes(map_id = state),map=map)+
-  expand_limits(x=map$long,y=map$lat)+
-  #scale_fill_gradient2(low="red", guide="colorbar")+
-  ggtitle("US Congress: Democratic Cash on Hand")+
-  xlab("longitude")+ylab("latitude")
+us <- map_data("state")
+  
+  hh <- ggplot()+
+        geom_map(data=us, map=us, 
+                      aes(x=long, y=lat, map_id=region),
+                      color="#7f7f7f", size=0.15, fill="white")+
+        geom_map(data=data, map=us,
+                      aes(fill=cash_on_hand, map_id=state),color="black")+
+        scale_fill_distiller(name="Cash on Hand",palette=9,label=dollar,direction=1)+
+        coord_map("albers", 39, 42)+
+        theme(legend.position = "right",
+              panel.background= element_rect(fill = "white"),
+              axis.ticks = element_blank(), 
+              axis.title = element_blank(), 
+              axis.text =  element_blank())+
+        ggtitle("US Congress: Democratic Cash on Hand")
+
+  hh
+
+
 
