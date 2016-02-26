@@ -65,20 +65,6 @@ def colorz(filename, n=5):
         de_black= delta_e_cie1976(lab_n, black)
         de_gray= delta_e_cie1976(lab_n, gray)
         de_sliver= delta_e_cie1976(lab_n, sliver)
-        de_white= delta_e_cie1976(lab_n, white)
-        de_maroon= delta_e_cie1976(lab_n, maroon)
-        de_red= delta_e_cie1976(lab_n, red)
-
-
-        de_olive= delta_e_cie1976(lab_n, olive)
-        de_yellow= delta_e_cie1976(lab_n, yellow)
-        de_green= delta_e_cie1976(lab_n, green)
-        de_lime= delta_e_cie1976(lab_n, lime)
-        de_teal= delta_e_cie1976(lab_n, teal)
-        de_aqua= delta_e_cie1976(lab_n, aqua)
-        de_navy= delta_e_cie1976(lab_n, navy)
-        de_blue= delta_e_cie1976(lab_n, blue)
-        
         de_orange= delta_e_cie1976(lab_n, orange)
         de_purple= delta_e_cie1976(lab_n, purple)
         de_fuchsia= delta_e_cie1976(lab_n, fuchsia)
