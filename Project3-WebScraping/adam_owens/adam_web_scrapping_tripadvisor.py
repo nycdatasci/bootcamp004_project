@@ -29,8 +29,7 @@ user_agent = "Mozilla/44.0.2 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537
 df = pd.DataFrame()
 
 def get_city_page(city, state, datadir):
-    """ Returns the URL of the list of the hotels in a city. Corresponds to
-    STEP 1 & 2 of the slides.
+    """ Returns the URL of the list of the hotels in a city.
     Parameters
     ----------
     city : str
@@ -110,17 +109,32 @@ def parse_hotellist_page(city, state, html):
     if not hotel_boxes:
         log.info("#################################### Option 3 ######################################")
         hotel_boxes = soup.findAll('div', {'class' :'listing easyClear  p13n_imperfect'})
-    
+   
     print 'the number of hotels found is ' + str(len(hotel_boxes))
+    
     for hotel_box in hotel_boxes:
+        #Scrapte Hotel Name
         hotel_name = hotel_box.find("a", {"target" : "_blank"}).find(text=True)
         log.info("Hotel name: %s" % hotel_name.strip())
-
+        #Scrape City Rank
+        city_rankings = hotel_box.find("div", {"class" : "slim_ranking"})
+        if city_rankings != None:
+            city_rankings = city_rankings.find(text=True)
+            city_rankings = city_rankings[0:-1]            
+            city_rank = int(re.search(r'\d+', city_rankings).group())            
+        #Scrape Ad Features
+        htl_tags = hotel_box.findAll("div", {"class" : "clickable_tags"})
+        if htl_tags != None:        
+            for features in htl_tags:
+                htl_features = features.find("span", {"class" : "tag"})
+                if htl_features != None:
+                    htl_features = htl_features.find(text=True)
+        #Scrape Stars
         stars = hotel_box.find("img", {"class" : "sprite-ratings"})
         if stars:
             log.info("Stars: %s" % stars['alt'].split()[0])
             stars = "%s" % stars['alt'].split()[0]
-        
+        #Scrape Review Coount  
         num_reviews = hotel_box.find("span", {'class': "more"})
         if num_reviews != None:
             num_reviews = num_reviews.find(text=True)
@@ -134,11 +148,12 @@ def parse_hotellist_page(city, state, html):
             num_reviews  = int(num_reviews.strip())
         elif num_reviews == '':
             num_reviews = 0
-
+    
         df = df.append({
                     'City': city, 'State': state, 
                     'Hotel_Name': hotel_name, 'Review_Count': num_reviews,
-                    'Star_Rating': stars}, ignore_index=True)
+                    'Star_Rating': stars, 'Hotel_Features': htl_features, 
+                    'City_Ranking': city_rank}, ignore_index=True)
         #save to file
         df.to_csv('./data/tripadvisors2.csv', encoding='utf-8')
    
@@ -155,7 +170,6 @@ def parse_hotellist_page(city, state, html):
         if href.find(text = True) == 'Next':
             log.info("Next url is %s" % href['href'])
             return href['href']
-
 
 def scrape_hotels(city, state, datadir='data/'):
     """Runs the main scraper code
@@ -204,5 +218,4 @@ if __name__ == "__main__":
 df_citystate = pd.DataFrame({'City': ("Chicago","New York City","Los Angeles","Salt Lake City"),
                              'State': ("Illinois","New York","California", "Utah")}) 
 
-for i,j in df_citystate('City', 'State'):
-    scrape_hotels(i, j, datadir='datascience/data/')
+scrape_hotels("Salt Lake City", "Utah", datadir = 'datascience/data/')
