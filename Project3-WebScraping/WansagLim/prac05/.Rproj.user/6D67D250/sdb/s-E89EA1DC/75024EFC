@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1456291472427.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "75024EFC",
+    "lastKnownWriteTime" : 8751657549824161637,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "z05k69um8v",
+        "caption" : "jobsAPI",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=jobsAPI&cache_key=z05k69um8v",
+        "displayedObservations" : 10,
+        "environment" : "",
+        "object" : "jobsAPI",
+        "totalObservations" : 10,
+        "variables" : 10
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}
