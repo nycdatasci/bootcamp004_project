@@ -102,13 +102,14 @@
 
 library(ggplot2)
 library(dplyr)
-library(corplot)
+library(GGally)
+
 
 forestdata= read.csv('train.csv', header=TRUE)
 View(forestdata)
 summary(forestdata[2:15,])
 
-
+# adding a new variable for covernames based on cover type
 
 forestdata$covername='a'
 forestdata$covername[forestdata$Cover_Type==1]='Spruce-fir'
@@ -120,7 +121,13 @@ forestdata$covername[forestdata$Cover_Type==6]='Douglas-fir'
 forestdata$covername[forestdata$Cover_Type==7]='Krummholz'
 
 
+
+# Studying Elevation distribution and densities across Cover type
+ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Elevation)) + geom_density()
 ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 
-corr(forestdata[,2:11])
+
+ggpairs(forestdata[,2:5],alpha=0.2)
+
 
