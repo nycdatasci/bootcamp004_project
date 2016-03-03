@@ -103,6 +103,8 @@
 library(ggplot2)
 library(dplyr)
 library(GGally)
+library(clusterSim)
+
 
 
 forestdata= read.csv('train.csv', header=TRUE)
@@ -123,6 +125,15 @@ forestdata$covername[forestdata$Cover_Type==7]='Krummholz'
 
 ggpairs(forestdata[,2:5],alpha=0.2)
 
+
+ggpairs(forestdata[,5:7],alpha=0.2)
+
+# Studying Cover name
+ggplot(forestdata, aes(x=covername)) + geom_bar(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+
+# Training set has an equal number of observations for each cover type
+
+
 # Studying Elevation distribution and densities across Cover type
 ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
 ggplot(forestdata, aes(x=Elevation)) + geom_density()
@@ -133,9 +144,6 @@ ggplot(forestdata, aes(x=Aspect)) + geom_histogram(aes(group=covername, colour=c
 ggplot(forestdata, aes(x=Aspect)) + geom_density()
 ggplot(forestdata, aes(x=Aspect)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 # Rose diagram
-dir = cut_interval(runif(100,0,360), n=16)
-mag = cut_interval(rgamma(100,15), n=4)
-
 # make Aspect of 360 = 0
 forestdata$Aspect[forestdata$Aspect == 360] = 0
 
@@ -149,9 +157,67 @@ ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
   coord_polar()
 
 
+#The aspect value is higher across once side of the direction of slope,
+#however, at first glance , the covernames seem equitably distributed
+
 # Studying Slope
 ggplot(forestdata, aes(x=Slope)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
 ggplot(forestdata, aes(x=Slope)) + geom_density()
 ggplot(forestdata, aes(x=Slope)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+
+# The slope densities across covertypes do not seem to segregate them 
+# as much, it  does not seem like an important predictor of Cover type
+
+
+# Create single Soil_Type column
+forestdata$Soil_Type = 0
+for (i in 16:55) {
+  forestdata$Soil_Type[forestdata[,i] == 1] = i-15  
+}
+# Studying Soil Type
+ggplot(forestdata, aes(x=Soil_Type)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+
+
+
+
+
+# K means clustering of the data
+
+
+wssplot = function(data, nc = 15, seed = 0) {
+  wss = (nrow(data) - 1) * sum(apply(data, 2, var))
+  for (i in 2:nc) {
+    set.seed(seed)
+    wss[i] = sum(kmeans(data, centers = i, iter.max = 10, nstart = 5)$withinss)
+  }
+  plot(1:nc, wss, type = "b",
+       xlab = "Number of Clusters",
+       ylab = "Within-Cluster Variance",
+       main = "Scree Plot for the K-Means Procedure")
+}
+
+
+forestdatanorm<-data.frame(scale(forestdata[,-c(1,12:58)]))
+#forestdatanorm=subset(forestdatanorm, select=-c(Soil_Type7,Soil_Type15))
+
+View(forestdatanorm)
+fit7 <- kmeans(forestdatanorm, 7,nstart=10) 
+fit4 <- kmeans(forestdatanorm, 4,nstart=10)
+
+wssplot(forestdatanorm)
+
+#  Daavies bouldin index not working !
+# cl1 <- pam(forestdatanorm, 4)
+# distancekmeans<-dist(data_ratio)
+# print(index.DB(forestdatanorm, cl1$clustering,distancekmeans, centrotypes="medoids"))
+
+
+table7clusters=table(fit7$cluster,forestdata$covername)
+table4clusters=table(fit4$cluster,forestdata$covername)
+chisq.test(table4clusters)
+chisq.test(table7clusters)
+cor(fit$cluster,forestdata$covername)
+
+
 
 
