@@ -99,7 +99,7 @@
 
 
 #setwd('c://dataset/forestcover')
-#setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas)
+#setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
 library(dplyr)
@@ -124,10 +124,21 @@ forestdata$covername[forestdata$Cover_Type==6]='Douglas-fir'
 forestdata$covername[forestdata$Cover_Type==7]='Krummholz'
 
 
+
+# Create single Wilderness_Area column
+forestdata$Wilderness_Area = 0
+for (i in 12:15) {
+  forestdata$Wilderness_Area[forestdata[,i] == 1] = i-11  
+}
+# Studying Wilderness Area
+ggplot(forestdata, aes(x=Wilderness_Area)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+
+
 ggpairs(forestdata[,2:5],alpha=0.2)
 
 
 ggpairs(forestdata[,5:7],alpha=0.2)
+
 
 # Studying Cover name
 ggplot(forestdata, aes(x=covername)) + geom_bar(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
@@ -170,6 +181,54 @@ ggplot(forestdata, aes(x=Slope)) + geom_density(aes(group=covername, colour=cove
 # as much, it  does not seem like an important predictor of Cover type
 
 
+# Studying Distance to Roadways
+ggplot(forestdata, aes(x=Horizontal_Distance_To_Roadways)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Horizontal_Distance_To_Roadways)) + geom_density()
+ggplot(forestdata, aes(x=Horizontal_Distance_To_Roadways)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+
+# Hillshade average
+forestdata$Hillshade_mean = (forestdata$Hillshade_9am + forestdata$Hillshade_3pm + forestdata$Hillshade_Noon) / 3
+ggplot(forestdata, aes(x=Hillshade_mean)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Hillshade_mean)) + geom_density()
+ggplot(forestdata, aes(x=Hillshade_mean)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+# Hillshade 9AM
+ggplot(forestdata, aes(x=Hillshade_9am)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Hillshade_9am)) + geom_density()
+ggplot(forestdata, aes(x=Hillshade_9am)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+# Hillshade 3PM
+ggplot(forestdata, aes(x=Hillshade_3pm)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Hillshade_3pm)) + geom_density()
+ggplot(forestdata, aes(x=Hillshade_3pm)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+# Hillshade noon
+ggplot(forestdata, aes(x=Hillshade_Noon)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Hillshade_Noon)) + geom_density()
+ggplot(forestdata, aes(x=Hillshade_Noon)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+
+
+# Distance to Fire points
+ggplot(forestdata, aes(x=Horizontal_Distance_To_Fire_Points)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Horizontal_Distance_To_Fire_Points)) + geom_density()
+ggplot(forestdata, aes(x=Horizontal_Distance_To_Fire_Points)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+
+# Hydrology
+# Horizontal distance to Hydrology
+ggplot(forestdata, aes(x=Horizontal_Distance_To_Hydrology)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Horizontal_Distance_To_Hydrology)) + geom_density()
+ggplot(forestdata, aes(x=Horizontal_Distance_To_Hydrology)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+
+# Vertical distance to Hydrology
+ggplot(forestdata, aes(x=Vertical_Distance_To_Hydrology)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Vertical_Distance_To_Hydrology)) + geom_density()
+ggplot(forestdata, aes(x=Vertical_Distance_To_Hydrology)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+
+# Euclidean Distance from Hydrology
+forestdata$Euclidean_Distance_To_Hydrology = (forestdata$Horizontal_Distance_To_Hydrology^2 + forestdata$Vertical_Distance_To_Hydrology^2)^.5
+ggplot(forestdata, aes(x=Euclidean_Distance_To_Hydrology)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Euclidean_Distance_To_Hydrology)) + geom_density()
+ggplot(forestdata, aes(x=Euclidean_Distance_To_Hydrology)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+# Since Horizontal distance is so much larger, these looks basically the same as the horizontal distance charts
+
+
 # Create single Soil_Type column
 forestdata$Soil_Type = 0
 for (i in 16:55) {
@@ -177,6 +236,8 @@ for (i in 16:55) {
 }
 # Studying Soil Type
 ggplot(forestdata, aes(x=Soil_Type)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+
+
 
 
 
@@ -217,6 +278,8 @@ chisq.test(table4clusters)
 chisq.test(table7clusters)
 cor(fit$cluster,forestdata$covername)
 
+
+# Logistic Regression
 
 # Random forest
 
