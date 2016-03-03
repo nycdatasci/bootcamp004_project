@@ -121,13 +121,37 @@ forestdata$covername[forestdata$Cover_Type==6]='Douglas-fir'
 forestdata$covername[forestdata$Cover_Type==7]='Krummholz'
 
 
+ggpairs(forestdata[,2:5],alpha=0.2)
 
 # Studying Elevation distribution and densities across Cover type
 ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
 ggplot(forestdata, aes(x=Elevation)) + geom_density()
 ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 
+# Studying Aspect across cover type
+ggplot(forestdata, aes(x=Aspect)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Aspect)) + geom_density()
+ggplot(forestdata, aes(x=Aspect)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+# Rose diagram
+dir = cut_interval(runif(100,0,360), n=16)
+mag = cut_interval(rgamma(100,15), n=4)
 
-ggpairs(forestdata[,2:5],alpha=0.2)
+# make Aspect of 360 = 0
+forestdata$Aspect[forestdata$Aspect == 360] = 0
+
+rose_diagram_df = forestdata[c('Aspect', 'covername')]
+
+rose_diagram_df['aspect_group'] = cut(rose_diagram_df$Aspect, breaks=c(-1,seq(20,360, by = 20)), labels=FALSE)
+aspect_group
+
+ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
+  geom_bar() +
+  coord_polar()
+
+
+# Studying Slope
+ggplot(forestdata, aes(x=Slope)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Slope)) + geom_density()
+ggplot(forestdata, aes(x=Slope)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 
 
