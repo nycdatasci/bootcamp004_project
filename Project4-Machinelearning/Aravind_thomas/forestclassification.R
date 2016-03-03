@@ -99,6 +99,7 @@
 
 
 #setwd('c://dataset/forestcover')
+#setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas)
 
 library(ggplot2)
 library(dplyr)
@@ -179,8 +180,6 @@ ggplot(forestdata, aes(x=Soil_Type)) + geom_histogram(aes(group=covername, colou
 
 
 
-
-
 # K means clustering of the data
 
 
@@ -219,5 +218,5 @@ chisq.test(table7clusters)
 cor(fit$cluster,forestdata$covername)
 
 
-
+# Random forest
 
