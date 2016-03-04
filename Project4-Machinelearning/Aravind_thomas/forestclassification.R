@@ -105,7 +105,7 @@ library(ggplot2)
 library(dplyr)
 library(GGally)
 library(clusterSim)
-library(VGAM)
+#library(VGAM)
 
 
 forestdata= read.csv('train.csv', header=TRUE)
@@ -172,8 +172,8 @@ forestdata$Aspect[forestdata$Aspect == 360] = 0
 rose_diagram_df = forestdata[c('Aspect', 'covername')]
 
 rose_diagram_df['aspect_group'] = cut(rose_diagram_df$Aspect, breaks=c(-1,seq(20,360, by = 20)), labels=FALSE)
-aspect_group
 
+forestdata$aspect_group=rose_diagram_df$aspect_group
 forestdata$aspect_group_shift= forestdata$aspect_group+3
 forestdata$aspect_group_shift[forestdata$aspect_group_shift==19]= 1 
 forestdata$aspect_group_shift[forestdata$aspect_group_shift==20]= 2 
@@ -187,7 +187,7 @@ ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
   geom_bar() +
   coord_polar()
 
-forestdata$aspect_group=rose_diagram_df$aspect_group
+
 
 
 
@@ -301,16 +301,18 @@ chisq.test(table4clusters)
 chisq.test(table7clusters)
 
 
-# converting to factors
+
+
+
+#################### converting to factors ########################
 
 forestdata$Soil_Type=as.factor(forestdata$Soil_Type)
 forestdata$Wilderness_Area=as.factor(forestdata$Wilderness_Area)
 
 forestdata$covername=as.factor(forestdata$covername)
 forestdata$Cover_Type=as.factor(forestdata$Cover_Type)
-
-
-
+forestdata$aspect_group=as.factor(forestdata$aspect_group)
+forestdata$aspect_group_shift=as.factor(forestdata$aspect_group_shift)
 
 
 # Logistic Regression using GLMnet 
@@ -322,45 +324,110 @@ xfactors <- model.matrix(forestdata$Cover_Type ~ forestdata$Elevation +
                            forestdata$Horizontal_Distance_To_Hydrology +
                            forestdata$Vertical_Distance_To_Hydrology +
                            forestdata$Horizontal_Distance_To_Roadways +
-                           forestdata$Hillshade_9am )[,-1]
+                           forestdata$Hillshade_9am +
+                           forestdata$Hillshade_Noon +
+                           forestdata$Hillshade_3pm +
+                           forestdata$Horizontal_Distance_To_Fire_Points +
+                           forestdata$Wilderness_Area +                  #removes the first area
+                           forestdata$Wilderness_Area1 +
+                           forestdata$Horizontal_Distance_To_Fire_Points +
+                           forestdata$Soil_Type +
+                           forestdata$Soil_Type1)[,-1]
 x=as.matrix(xfactors)
 
 
+set.seed(0)
+train = sample(1:nrow(x), 7*nrow(x)/10)
+test = (-train)
 
-glmmod<-glmnet(x,y=forestdata$Cover_Type,alpha=0,family='multinomial')
+y = forestdata$Cover_Type
+y.test = y[test]
 
-cv.glmmod <- cv.glmnet(x,y=forestdata$Cover_Type,alpha=1)
-plot(cv.glmmod)
-best_lambda <- cv.glmmod$lambda.min
+# Ridge multinomial logistic regression
+glmmod.cv.ridge <- cv.glmnet(x[train,],y[train],alpha=0,family='multinomial', nfolds = 10)
+plot(glmmod.cv.ridge)
+best_lambda_ridge = glmmod.cv.ridge$lambda.min
 
-output=predict(glmmod, type="class", x[1:2,])
+glmmod_best_lambda_ridge = predict(glmmod.cv.ridge, type = "class", s = best_lambda_ridge, x[test,])
+glmmod_best_lambda_ridge = as.data.frame(glmmod_best_lambda_ridge)
+library(caret)
+confusionMatrix(glmmod_best_lambda_ridge[,1], y.test, positive = '1')
+# accuracy = 0.6629 for our test set in train.csv
+coef(glmmod.cv.ridge)
 
+# Lasso multinomial logistic regression
+glmmod.cv.lasso <- cv.glmnet(x[train,],y[train],alpha=1,family='multinomial', nfolds = 10)
+plot(glmmod.cv.lasso)
+best_lambda_lasso = glmmod.cv.lasso$lambda.min
 
+glmmod_best_lambda_lasso = predict(glmmod.cv.lasso, type = "class", s = best_lambda_lasso, x[test,])
+glmmod_best_lambda_lasso = as.data.frame(glmmod_best_lambda_lasso)
+confusionMatrix(glmmod_best_lambda_lasso[,1], y.test, positive = '1')
+# accuracy = 0.7099 within the test set in train.csv
 
-coef(glmmod)
-cv.glmmod <- cv.glmnet(x,y=forestdata$Cover_Type,alpha=1)
-plot(cv.glmmod)
+coef(glmmod.cv.lasso)
 
-# logisticfit1=glm(Cover_Type ~ Elevation +
-#       Aspect +
-#       Slope +
-#       Horizontal_Distance_To_Hydrology +
-#       Vertical_Distance_To_Hydrology +
-#       Horizontal_Distance_To_Roadways +
-#       Hillshade_9am +
-#       Hillshade_Noon +
-#       Hillshade_3pm +
-#       Horizontal_Distance_To_Fire_Points +
-#       Wilderness_Area +
-#       Soil_Type ,family="multinomial",data=forestdata)
-
-
-
-
-
+# Class 7 predicted with higher elevations, class 4 predicted with lower elevations, as expected
+# Wilderness_Area1 not in the model
 
 
+# Run on test set
+foresttest = read.csv('test.csv', header = TRUE)
+
+confusionMatrix(glmmod_best_lambda[,1], y.test, positive = '1')
+glmmod_best_lambda = predict(glmmod.cv, type = "class", s = best_lambda, as.matrix(foresttest))
+glmmod_best_lambda = as.data.frame(glmmod_best_lambda)
 
 
-# Random forest
+foresttest$Cover_Type = sample(1:7, nrow(foresttest), replace = TRUE)
 
+foresttest$Soil_Type = 0
+for (i in 16:55) {
+  foresttest$Soil_Type[foresttest[,i] == 1] = i-15  
+}
+foresttest$Wilderness_Area = 0
+for (i in 12:15) {
+  foresttest$Wilderness_Area[foresttest[,i] == 1] = i-11  
+}
+
+foresttest$Soil_Type=as.factor(foresttest$Soil_Type)
+foresttest$Wilderness_Area=as.factor(foresttest$Wilderness_Area)
+foresttest$Cover_Type=as.factor(foresttest$Cover_Type)
+
+xfactorstest <- model.matrix(foresttest$Cover_Type ~ foresttest$Elevation +
+                           foresttest$Aspect +
+                           foresttest$Slope +
+                           foresttest$Horizontal_Distance_To_Hydrology +
+                           foresttest$Vertical_Distance_To_Hydrology +
+                           foresttest$Horizontal_Distance_To_Roadways +
+                           foresttest$Hillshade_9am +
+                           foresttest$Hillshade_Noon +
+                           foresttest$Hillshade_3pm +
+                           foresttest$Horizontal_Distance_To_Fire_Points +
+                           foresttest$Wilderness_Area +
+                           foresttest$Wilderness_Area1 +
+                           foresttest$Soil_Type +
+                           foresttest$Soil_Type1)[,-1]
+xtest=as.matrix(xfactorstest)
+
+xtest = xtest[, -c(20, 28)]
+
+glmmod_best_lambda_ridge_test = predict(glmmod.cv.ridge, type = "class", s = best_lambda_ridge, xtest)
+glmmod_best_lambda_ridge_test = as.data.frame(glmmod_best_lambda_ridge_test)
+
+glmmod_best_lambda_ridge_test
+ridge_submission1 = foresttest[,c(1,56)]
+ridge_submission1$Cover_Type = glmmod_best_lambda_ridge_test[,1]
+
+write.csv(ridge_submission1, 'ridge_submission1.csv')
+# kaggle score = 0.55696
+
+
+glmmod_best_lambda_lasso_test = predict(glmmod.cv.lasso, type = "class", s = best_lambda_lasso, xtest)
+glmmod_best_lambda_lasso_test = as.data.frame(glmmod_best_lambda_lasso_test)
+
+lasso_submission1 = foresttest[,c(1,56)]
+lasso_submission1$Cover_Type = glmmod_best_lambda_lasso_test[,1]
+
+write.csv(lasso_submission1, 'lasso_submission1.csv', row.names = FALSE)
+# kaggle score = 0.59594
