@@ -1,3 +1,4 @@
+library(dygraphs)
 library(shiny)
 library(shinydashboard)
 library(googleVis)
@@ -5,7 +6,7 @@ library(dplyr)
 require(datasets)
 library(RColorBrewer)
 library(xts)
-library(googleCharts)
+
 
 setwd('C://dataset')
 worldbank=read.csv('worldbankplay2.csv',header=TRUE, stringsAsFactors = FALSE)
@@ -18,6 +19,7 @@ ind.cat=unique(worldbank[,c('Indicator.Name','Indicator.Category')])
 
 
 ui <- dashboardPage(
+  
   dashboardHeader(title = "World bank indicator explorer"),
   dashboardSidebar(
     sidebarMenu(
@@ -81,7 +83,7 @@ ui <- dashboardPage(
                     collapsible = TRUE,
                     selectizeInput("varx", "Select X variable", indicators),
                     selectizeInput("vary", "Select Y variable", indicators),
-                    selectizeInput("size", "Select X variable", indicators),
+                    selectizeInput("size", "Select size variable", indicators),
                     sliderInput("year1", "Year",
                                 min = 1960, max =2015,
                                 value =2013, animate = TRUE)

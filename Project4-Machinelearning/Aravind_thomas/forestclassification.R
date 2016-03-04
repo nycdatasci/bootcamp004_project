@@ -105,12 +105,13 @@ library(ggplot2)
 library(dplyr)
 library(GGally)
 library(clusterSim)
-
+library(VGAM)
 
 
 forestdata= read.csv('train.csv', header=TRUE)
 View(forestdata)
-summary(forestdata[2:15,])
+summary(forestdata[,2:11])
+
 
 # adding a new variable for covernames based on cover type
 
@@ -139,6 +140,15 @@ ggpairs(forestdata[,2:5],alpha=0.2)
 
 ggpairs(forestdata[,5:7],alpha=0.2)
 
+pairs(forestdata[,2:11], lower.panel=panel.smooth, upper.panel=panel.cor)
+
+
+#plotting the correlation matrix of the quantitative factors 
+forestcorrelation=cor(forestdata[,2:11])
+
+
+
+
 
 # Studying Cover name
 ggplot(forestdata, aes(x=covername)) + geom_bar(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
@@ -164,9 +174,22 @@ rose_diagram_df = forestdata[c('Aspect', 'covername')]
 rose_diagram_df['aspect_group'] = cut(rose_diagram_df$Aspect, breaks=c(-1,seq(20,360, by = 20)), labels=FALSE)
 aspect_group
 
+forestdata$aspect_group_shift= forestdata$aspect_group+3
+forestdata$aspect_group_shift[forestdata$aspect_group_shift==19]= 1 
+forestdata$aspect_group_shift[forestdata$aspect_group_shift==20]= 2 
+forestdata$aspect_group_shift[forestdata$aspect_group_shift==21]= 3 
+
+ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) +
+  geom_bar() +
+  coord_polar()
+
 ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
   geom_bar() +
   coord_polar()
+
+forestdata$aspect_group=rose_diagram_df$aspect_group
+
+
 
 
 #The aspect value is higher across once side of the direction of slope,
@@ -276,10 +299,68 @@ table7clusters=table(fit7$cluster,forestdata$covername)
 table4clusters=table(fit4$cluster,forestdata$covername)
 chisq.test(table4clusters)
 chisq.test(table7clusters)
-cor(fit$cluster,forestdata$covername)
 
 
-# Logistic Regression
+# converting to factors
+
+forestdata$Soil_Type=as.factor(forestdata$Soil_Type)
+forestdata$Wilderness_Area=as.factor(forestdata$Wilderness_Area)
+
+forestdata$covername=as.factor(forestdata$covername)
+forestdata$Cover_Type=as.factor(forestdata$Cover_Type)
+
+
+
+
+
+# Logistic Regression using GLMnet 
+
+library(glmnet)
+xfactors <- model.matrix(forestdata$Cover_Type ~ forestdata$Elevation +
+                           forestdata$Aspect +
+                           forestdata$Slope +
+                           forestdata$Horizontal_Distance_To_Hydrology +
+                           forestdata$Vertical_Distance_To_Hydrology +
+                           forestdata$Horizontal_Distance_To_Roadways +
+                           forestdata$Hillshade_9am )[,-1]
+x=as.matrix(xfactors)
+
+
+
+glmmod<-glmnet(x,y=forestdata$Cover_Type,alpha=0,family='multinomial')
+
+cv.glmmod <- cv.glmnet(x,y=forestdata$Cover_Type,alpha=1)
+plot(cv.glmmod)
+best_lambda <- cv.glmmod$lambda.min
+
+output=predict(glmmod, type="class", x[1:2,])
+
+
+
+coef(glmmod)
+cv.glmmod <- cv.glmnet(x,y=forestdata$Cover_Type,alpha=1)
+plot(cv.glmmod)
+
+# logisticfit1=glm(Cover_Type ~ Elevation +
+#       Aspect +
+#       Slope +
+#       Horizontal_Distance_To_Hydrology +
+#       Vertical_Distance_To_Hydrology +
+#       Horizontal_Distance_To_Roadways +
+#       Hillshade_9am +
+#       Hillshade_Noon +
+#       Hillshade_3pm +
+#       Horizontal_Distance_To_Fire_Points +
+#       Wilderness_Area +
+#       Soil_Type ,family="multinomial",data=forestdata)
+
+
+
+
+
+
+
+
 
 # Random forest
 

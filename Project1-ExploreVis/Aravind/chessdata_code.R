@@ -1,4 +1,4 @@
-
+ 
 #Visualising Chess ratings data by FIDE
 
 
@@ -58,6 +58,7 @@ y$probabofmaster=y$masters/y$pop
 group2=group_by(title_active,Fed.Full.name,Title)
 titlefed=summarise(group2, count=n(),rating=mean(Rating))
 
+chess_clean_inactive=chess_clean[chess_clean$Flag=='wi'| chess_clean$Flag=='i',]
 
 
 
@@ -72,6 +73,11 @@ x1=qplot(Rating,data=chess_active,fill=Sex,binwidth=20)+geom_histogram(colour="b
 
 ggplot(chess_all[chess_all$Rating>2500,],aes(x=Rating,fill=Year))+geom_density(alpha=0.6)
 
+)
+
+
+
+
 qplot(class, hwy, data = mpg,geom = "boxplot")
 qplot(Year,Rating, data=chess_all[chess_all$Rating>2500,],geom="boxplot")
 
@@ -80,6 +86,12 @@ qplot(Year,Rating, data=chess_all[chess_all$Rating>2500,],geom="boxplot")
 
 x2=ggplot(chess_active,aes(x=Rating,fill=Sex))+geom_density(alpha=0.3)+ggtitle("Rating Density plots across Sex")
 x3=ggplot(chess,aes(x=Rating,fill=Sex))+geom_density(alpha=0.3)
+
+
+#between inactive players
+ggplot(chess_clean_inactive,aes(x=Rating,fill=Sex))+geom_density(alpha=0.3)+ggtitle("Rating Density plots across inactive players")
+
+
 
 
 #Who are Grandmasters.
