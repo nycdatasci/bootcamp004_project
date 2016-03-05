@@ -315,6 +315,36 @@ forestdata$aspect_group=as.factor(forestdata$aspect_group)
 forestdata$aspect_group_shift=as.factor(forestdata$aspect_group_shift)
 
 
+
+# Functions to save model details
+summary_table = data.frame()
+modelsummary = function(confusion_matrix, table, model_name, kaggle_score, kaggle_rank)
+{
+  # Creates summary statistics for each model
+  temp = as.data.frame(colMeans(confusion_matrix$byClass))
+  model_names = t(as.data.frame(c(model_name, kaggle_score, kaggle_rank)))
+  colnames(model_names) = c('model', 'kaggle_score', 'kaggle_rank')
+  k = cbind(model_names, t(confusion_matrix$overall), t(temp))
+  table = rbind(table,k)
+  rownames(table) = 1:nrow(table)
+  return(table)
+}
+
+fitted_class_df = data.frame(1:15120)
+append_fitted_class = function(fitted_classes, table, model_name)
+{
+  # adds a column with the fitted classifications for each model
+  temp = as.data.frame(fitted_classes)
+  colnames(temp) = model_name
+  table = cbind(table, temp)
+  if (colnames(table)[1] == "X1.15120")
+  {
+    table = table[-1]
+  }
+  return(table)
+}
+
+
 # Logistic Regression using GLMnet 
 
 library(glmnet)
@@ -337,23 +367,33 @@ x=as.matrix(xfactors)
 
 
 set.seed(0)
-train = sample(1:nrow(x), 7*nrow(x)/10)
+train = sample(1:nrow(x), 85*nrow(x)/100)
 test = (-train)
 
 y = forestdata$Cover_Type
 y.test = y[test]
 
+grid = 10^seq(5, -7, length = 100)
+
+
+
 # Ridge multinomial logistic regression
-glmmod.cv.ridge <- cv.glmnet(x[train,],y[train],alpha=0,family='multinomial', nfolds = 10)
+glmmod.cv.ridge <- cv.glmnet(x[train,],y[train],alpha=0,family='multinomial', nfolds = 10, lambda = grid)
 plot(glmmod.cv.ridge)
 best_lambda_ridge = glmmod.cv.ridge$lambda.min
+
+# save fitted classifications on the training set for later
+glmmod_best_lambda_ridge_training = predict(glmmod.cv.ridge, type = "class", s = best_lambda_ridge, x)
 
 glmmod_best_lambda_ridge = predict(glmmod.cv.ridge, type = "class", s = best_lambda_ridge, x[test,])
 glmmod_best_lambda_ridge = as.data.frame(glmmod_best_lambda_ridge)
 library(caret)
 confusionMatrix(glmmod_best_lambda_ridge[,1], y.test, positive = '1')
-# accuracy = 0.6629 for our test set in train.csv
+# accuracy = 0.6629 for our test set in train.csv for 70-30 CV and default lambda
+# accuracy = 0.709 for our test set in train.csv for 85-15 CV and lambda from broader grid
 coef(glmmod.cv.ridge)
+
+
 
 # Lasso multinomial logistic regression
 glmmod.cv.lasso <- cv.glmnet(x[train,],y[train],alpha=1,family='multinomial', nfolds = 10)
@@ -364,14 +404,36 @@ glmmod_best_lambda_lasso = predict(glmmod.cv.lasso, type = "class", s = best_lam
 glmmod_best_lambda_lasso = as.data.frame(glmmod_best_lambda_lasso)
 confusionMatrix(glmmod_best_lambda_lasso[,1], y.test, positive = '1')
 # accuracy = 0.7099 within the test set in train.csv
-
+# accuracy = 0.7099 for our test set in train.csv for 85-15 CV
 coef(glmmod.cv.lasso)
+
 
 # Class 7 predicted with higher elevations, class 4 predicted with lower elevations, as expected
 # Wilderness_Area1 not in the model
 
 
-# Run on test set
+# elastic multinomial logistic regression
+glmmod.cv.elastic <- cv.glmnet(x[train,],y[train],alpha=0.5,family='multinomial', nfolds = 10)
+plot(glmmod.cv.elastic)
+best_lambda_elastic = glmmod.cv.elastic$lambda.min
+
+glmmod_best_lambda_elastic = predict(glmmod.cv.elastic, type = "class", s = best_lambda_elastic, x[test,])
+glmmod_best_lambda_elastic = as.data.frame(glmmod_best_lambda_elastic)
+confusionMatrix(glmmod_best_lambda_elastic[,1], y.test, positive = '1') 
+# accuracy = 0.7108 within the test set in train.csv
+coef(glmmod.cv.elastic)
+
+## capture all the output to a file.
+zz <- file("results_details.Rout", open = "wt")
+sink(zz, append = TRUE)
+sink(zz, type = "message",append = TRUE)
+try(log("a"))
+line = 'hello'
+write(line,file="results_details.Rout",append=TRUE)
+5*5
+closeAllConnections() 
+555*555
+# Run on test set ####
 foresttest = read.csv('test.csv', header = TRUE)
 
 confusionMatrix(glmmod_best_lambda[,1], y.test, positive = '1')
@@ -413,21 +475,57 @@ xtest=as.matrix(xfactorstest)
 xtest = xtest[, -c(20, 28)]
 
 glmmod_best_lambda_ridge_test = predict(glmmod.cv.ridge, type = "class", s = best_lambda_ridge, xtest)
-glmmod_best_lambda_ridge_test = as.data.frame(glmmod_best_lambda_ridge_test)
+glmmod_best_lambda_ridge_test = as.data.frame(glgmmod_best_lambda_ridge_test)
 
 glmmod_best_lambda_ridge_test
 ridge_submission1 = foresttest[,c(1,56)]
 ridge_submission1$Cover_Type = glmmod_best_lambda_ridge_test[,1]
 
-write.csv(ridge_submission1, 'ridge_submission1.csv')
-# kaggle score = 0.55696
+write.csv(ridge_submission1, 'ridge_submission2.csv', row.names = FALSE)
+# kaggle score = 0.55696, 1489th place for 70-30 split
+# kaggle score = 0.59550, 1414th place for 85-15 split
 
 
-glmmod_best_lambda_lasso_test = predict(glmmod.cv.lasso, type = "class", s = best_lambda_lasso, xtest)
+k = as.data.frame(1:565892)
+for (i in 1:99)
+{
+  print(i)
+  temp = predict(glmmod.cv.lasso, type = "class", s = glmmod.cv.lasso$lambda[i], xtest)
+  temp = as.data.frame(temp)
+  colnames(temp) = as.character(glmmod.cv.lasso$lambda[i])
+  k = cbind(k, temp)
+}
+#write.csv(k, 'lasso_lambda_blend.csv', row.names = FALSE)
+library(modeest)
+apply(as.numeric(k[1,]), 1, mfv)
+modes = 1:565892
+for (i in 1:nrow(k))
+{
+  modes[i] = mfv(as.numeric(k[i,]))
+}
+
+
+#glmmod_best_lambda_lasso_test = predict(glmmod.cv.lasso, type = "class", s = best_lambda_lasso, xtest)
+
 glmmod_best_lambda_lasso_test = as.data.frame(glmmod_best_lambda_lasso_test)
 
 lasso_submission1 = foresttest[,c(1,56)]
 lasso_submission1$Cover_Type = glmmod_best_lambda_lasso_test[,1]
 
-write.csv(lasso_submission1, 'lasso_submission1.csv', row.names = FALSE)
-# kaggle score = 0.59594
+write.csv(lasso_submission1, 'lasso_submission2.csv', row.names = FALSE)
+# kaggle score = 0.59594, 1411th place for 70-30 split
+# kaggle score = 0.59526, 1415th place for 85-15 split
+
+glmmod_best_lambda_elastic_test = predict(glmmod.cv.lasso, type = "class", s = best_lambda_elastic, xtest)
+glmmod_best_lambda_elastic_test = as.data.frame(glmmod_best_lambda_elastic_test)
+
+elastic_submission2 = foresttest[,c(1,56)]
+elastic_submission2$Cover_Type = glmmod_best_lambda_elastic_test[,1]
+
+write.csv(elastic_submission2, 'elastic_submission2.csv', row.names = FALSE)
+# kaggle score = 0.59588, 1412th place for 70-30 split
+# kaggle score = 0.59520, 1415th place for 85-15 split
+
+
+
+
