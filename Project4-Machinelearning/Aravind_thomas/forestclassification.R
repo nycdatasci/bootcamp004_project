@@ -107,23 +107,27 @@ library(dplyr)
 library(GGally)
 library(clusterSim)
 #library(VGAM)
+library(caret)
+library(glmnet)
+library(tree)
+library(randomForest)
+library(gbm)
 
-
-forestdata= read.csv('train.csv', header=TRUE)
+forestdata = read.csv('train.csv', header=TRUE)
 View(forestdata)
 summary(forestdata[,2:11])
 
 
 # adding a new variable for covernames based on cover type
 
-forestdata$covername='a'
-forestdata$covername[forestdata$Cover_Type==1]='Spruce-fir'
-forestdata$covername[forestdata$Cover_Type==2]='Lodgepole Pine'
-forestdata$covername[forestdata$Cover_Type==3]='Ponderosa Pine'
-forestdata$covername[forestdata$Cover_Type==4]='Cottonwood-Willow'
-forestdata$covername[forestdata$Cover_Type==5]='Aspen'
-forestdata$covername[forestdata$Cover_Type==6]='Douglas-fir'
-forestdata$covername[forestdata$Cover_Type==7]='Krummholz'
+forestdata$covername = 'a'
+forestdata$covername[forestdata$Cover_Type==1] = 'Spruce-fir'
+forestdata$covername[forestdata$Cover_Type==2] = 'Lodgepole Pine'
+forestdata$covername[forestdata$Cover_Type==3] = 'Ponderosa Pine'
+forestdata$covername[forestdata$Cover_Type==4] = 'Cottonwood-Willow'
+forestdata$covername[forestdata$Cover_Type==5] = 'Aspen'
+forestdata$covername[forestdata$Cover_Type==6] = 'Douglas-fir'
+forestdata$covername[forestdata$Cover_Type==7] = 'Krummholz'
 
 
 
@@ -132,16 +136,7 @@ forestdata$Wilderness_Area = 0
 for (i in 12:15) {
   forestdata$Wilderness_Area[forestdata[,i] == 1] = i-11  
 }
-# Studying Wilderness Area
-ggplot(forestdata, aes(x=Wilderness_Area)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
 
-
-ggpairs(forestdata[,2:5],alpha=0.2)
-
-
-ggpairs(forestdata[,5:7],alpha=0.2)
-
-pairs(forestdata[,2:11], lower.panel=panel.smooth, upper.panel=panel.cor)
 
 
 #plotting the correlation matrix of the quantitative factors 
@@ -281,12 +276,19 @@ ggplot(forestdata, aes(x=Euclidean_Distance_To_Hydrology)) + geom_density()
 ggplot(forestdata, aes(x=Euclidean_Distance_To_Hydrology)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 # Since Horizontal distance is so much larger, these looks basically the same as the horizontal distance charts
 
-
+# Studying Wilderness Area
+ggplot(forestdata, aes(x=Wilderness_Area)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
 
 # Studying Soil Type
 ggplot(forestdata, aes(x=Soil_Type)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
 
 
+# Correlations
+ggpairs(forestdata[,2:5],alpha=0.2)
+
+ggpairs(forestdata[,5:7],alpha=0.2)
+
+pairs(forestdata[,2:11], lower.panel=panel.smooth, upper.panel=panel.cor)
 
 
 
@@ -363,9 +365,9 @@ append_fitted_class = function(fitted_classes, table, model_name)
 }
 
 ######### Modeling ################
-# Logistic Regression using GLMnet 
+# LOGISTIC REGRESSION USING GLMnet 
 
-library(glmnet)
+
 xfactors <- model.matrix(forestdata$Cover_Type ~ forestdata$Elevation +
                            forestdata$Aspect +
                            forestdata$Slope +
@@ -405,7 +407,7 @@ glmmod_best_lambda_ridge_training = predict(glmmod.cv.ridge, type = "class", s =
 
 glmmod_best_lambda_ridge = predict(glmmod.cv.ridge, type = "class", s = best_lambda_ridge, x[test,])
 glmmod_best_lambda_ridge = as.data.frame(glmmod_best_lambda_ridge)
-library(caret)
+
 confusionMatrix(glmmod_best_lambda_ridge[,1], y.test, positive = '1')
 # accuracy = 0.6629 for our test set in train.csv for 70-30 CV and default lambda
 # accuracy = 0.709 for our test set in train.csv for 85-15 CV and lambda from broader grid
@@ -462,7 +464,7 @@ foresttest$Cover_Type = sample(1:7, nrow(foresttest), replace = TRUE)
 testmodel=foresttest[,-c(22,30)]
 for(i in 12:54)
 {
-  testmodel[,i]= as.factor(testmodel[,i])
+  testmodel[,i] = as.factor(testmodel[,i])
   
 }
 
@@ -475,16 +477,14 @@ for (i in 12:15) {
   foresttest$Wilderness_Area[foresttest[,i] == 1] = i-11  
 }
 
-foresttest$Soil_Type=as.factor(foresttest$Soil_Type)
-foresttest$Wilderness_Area=as.factor(foresttest$Wilderness_Area)
-foresttest$Cover_Type=as.factor(foresttest$Cover_Type)
+foresttest$Soil_Type = as.factor(foresttest$Soil_Type)
+foresttest$Wilderness_Area = as.factor(foresttest$Wilderness_Area)
+foresttest$Cover_Type = as.factor(foresttest$Cover_Type)
 
 
 confusionMatrix(glmmod_best_lambda[,1], y.test, positive = '1')
 glmmod_best_lambda = predict(glmmod.cv, type = "class", s = best_lambda, as.matrix(foresttest))
 glmmod_best_lambda = as.data.frame(glmmod_best_lambda)
-
-
 
 
 
@@ -560,10 +560,25 @@ write.csv(elastic_submission2, 'elastic_submission2.csv', row.names = FALSE)
 # kaggle score = 0.59588, 1412th place for 70-30 split
 # kaggle score = 0.59520, 1415th place for 85-15 split
 
+# using All the 15120 for the training :
+glmmod.cv.elastic_all <- cv.glmnet(x,y,alpha=0.5,family='multinomial', nfolds = 10)
+plot(glmmod.cv.elastic_all)
+best_lambda_elastic_all = glmmod.cv.elastic_all$lambda.min
 
-# Decision Trees
+glmmod_best_lambda_elastic_test_all = predict(glmmod.cv.elastic_all, type = "class", s = best_lambda_elastic_all, xtest)
+glmmod_best_lambda_elastic_test_all = as.data.frame(glmmod_best_lambda_elastic_test_all)
 
-library(tree)
+elastic_submission3 = foresttest[,c(1,56)]
+elastic_submission3$Cover_Type = glmmod_best_lambda_elastic_test_all[,1]
+
+write.csv(elastic_submission3, 'elastic_submission3.csv', row.names = FALSE) 
+# kaggle score = 0.59496, 1417th place
+
+
+
+
+
+# DECISION TREES
 
 foresttrain = sample(1:nrow(forestdata1), 8*nrow(forestdata1)/10)
 forestdata1.train = forestdata1[foresttrain, ]
@@ -571,14 +586,13 @@ forestdata1.test = forestdata1[-foresttrain, ]
 
 tree.forestdata= tree(Cover_Type ~ . - Id, split = "gini", data = forestdata1, subset = foresttrain) #max depth reached?
 
-library(randomForest)
 
 #Fitting an initial random forest to the training subset.
 set.seed(0)
 rf.forestdata1 = randomForest(Cover_Type ~ . - Id, data = forestdata1, subset = foresttrain, importance = TRUE, ntree=500)
 
 
-rf.initialpred=predict(rf.forestdata1, forestdata1.test, type="class")
+rf.initialpred = predict(rf.forestdata1, forestdata1.test, type="class")
 confusionMatrix(rf.initialpred, forestdata1.test[,54], positive='1')
 
 importance(rf.forestdata1)
@@ -586,7 +600,7 @@ varImpPlot(rf.forestdata1)
 
 #final testing 
 
-rf.initialpred_test=predict(rf.forestdata1, testmodel, test, type = "class")
+rf.initialpred_test = predict(rf.forestdata1, testmodel, test, type = "class")
 rf.initialpred_test = as.data.frame(rf.initialpred_test)
 
 initialrfsubmission = foresttest[,c(1,56)]
@@ -605,9 +619,7 @@ rf.cv1=rfcv(forestdata1[,1:53], forestdata1[,54], cv.fold=5)
 
 
 
-
-
-library(gbm)
+# Boosting
 
 boost.forestdata1 = gbm( Cover_Type~ . -Id, data = forestdata1.train,
                    distribution = "multinomial",
@@ -615,17 +627,17 @@ boost.forestdata1 = gbm( Cover_Type~ . -Id, data = forestdata1.train,
                    interaction.depth = 3)
 
 
-boostsummary=summary(boost.forestdata1)
-boostsummary[boostsummary$rel.inf>0,]
+boostsummary = summary(boost.forestdata1)
+boostsummary[boostsummary$rel.inf > 0,]
 
-boost.initialpred=predict(boost.forestdata1, forestdata1.test, n.trees=1000, type='response')
+boost.initialpred = predict(boost.forestdata1, forestdata1.test, n.trees=1000, type='response')
 
-boost.initialpred=apply(boost.initialpred,1,which.max)
-confusionMatrix(boost.initialpred,forestdata1.test[,54],positive='1')
+boost.initialpred = apply(boost.initialpred, 1, which.max)
+confusionMatrix(boost.initialpred, forestdata1.test[,54], positive='1')
 
 importance(rf.forestdata1)
 varImpPlot(rf.forestdata1)
 
-apply(boost.initialpred,1,which.max)
+apply(boost.initialpred, 1, which.max)
 nrow(forestdata1.test)
 
