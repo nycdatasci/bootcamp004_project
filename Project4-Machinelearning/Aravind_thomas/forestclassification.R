@@ -98,7 +98,7 @@
 # 7 -- Krummholz
 
 
-setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
@@ -149,6 +149,48 @@ forestcorrelation=cor(forestdata[,2:11])
 
 
 
+forestdata$Hillshade_mean = (forestdata$Hillshade_9am + forestdata$Hillshade_3pm + forestdata$Hillshade_Noon) / 3
+forestdata$Euclidean_Distance_To_Hydrology = (forestdata$Horizontal_Distance_To_Hydrology^2 + forestdata$Vertical_Distance_To_Hydrology^2)^.5
+
+forestdata$Aspect[forestdata$Aspect == 360] = 0
+
+rose_diagram_df = forestdata[c('Aspect', 'covername')]
+
+rose_diagram_df['aspect_group'] = cut(rose_diagram_df$Aspect, breaks=c(-1,seq(20,360, by = 20)), labels=FALSE)
+
+forestdata$aspect_group=rose_diagram_df$aspect_group
+forestdata$aspect_group_shift= forestdata$aspect_group+3
+forestdata$aspect_group_shift[forestdata$aspect_group_shift==19]= 1 
+forestdata$aspect_group_shift[forestdata$aspect_group_shift==20]= 2 
+forestdata$aspect_group_shift[forestdata$aspect_group_shift==21]= 3 
+
+# Create single Soil_Type column
+forestdata$Soil_Type = 0
+for (i in 16:55) {
+  forestdata$Soil_Type[forestdata[,i] == 1] = i-15  
+}
+
+#################### converting to factors ########################
+
+forestdata$Soil_Type=as.factor(forestdata$Soil_Type)
+forestdata$Wilderness_Area=as.factor(forestdata$Wilderness_Area)
+
+forestdata$covername=as.factor(forestdata$covername)
+forestdata$Cover_Type=as.factor(forestdata$Cover_Type)
+forestdata$aspect_group=as.factor(forestdata$aspect_group)
+forestdata$aspect_group_shift=as.factor(forestdata$aspect_group_shift)
+
+forestdata1= forestdata[,-c(22,30)]
+
+
+for(i in 12:53)
+{
+  forestdata1[,i]= as.factor(forestdata1[,i])
+  
+}
+forestdata1=forestdata1[,1:54]
+
+
 
 
 # Studying Cover name
@@ -168,17 +210,6 @@ ggplot(forestdata, aes(x=Aspect)) + geom_density()
 ggplot(forestdata, aes(x=Aspect)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 # Rose diagram
 # make Aspect of 360 = 0
-forestdata$Aspect[forestdata$Aspect == 360] = 0
-
-rose_diagram_df = forestdata[c('Aspect', 'covername')]
-
-rose_diagram_df['aspect_group'] = cut(rose_diagram_df$Aspect, breaks=c(-1,seq(20,360, by = 20)), labels=FALSE)
-
-forestdata$aspect_group=rose_diagram_df$aspect_group
-forestdata$aspect_group_shift= forestdata$aspect_group+3
-forestdata$aspect_group_shift[forestdata$aspect_group_shift==19]= 1 
-forestdata$aspect_group_shift[forestdata$aspect_group_shift==20]= 2 
-forestdata$aspect_group_shift[forestdata$aspect_group_shift==21]= 3 
 
 ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) +
   geom_bar() +
@@ -211,7 +242,6 @@ ggplot(forestdata, aes(x=Horizontal_Distance_To_Roadways)) + geom_density()
 ggplot(forestdata, aes(x=Horizontal_Distance_To_Roadways)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 
 # Hillshade average
-forestdata$Hillshade_mean = (forestdata$Hillshade_9am + forestdata$Hillshade_3pm + forestdata$Hillshade_Noon) / 3
 ggplot(forestdata, aes(x=Hillshade_mean)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
 ggplot(forestdata, aes(x=Hillshade_mean)) + geom_density()
 ggplot(forestdata, aes(x=Hillshade_mean)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
@@ -246,18 +276,13 @@ ggplot(forestdata, aes(x=Vertical_Distance_To_Hydrology)) + geom_density()
 ggplot(forestdata, aes(x=Vertical_Distance_To_Hydrology)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 
 # Euclidean Distance from Hydrology
-forestdata$Euclidean_Distance_To_Hydrology = (forestdata$Horizontal_Distance_To_Hydrology^2 + forestdata$Vertical_Distance_To_Hydrology^2)^.5
 ggplot(forestdata, aes(x=Euclidean_Distance_To_Hydrology)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
 ggplot(forestdata, aes(x=Euclidean_Distance_To_Hydrology)) + geom_density()
 ggplot(forestdata, aes(x=Euclidean_Distance_To_Hydrology)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 # Since Horizontal distance is so much larger, these looks basically the same as the horizontal distance charts
 
 
-# Create single Soil_Type column
-forestdata$Soil_Type = 0
-for (i in 16:55) {
-  forestdata$Soil_Type[forestdata[,i] == 1] = i-15  
-}
+
 # Studying Soil Type
 ggplot(forestdata, aes(x=Soil_Type)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
 
@@ -305,25 +330,6 @@ chisq.test(table7clusters)
 
 
 
-#################### converting to factors ########################
-
-forestdata$Soil_Type=as.factor(forestdata$Soil_Type)
-forestdata$Wilderness_Area=as.factor(forestdata$Wilderness_Area)
-
-forestdata$covername=as.factor(forestdata$covername)
-forestdata$Cover_Type=as.factor(forestdata$Cover_Type)
-forestdata$aspect_group=as.factor(forestdata$aspect_group)
-forestdata$aspect_group_shift=as.factor(forestdata$aspect_group_shift)
-
-forestdata1= forestdata[,-c(22,30)]
-
-
-for(i in 12:53)
-{
-  forestdata1[,i]= as.factor(forestdata1[,i])
-  
-}
-forestdata1=forestdata1[,1:54]
 
 
 
@@ -356,7 +362,7 @@ append_fitted_class = function(fitted_classes, table, model_name)
   return(table)
 }
 
-
+######### Modeling ################
 # Logistic Regression using GLMnet 
 
 library(glmnet)
@@ -435,22 +441,16 @@ confusionMatrix(glmmod_best_lambda_elastic[,1], y.test, positive = '1')
 # accuracy = 0.7108 within the test set in train.csv
 coef(glmmod.cv.elastic)
 
-## capture all the output to a file.
-zz <- file("results_details.Rout", open = "wt")
-sink(zz, append = TRUE)
-sink(zz, type = "message",append = TRUE)
-try(log("a"))
-line = 'hello'
-write(line,file="results_details.Rout",append=TRUE)
-5*5
-closeAllConnections() 
-555*555
-
-
-
-
-
-
+### capture all the output to a file.
+#zz <- file("results_details.Rout", open = "wt")
+#sink(zz, append = TRUE)
+#sink(zz, type = "message",append = TRUE)
+#try(log("a"))
+#line = 'hello'
+#write(line,file="results_details.Rout",append=TRUE)
+#5*5
+#closeAllConnections() 
+#555*555
 
 
 
@@ -458,26 +458,13 @@ closeAllConnections()
 
 # Run on test set ####
 foresttest = read.csv('test.csv', header = TRUE)
-
-confusionMatrix(glmmod_best_lambda[,1], y.test, positive = '1')
-glmmod_best_lambda = predict(glmmod.cv, type = "class", s = best_lambda, as.matrix(foresttest))
-glmmod_best_lambda = as.data.frame(glmmod_best_lambda)
-
-
 foresttest$Cover_Type = sample(1:7, nrow(foresttest), replace = TRUE)
-
-
 testmodel=foresttest[,-c(22,30)]
-
-
-
 for(i in 12:54)
 {
   testmodel[,i]= as.factor(testmodel[,i])
   
 }
-
-
 
 foresttest$Soil_Type = 0
 for (i in 16:55) {
@@ -491,6 +478,15 @@ for (i in 12:15) {
 foresttest$Soil_Type=as.factor(foresttest$Soil_Type)
 foresttest$Wilderness_Area=as.factor(foresttest$Wilderness_Area)
 foresttest$Cover_Type=as.factor(foresttest$Cover_Type)
+
+
+confusionMatrix(glmmod_best_lambda[,1], y.test, positive = '1')
+glmmod_best_lambda = predict(glmmod.cv, type = "class", s = best_lambda, as.matrix(foresttest))
+glmmod_best_lambda = as.data.frame(glmmod_best_lambda)
+
+
+
+
 
 xfactorstest <- model.matrix(foresttest$Cover_Type ~ foresttest$Elevation +
                            foresttest$Aspect +
@@ -573,24 +569,24 @@ foresttrain = sample(1:nrow(forestdata1), 8*nrow(forestdata1)/10)
 forestdata1.train = forestdata1[foresttrain, ]
 forestdata1.test = forestdata1[-foresttrain, ]
 
-tree.forestdata= tree(Cover_Type ~. -Id, split="gini",data=forestdata1, subset=foresttrain,control=tree.control(nmax=50) )
+tree.forestdata= tree(Cover_Type ~ . - Id, split = "gini", data = forestdata1, subset = foresttrain) #max depth reached?
 
 library(randomForest)
 
 #Fitting an initial random forest to the training subset.
 set.seed(0)
-rf.forestdata1 = randomForest(Cover_Type ~ .-Id, data = forestdata1, subset =foresttrain, importance = TRUE,ntree=1000)
+rf.forestdata1 = randomForest(Cover_Type ~ . - Id, data = forestdata1, subset = foresttrain, importance = TRUE, ntree=500)
 
 
-rf.initialpred=predict(rf.forestdata1,forestdata1.test,type="class")
-confusionMatrix(rf.initialpred,forestdata1.test[,54],positive='1')
+rf.initialpred=predict(rf.forestdata1, forestdata1.test, type="class")
+confusionMatrix(rf.initialpred, forestdata1.test[,54], positive='1')
 
 importance(rf.forestdata1)
 varImpPlot(rf.forestdata1)
 
 #final testing 
 
-rf.initialpred_test=predict(rf.forestdata1,testmodel,test,type="class")
+rf.initialpred_test=predict(rf.forestdata1, testmodel, test, type = "class")
 rf.initialpred_test = as.data.frame(rf.initialpred_test)
 
 initialrfsubmission = foresttest[,c(1,56)]
@@ -611,10 +607,6 @@ rf.cv1=rfcv(forestdata1[,1:53], forestdata1[,54], cv.fold=5)
 
 
 
-
-
-
-
 library(gbm)
 
 boost.forestdata1 = gbm( Cover_Type~ . -Id, data = forestdata1.train,
@@ -626,7 +618,7 @@ boost.forestdata1 = gbm( Cover_Type~ . -Id, data = forestdata1.train,
 boostsummary=summary(boost.forestdata1)
 boostsummary[boostsummary$rel.inf>0,]
 
-boost.initialpred=predict(boost.forestdata1,forestdata1.test, n.trees=1000,type='response')
+boost.initialpred=predict(boost.forestdata1, forestdata1.test, n.trees=1000, type='response')
 
 boost.initialpred=apply(boost.initialpred,1,which.max)
 confusionMatrix(boost.initialpred,forestdata1.test[,54],positive='1')
