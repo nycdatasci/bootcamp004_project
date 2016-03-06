@@ -314,16 +314,11 @@ forestdata$covername=as.factor(forestdata$covername)
 forestdata$Cover_Type=as.factor(forestdata$Cover_Type)
 forestdata$aspect_group=as.factor(forestdata$aspect_group)
 forestdata$aspect_group_shift=as.factor(forestdata$aspect_group_shift)
-forestdata[,12:55]= as.factor(forestdata[,12:55])
-View(forestdata)
-f
-
 
 forestdata1= forestdata[,-c(22,30)]
 
-forestdata1[,12:53]= as.factor(forestdata1[,12:53])
 
-for(i in 14:53)
+for(i in 12:53)
 {
   forestdata1[,i]= as.factor(forestdata1[,i])
   
@@ -450,6 +445,17 @@ write(line,file="results_details.Rout",append=TRUE)
 5*5
 closeAllConnections() 
 555*555
+
+
+
+
+
+
+
+
+
+
+
 # Run on test set ####
 foresttest = read.csv('test.csv', header = TRUE)
 
@@ -459,6 +465,19 @@ glmmod_best_lambda = as.data.frame(glmmod_best_lambda)
 
 
 foresttest$Cover_Type = sample(1:7, nrow(foresttest), replace = TRUE)
+
+
+testmodel=foresttest[,-c(22,30)]
+
+
+
+for(i in 12:54)
+{
+  testmodel[,i]= as.factor(testmodel[,i])
+  
+}
+
+
 
 foresttest$Soil_Type = 0
 for (i in 16:55) {
@@ -498,7 +517,7 @@ glmmod_best_lambda_ridge_test
 ridge_submission1 = foresttest[,c(1,56)]
 ridge_submission1$Cover_Type = glmmod_best_lambda_ridge_test[,1]
 
-write.csv(ridge_submission1, 'ridge_submission2.csv', row.names = FALSE)
+write.csv(ridge_submission1, 'ridge2_submission2.csv', row.names = FALSE)
 # kaggle score = 0.55696, 1489th place for 70-30 split
 # kaggle score = 0.59550, 1414th place for 85-15 split
 # 
@@ -560,7 +579,7 @@ library(randomForest)
 
 #Fitting an initial random forest to the training subset.
 set.seed(0)
-rf.forestdata1 = randomForest(Cover_Type ~ .-Id, data = forestdata1, subset =foresttrain, importance = TRUE,ntree=100)
+rf.forestdata1 = randomForest(Cover_Type ~ .-Id, data = forestdata1, subset =foresttrain, importance = TRUE,ntree=1000)
 
 
 rf.initialpred=predict(rf.forestdata1,forestdata1.test,type="class")
@@ -568,6 +587,34 @@ confusionMatrix(rf.initialpred,forestdata1.test[,54],positive='1')
 
 importance(rf.forestdata1)
 varImpPlot(rf.forestdata1)
+
+#final testing 
+
+rf.initialpred_test=predict(rf.forestdata1,testmodel,test,type="class")
+rf.initialpred_test = as.data.frame(rf.initialpred_test)
+
+initialrfsubmission = foresttest[,c(1,56)]
+initialrfsubmission$Cover_Type = rf.initialpred_test[,1]
+
+write.csv(initialrfsubmission, 'rf_submission1.csv', row.names = FALSE)
+
+
+#Kaggle score 0.68932 with basic random forest , Rank  1286
+
+# Random forest with cross validation 
+
+rf.cv1=rfcv(forestdata1[,1:53], forestdata1[,54], cv.fold=5)
+
+
+
+
+
+
+
+
+
+
+
 library(gbm)
 
 boost.forestdata1 = gbm( Cover_Type~ . -Id, data = forestdata1.train,
