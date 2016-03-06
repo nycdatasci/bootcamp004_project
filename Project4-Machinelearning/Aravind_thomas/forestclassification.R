@@ -98,7 +98,8 @@
 # 7 -- Krummholz
 
 
-#setwd('c://dataset/forestcover')
+setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
@@ -313,6 +314,22 @@ forestdata$covername=as.factor(forestdata$covername)
 forestdata$Cover_Type=as.factor(forestdata$Cover_Type)
 forestdata$aspect_group=as.factor(forestdata$aspect_group)
 forestdata$aspect_group_shift=as.factor(forestdata$aspect_group_shift)
+forestdata[,12:55]= as.factor(forestdata[,12:55])
+View(forestdata)
+f
+
+
+forestdata1= forestdata[,-c(22,30)]
+
+forestdata1[,12:53]= as.factor(forestdata1[,12:53])
+
+for(i in 14:53)
+{
+  forestdata1[,i]= as.factor(forestdata1[,i])
+  
+}
+forestdata1=forestdata1[,1:54]
+
 
 
 
@@ -484,6 +501,7 @@ ridge_submission1$Cover_Type = glmmod_best_lambda_ridge_test[,1]
 write.csv(ridge_submission1, 'ridge_submission2.csv', row.names = FALSE)
 # kaggle score = 0.55696, 1489th place for 70-30 split
 # kaggle score = 0.59550, 1414th place for 85-15 split
+# 
 
 
 k = as.data.frame(1:565892)
@@ -515,6 +533,7 @@ lasso_submission1$Cover_Type = glmmod_best_lambda_lasso_test[,1]
 write.csv(lasso_submission1, 'lasso_submission2.csv', row.names = FALSE)
 # kaggle score = 0.59594, 1411th place for 70-30 split
 # kaggle score = 0.59526, 1415th place for 85-15 split
+# kaggle score = 0.59443 if we took the lowest 50 percintile of lambdas and calculated the mode of the predictions
 
 glmmod_best_lambda_elastic_test = predict(glmmod.cv.lasso, type = "class", s = best_lambda_elastic, xtest)
 glmmod_best_lambda_elastic_test = as.data.frame(glmmod_best_lambda_elastic_test)
@@ -527,5 +546,47 @@ write.csv(elastic_submission2, 'elastic_submission2.csv', row.names = FALSE)
 # kaggle score = 0.59520, 1415th place for 85-15 split
 
 
+# Decision Trees
 
+library(tree)
+
+foresttrain = sample(1:nrow(forestdata1), 8*nrow(forestdata1)/10)
+forestdata1.train = forestdata1[foresttrain, ]
+forestdata1.test = forestdata1[-foresttrain, ]
+
+tree.forestdata= tree(Cover_Type ~. -Id, split="gini",data=forestdata1, subset=foresttrain,control=tree.control(nmax=50) )
+
+library(randomForest)
+
+#Fitting an initial random forest to the training subset.
+set.seed(0)
+rf.forestdata1 = randomForest(Cover_Type ~ .-Id, data = forestdata1, subset =foresttrain, importance = TRUE,ntree=100)
+
+
+rf.initialpred=predict(rf.forestdata1,forestdata1.test,type="class")
+confusionMatrix(rf.initialpred,forestdata1.test[,54],positive='1')
+
+importance(rf.forestdata1)
+varImpPlot(rf.forestdata1)
+library(gbm)
+
+boost.forestdata1 = gbm( Cover_Type~ . -Id, data = forestdata1.train,
+                   distribution = "multinomial",
+                   n.trees = 1000,
+                   interaction.depth = 3)
+
+
+boostsummary=summary(boost.forestdata1)
+boostsummary[boostsummary$rel.inf>0,]
+
+boost.initialpred=predict(boost.forestdata1,forestdata1.test, n.trees=1000,type='response')
+
+boost.initialpred=apply(boost.initialpred,1,which.max)
+confusionMatrix(boost.initialpred,forestdata1.test[,54],positive='1')
+
+importance(rf.forestdata1)
+varImpPlot(rf.forestdata1)
+
+apply(boost.initialpred,1,which.max)
+nrow(forestdata1.test)
 
