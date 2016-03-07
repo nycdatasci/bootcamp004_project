@@ -98,7 +98,8 @@
 # 7 -- Krummholz
 
 
-#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+
 
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
@@ -614,7 +615,57 @@ write.csv(initialrfsubmission, 'rf_submission2.csv', row.names = FALSE)
 # Random forest with cross validation 
 
 rf.cv1=rfcv(forestdata1[,1:53], forestdata1[,54], cv.fold=5)
+rf.cvtest = predict(rf.cv1, testmodel, test, type = "class")
+rf.initialpred_test = as.data.frame(rf.initialpred_test)
 
+initialrfsubmission = foresttest[,c(1,56)]
+initialrfsubmission$Cover_Type = rf.initialpred_test[,1]
+
+write.csv(initialrfsubmission, 'rf_submission2.csv', row.names = FALSE)
+
+importance(rf.forestdata1)
+varImpPlot(rf.forestdata1)
+
+confusionMatrix(as.vector(rf.cv1$predicted), forestdata1[,54], positive='1')
+
+
+
+
+
+#varying the number of parameters randomforest
+
+accuracy = numeric(30)
+for (mtry in 1:30) {
+  fit = randomForest(Cover_Type ~ . - Id, data = forestdata1, subset=foresttrain,importance = TRUE, ntree=100, mtry = mtry)
+  fit.pred = predict(fit, forestdata1.test, type="class")
+  accuracy[mtry]=confusionMatrix(fit.pred, forestdata1.test[,54], positive='1')$overall[1]
+  cat("We're performing iteration", mtry, "\n")
+}
+
+#Visualizing the OOB error.
+plot(1:30, accuracy, pch = 16, type = "b",
+     xlab = "Variables Considered at Each Split",
+     ylab = "accuracy",
+     main = "Random Forest changing Variables")
+
+
+#finally choosing mtry=13 and ntree=500 on the whole dataset based on the accuracy plot 
+
+rf.tuned = randomForest(Cover_Type ~ . - Id, data = forestdata1, importance = TRUE, ntree=500,mtry=13) # subset
+
+importance(rf.tuned)
+varImpPlot(rf.tuned)
+
+#final testing 
+
+rf.tunedtest = predict(rf.tuned, testmodel, type = "class")
+rf.tunedtest = as.data.frame(rf.tunedtest)
+
+tunedrandomforest1 = foresttest[,c(1,56)]
+tunedrandomforest1$Cover_Type = rf.tunedtest[,1]
+
+write.csv(tunedrandomforest1, 'rf_tunedtomtry13.csv', row.names = FALSE)
+# This improved the accuracy of Kaggle test set to 0.75168 Rank 792.
 
 
 
@@ -677,8 +728,8 @@ nnet.pred2summary.all = as.data.frame(nnet.pred2summary.all)
 initialnnetsubmission = foresttest[,c(1,56)]
 initialnnetsubmission$Cover_Type = nnet.pred2summary.all[,1]
 
-write.csv(initialnnetsubmission, 'nnet_submission1.csv', row.names = FALSE)
-# kaggle score = 0.50867 then .51487, then 0.52113 for 80% of training
+write.csv(initialnnetsubmission, 'nnet_submission2.csv', row.names = FALSE)
+# kaggle score = 0.50867 then .51487, then 0.52113/0.52432 for 80% of training
 
 
 
@@ -688,10 +739,15 @@ nnet.pred3summary=predict(nnet.pred3,forestdata1.test.scaled[,1:52], type="class
 confusionMatrix(nnet.pred3summary, forestdata1.test.scaled[,53], positive='1')
 
 
-# Trying neuralnet package - not working
+# Trying neuralnet package - 
 set.seed(0)
+
 forestdata1.train.scaled = cbind( scale(forestdata1.train[,2:11]), forestdata1.train[,12:54])
 forestdata1.test.scaled = cbind( scale(forestdata1.test[,2:11]), forestdata1.test[,12:54])
+
+forestdata1.train.scaled = cbind( scale(forestdata1.train[,2:11]), forestdata1.train[,12:54])
+forestdata1.test.scaled = cbind( scale(forestdata1.test[,2:11]), forestdata1.test[,12:54])
+
 
 forestdata1.train.scaled = as.data.frame(forestdata1.train.scaled)
 forestdata1.test.scaled = as.data.frame(forestdata1.test.scaled)
