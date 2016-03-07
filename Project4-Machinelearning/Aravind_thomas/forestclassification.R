@@ -586,11 +586,10 @@ forestdata1.test = forestdata1[-foresttrain, ]
 
 tree.forestdata= tree(Cover_Type ~ . - Id, split = "gini", data = forestdata1, subset = foresttrain) #max depth reached?
 
-
 #Fitting an initial random forest to the training subset.
 set.seed(0)
 rf.forestdata1 = randomForest(Cover_Type ~ . - Id, data = forestdata1, subset = foresttrain, importance = TRUE, ntree=500)
-
+rf.forestdata1 = randomForest(Cover_Type ~ . - Id, data = forestdata1, importance = TRUE, ntree=500) # subset
 
 rf.initialpred = predict(rf.forestdata1, forestdata1.test, type="class")
 confusionMatrix(rf.initialpred, forestdata1.test[,54], positive='1')
@@ -606,10 +605,11 @@ rf.initialpred_test = as.data.frame(rf.initialpred_test)
 initialrfsubmission = foresttest[,c(1,56)]
 initialrfsubmission$Cover_Type = rf.initialpred_test[,1]
 
-write.csv(initialrfsubmission, 'rf_submission1.csv', row.names = FALSE)
+write.csv(initialrfsubmission, 'rf_submission2.csv', row.names = FALSE)
 
 
-#Kaggle score 0.68932 with basic random forest , Rank  1286
+# rf_submission1.csv Kaggle score 0.68932 with basic random forest , Rank  1286
+# rf_submission2.csv Kaggle score of 0.70748 for rf of entire train set. Rank 1210
 
 # Random forest with cross validation 
 
@@ -626,7 +626,6 @@ boost.forestdata1 = gbm( Cover_Type~ . -Id, data = forestdata1.train,
                    n.trees = 1000,
                    interaction.depth = 3)
 
-
 boostsummary = summary(boost.forestdata1)
 boostsummary[boostsummary$rel.inf > 0,]
 
@@ -640,4 +639,112 @@ varImpPlot(rf.forestdata1)
 
 apply(boost.initialpred, 1, which.max)
 nrow(forestdata1.test)
+
+
+
+# ARTIFICIAL NEURAL NETWORKS
+
+library(nnet)
+library(neuralnet)
+
+# scale only quantitative variables
+forestdata1.train.scaled = cbind( scale(forestdata1.train[,2:11]), forestdata1.train[,12:54])
+forestdata1.test.scaled = cbind( scale(forestdata1.test[,2:11]), forestdata1.test[,12:54])
+
+foresttestnn = foresttest
+foresttestnn = foresttestnn[, -c(22, 30)]
+
+forestdata1.scaled = cbind( scale(forestdata1[,2:11]), forestdata1[,12:54])
+foresttest.scaled = cbind( scale(foresttestnn[,2:11]), foresttestnn[,12:54])
+
+nnet.pred1 = nnet(forestdata1.train.scaled[,1:52], class.ind(forestdata1.train.scaled[,53]), size=10, softmax=TRUE)
+nnet.pred1summary = predict(nnet.pred1,forestdata1.test.scaled[,1:52], type="class")
+confusionMatrix(nnet.pred1summary, forestdata1.test.scaled[,53], positive='1')
+
+
+nnet.pred2= nnet(forestdata1.train.scaled[,1:52], class.ind(forestdata1.train.scaled[,53]), size=25, softmax=TRUE,MaxNWts=2000,maxit=300)
+nnet.pred2summary=predict(nnet.pred2, forestdata1.test.scaled[,1:52], type="class")
+confusionMatrix(nnet.pred2summary, forestdata1.test.scaled[,53], positive='1')
+# .8181 for maxit=300
+# .8194 for maxit=500
+
+# run on all train
+nnet.pred2.all = nnet(forestdata1.scaled[,1:52], class.ind(forestdata1.scaled[,53]), size=25, softmax=TRUE,MaxNWts=2000,maxit=300)
+nnet.pred2summary.all=predict(nnet.pred2, foresttest.scaled[,1:52], type="class")
+
+nnet.pred2summary.all = as.data.frame(nnet.pred2summary.all)
+
+initialnnetsubmission = foresttest[,c(1,56)]
+initialnnetsubmission$Cover_Type = nnet.pred2summary.all[,1]
+
+write.csv(initialnnetsubmission, 'nnet_submission1.csv', row.names = FALSE)
+# kaggle score = 0.50867 then .51487, then 0.52113 for 80% of training
+
+
+
+
+nnet.pred3= nnet(forestdata1.train.scaled[,1:52], class.ind(forestdata1.train.scaled[,53]), size=40, softmax=TRUE,MaxNWts=3000,maxit=500)
+nnet.pred3summary=predict(nnet.pred3,forestdata1.test.scaled[,1:52], type="class")
+confusionMatrix(nnet.pred3summary, forestdata1.test.scaled[,53], positive='1')
+
+
+# Trying neuralnet package - not working
+set.seed(0)
+forestdata1.train.scaled = cbind( scale(forestdata1.train[,2:11]), forestdata1.train[,12:54])
+forestdata1.test.scaled = cbind( scale(forestdata1.test[,2:11]), forestdata1.test[,12:54])
+
+forestdata1.train.scaled = as.data.frame(forestdata1.train.scaled)
+forestdata1.test.scaled = as.data.frame(forestdata1.test.scaled)
+
+string1 = paste(colnames(forestdata1.train.scaled), collapse='+')
+string1 = paste("~", string1)
+formula1 = as.formula(string1)
+
+forestdata1.train.scaled.nnet = model.matrix(formula1, data=forestdata1.train.scaled)
+forestdata1.test.scaled.nnet = model.matrix(formula1, data=forestdata1.test.scaled)
+
+forestdata1.train.scaled.nnet = cbind(forestdata1.train.scaled.nnet, rep(0, dim(forestdata1.train.scaled.nnet)[1]))
+colnames(forestdata1.train.scaled.nnet)[60] = 'Cover_Type1'
+# Add Cover_Type1 column
+for (i in 1:dim(forestdata1.train.scaled.nnet)[1])
+{
+  if (sum(forestdata1.train.scaled.nnet[i,54:59]) == 0) 
+    {
+      forestdata1.train.scaled.nnet[i,60] = 1
+    }
+}
+
+forestdata1.test.scaled.nnet = cbind(forestdata1.test.scaled.nnet, rep(0, dim(forestdata1.test.scaled.nnet)[1]))
+colnames(forestdata1.test.scaled.nnet)[60] = 'Cover_Type1'
+# Add Cover_Type1 column
+for (i in 1:dim(forestdata1.test.scaled.nnet)[1])
+{
+  if (sum(forestdata1.test.scaled.nnet[i,54:59]) == 0) 
+  {
+    forestdata1.test.scaled.nnet[i,60] = 1
+  }
+}
+
+
+#forestdata1.train.scaled.nnet = as.data.frame(forestdata1.train.scaled.nnet)
+#forestdata1.train.scaled.nnet = cbind(forestdata1.train.scaled.nnet[,2:53], forestdata1.train.scaled[,53])
+
+string2 = paste(colnames(forestdata1.train.scaled.nnet[,2:53]), collapse='+')
+string2 = paste("Cover_Type1+Cover_Type2+Cover_Type3+Cover_Type4+Cover_Type5+Cover_Type6+Cover_Type7~", string2)
+formula2 = as.formula(string2)
+
+
+neuralnet.pred2 = neuralnet(formula2, hidden = c(5), data = forestdata1.train.scaled.nnet, linear.output = FALSE)
+plot(neuralnet.pred2)
+
+
+neuralnet.pred2.test = compute(neuralnet.pred2, forestdata1.test.scaled.nnet[,2:53])
+apply(neuralnet.pred2.test, 1, which.max)
+
+
+
+
+#Evaluating the model performance on the test set.
+cor(predicted_strength3, concrete_test$strength)
+plot(predicted_strength3, concrete_test$strength)
 
