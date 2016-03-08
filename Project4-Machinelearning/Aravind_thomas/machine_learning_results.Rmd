@@ -1,0 +1,94 @@
+---
+title: "Forest Cover Type Classification Project"
+author: "Thomas Kolasa and Aravind Kolumum Raja"
+output: html_document 
+---
+
+### The Dataset
+
+We found the Forest Covertype in the UCI Machine Learning Repository that takes forestry data from the [Roosevel National Forest](https://tourbuilder.withgoogle.com/tour/ahJzfmd3ZWItdG91cmJ1aWxkZXJyEQsSBFRvdXIYgICAk5uU5AoM) in northern Colorado. The observations are taken from 30m by 30m patches of forest that are classified as one of seven forest types:
+
+1. Spruce/Fir
+2. Lodgepole Pine
+3. Ponderosa Pine
+4. Cottonwood/Willow
+5. Aspen
+6. Douglas-fir
+7. Krummholz
+
+Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative size of the training and test sets makes classification of cover type a challenging problem.
+
+```{r, echo=FALSE}
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+
+library(ggplot2)
+library(GGally)
+
+forestdata = read.csv('train.csv', header=TRUE)
+
+# adding a new variable for covernames based on cover type
+
+forestdata$covername = 'a'
+forestdata$covername[forestdata$Cover_Type==1] = 'Spruce-fir'
+forestdata$covername[forestdata$Cover_Type==2] = 'Lodgepole Pine'
+forestdata$covername[forestdata$Cover_Type==3] = 'Ponderosa Pine'
+forestdata$covername[forestdata$Cover_Type==4] = 'Cottonwood-Willow'
+forestdata$covername[forestdata$Cover_Type==5] = 'Aspen'
+forestdata$covername[forestdata$Cover_Type==6] = 'Douglas-fir'
+forestdata$covername[forestdata$Cover_Type==7] = 'Krummholz'
+
+# Create single Wilderness_Area column
+forestdata$Wilderness_Area = 0
+for (i in 12:15) {
+  forestdata$Wilderness_Area[forestdata[,i] == 1] = i-11  
+}
+
+#plotting the correlation matrix of the quantitative factors 
+forestcorrelation=cor(forestdata[,2:11])
+# 
+forestdata$Hillshade_mean = (forestdata$Hillshade_9am + forestdata$Hillshade_3pm + forestdata$Hillshade_Noon) / 3
+forestdata$Euclidean_Distance_To_Hydrology = (forestdata$Horizontal_Distance_To_Hydrology^2 + forestdata$Vertical_Distance_To_Hydrology^2)^.5
+
+forestdata$Aspect[forestdata$Aspect == 360] = 0
+
+rose_diagram_df = forestdata[c('Aspect', 'covername')]
+
+rose_diagram_df['aspect_group'] = cut(rose_diagram_df$Aspect, breaks=c(-1,seq(20,360, by = 20)), labels=FALSE)
+
+forestdata$aspect_group=rose_diagram_df$aspect_group
+forestdata$aspect_group_shift= forestdata$aspect_group+3
+forestdata$aspect_group_shift[forestdata$aspect_group_shift==19]= 1 
+forestdata$aspect_group_shift[forestdata$aspect_group_shift==20]= 2 
+forestdata$aspect_group_shift[forestdata$aspect_group_shift==21]= 3 
+
+# Create single Soil_Type column
+forestdata$Soil_Type = 0
+for (i in 16:55) {
+  forestdata$Soil_Type[forestdata[,i] == 1] = i-15  
+}
+
+################### converting to factors ########################
+
+forestdata$Soil_Type=as.factor(forestdata$Soil_Type)
+forestdata$Wilderness_Area=as.factor(forestdata$Wilderness_Area)
+
+forestdata$covername=as.factor(forestdata$covername)
+forestdata$Cover_Type=as.factor(forestdata$Cover_Type)
+forestdata$aspect_group=as.factor(forestdata$aspect_group)
+forestdata$aspect_group_shift=as.factor(forestdata$aspect_group_shift)
+
+forestdata1= forestdata[,-c(22,30)]
+
+
+for(i in 12:53)
+{
+  forestdata1[,i]= as.factor(forestdata1[,i])
+  
+}
+forestdata1=forestdata1[,1:54]
+```
+
+```{r, echo=FALSE}
+
+```
