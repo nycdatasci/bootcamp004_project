@@ -189,6 +189,93 @@ forestdata1=forestdata1[,1:54]
 
 
 
+
+xfactors <- model.matrix(forestdata$Cover_Type ~ forestdata$Elevation +
+                           forestdata$Aspect +
+                           forestdata$Slope +
+                           forestdata$Horizontal_Distance_To_Hydrology +
+                           forestdata$Vertical_Distance_To_Hydrology +
+                           forestdata$Horizontal_Distance_To_Roadways +
+                           forestdata$Hillshade_9am +
+                           forestdata$Hillshade_Noon +
+                           forestdata$Hillshade_3pm +
+                           forestdata$Horizontal_Distance_To_Fire_Points +
+                           forestdata$Wilderness_Area +                  #removes the first area
+                           forestdata$Wilderness_Area1 +
+                           forestdata$Horizontal_Distance_To_Fire_Points +
+                           forestdata$Soil_Type +
+                           forestdata$Soil_Type1)[,-1]
+x=as.matrix(xfactors)
+
+
+set.seed(0)
+train = sample(1:nrow(x), 85*nrow(x)/100)
+test = (-train)
+
+y = forestdata$Cover_Type
+y.test = y[test]
+
+foresttest = read.csv('test.csv', header = TRUE)
+foresttest$Cover_Type = sample(1:7, nrow(foresttest), replace = TRUE)
+testmodel=foresttest[,-c(22,30)]
+for(i in 12:54)
+{
+  testmodel[,i] = as.factor(testmodel[,i])
+  
+}
+
+foresttest$Soil_Type = 0
+for (i in 16:55) {
+  foresttest$Soil_Type[foresttest[,i] == 1] = i-15  
+}
+foresttest$Wilderness_Area = 0
+for (i in 12:15) {
+  foresttest$Wilderness_Area[foresttest[,i] == 1] = i-11  
+}
+
+foresttest$Soil_Type = as.factor(foresttest$Soil_Type)
+foresttest$Wilderness_Area = as.factor(foresttest$Wilderness_Area)
+foresttest$Cover_Type = as.factor(foresttest$Cover_Type)
+
+
+confusionMatrix(glmmod_best_lambda[,1], y.test, positive = '1')
+glmmod_best_lambda = predict(glmmod.cv, type = "class", s = best_lambda, as.matrix(foresttest))
+glmmod_best_lambda = as.data.frame(glmmod_best_lambda)
+
+
+
+xfactorstest <- model.matrix(foresttest$Cover_Type ~ foresttest$Elevation +
+                               foresttest$Aspect +
+                               foresttest$Slope +
+                               foresttest$Horizontal_Distance_To_Hydrology +
+                               foresttest$Vertical_Distance_To_Hydrology +
+                               foresttest$Horizontal_Distance_To_Roadways +
+                               foresttest$Hillshade_9am +
+                               foresttest$Hillshade_Noon +
+                               foresttest$Hillshade_3pm +
+                               foresttest$Horizontal_Distance_To_Fire_Points +
+                               foresttest$Wilderness_Area +
+                               foresttest$Wilderness_Area1 +
+                               foresttest$Soil_Type +
+                               foresttest$Soil_Type1)[,-1]
+xtest=as.matrix(xfactorstest)
+
+xtest = xtest[, -c(20, 28)]
+
+
+
+
+
+
+
+
+
+
+
+
+#-------------------------  Exploratory Visuals ------------------------------------------------#
+
+
 # Studying Cover name
 ggplot(forestdata, aes(x=covername)) + geom_bar(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
 
@@ -215,7 +302,9 @@ ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
   geom_bar() +
   coord_polar()
 
-
+ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area )) +
+  geom_bar() +
+  coord_polar()
 
 
 
@@ -285,11 +374,36 @@ ggplot(forestdata, aes(x=Soil_Type)) + geom_histogram(aes(group=covername, colou
 
 
 # Correlations
-ggpairs(forestdata[,2:5],alpha=0.2)
+ggpairs(data = forestdata, columns = 8:10, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3))
 
-ggpairs(forestdata[,5:7],alpha=0.2)
+#By Wilderness Area
+ggpairs(data = forestdata, columns = 8:10, title = "Correlations", mapping = aes(colour = Wilderness_Area, alpha = .3))
 
-pairs(forestdata[,2:11], lower.panel=panel.smooth, upper.panel=panel.cor)
+ggpairs(data = forestdata, columns = c(5,6,7,11), title = "Correlations", mapping = aes(colour = Wilderness_Area, alpha = .3))
+
+
+
+# all 
+
+ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3))
+
+
+
+
+# Feature Engineering 
+
+Elevation
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -369,31 +483,6 @@ append_fitted_class = function(fitted_classes, table, model_name)
 # LOGISTIC REGRESSION USING GLMnet 
 
 
-xfactors <- model.matrix(forestdata$Cover_Type ~ forestdata$Elevation +
-                           forestdata$Aspect +
-                           forestdata$Slope +
-                           forestdata$Horizontal_Distance_To_Hydrology +
-                           forestdata$Vertical_Distance_To_Hydrology +
-                           forestdata$Horizontal_Distance_To_Roadways +
-                           forestdata$Hillshade_9am +
-                           forestdata$Hillshade_Noon +
-                           forestdata$Hillshade_3pm +
-                           forestdata$Horizontal_Distance_To_Fire_Points +
-                           forestdata$Wilderness_Area +                  #removes the first area
-                           forestdata$Wilderness_Area1 +
-                           forestdata$Horizontal_Distance_To_Fire_Points +
-                           forestdata$Soil_Type +
-                           forestdata$Soil_Type1)[,-1]
-x=as.matrix(xfactors)
-
-
-set.seed(0)
-train = sample(1:nrow(x), 85*nrow(x)/100)
-test = (-train)
-
-y = forestdata$Cover_Type
-y.test = y[test]
-
 grid = 10^seq(5, -7, length = 100)
 
 
@@ -444,68 +533,9 @@ confusionMatrix(glmmod_best_lambda_elastic[,1], y.test, positive = '1')
 # accuracy = 0.7108 within the test set in train.csv
 coef(glmmod.cv.elastic)
 
-### capture all the output to a file.
-#zz <- file("results_details.Rout", open = "wt")
-#sink(zz, append = TRUE)
-#sink(zz, type = "message",append = TRUE)
-#try(log("a"))
-#line = 'hello'
-#write(line,file="results_details.Rout",append=TRUE)
-#5*5
-#closeAllConnections() 
-#555*555
-
-
-
 
 
 # Run on test set ####
-foresttest = read.csv('test.csv', header = TRUE)
-foresttest$Cover_Type = sample(1:7, nrow(foresttest), replace = TRUE)
-testmodel=foresttest[,-c(22,30)]
-for(i in 12:54)
-{
-  testmodel[,i] = as.factor(testmodel[,i])
-  
-}
-
-foresttest$Soil_Type = 0
-for (i in 16:55) {
-  foresttest$Soil_Type[foresttest[,i] == 1] = i-15  
-}
-foresttest$Wilderness_Area = 0
-for (i in 12:15) {
-  foresttest$Wilderness_Area[foresttest[,i] == 1] = i-11  
-}
-
-foresttest$Soil_Type = as.factor(foresttest$Soil_Type)
-foresttest$Wilderness_Area = as.factor(foresttest$Wilderness_Area)
-foresttest$Cover_Type = as.factor(foresttest$Cover_Type)
-
-
-confusionMatrix(glmmod_best_lambda[,1], y.test, positive = '1')
-glmmod_best_lambda = predict(glmmod.cv, type = "class", s = best_lambda, as.matrix(foresttest))
-glmmod_best_lambda = as.data.frame(glmmod_best_lambda)
-
-
-
-xfactorstest <- model.matrix(foresttest$Cover_Type ~ foresttest$Elevation +
-                           foresttest$Aspect +
-                           foresttest$Slope +
-                           foresttest$Horizontal_Distance_To_Hydrology +
-                           foresttest$Vertical_Distance_To_Hydrology +
-                           foresttest$Horizontal_Distance_To_Roadways +
-                           foresttest$Hillshade_9am +
-                           foresttest$Hillshade_Noon +
-                           foresttest$Hillshade_3pm +
-                           foresttest$Horizontal_Distance_To_Fire_Points +
-                           foresttest$Wilderness_Area +
-                           foresttest$Wilderness_Area1 +
-                           foresttest$Soil_Type +
-                           foresttest$Soil_Type1)[,-1]
-xtest=as.matrix(xfactorstest)
-
-xtest = xtest[, -c(20, 28)]
 
 glmmod_best_lambda_ridge_test = predict(glmmod.cv.ridge, type = "class", s = best_lambda_ridge, xtest)
 glmmod_best_lambda_ridge_test = as.data.frame(glgmmod_best_lambda_ridge_test)
@@ -629,7 +659,7 @@ varImpPlot(rf.forestdata1)
 confusionMatrix(as.vector(rf.cv1$predicted), forestdata1[,54], positive='1')
 
 
-
+# --------------Tuning the random forest ------
 
 
 #varying the number of parameters randomforest
@@ -690,6 +720,19 @@ varImpPlot(rf.forestdata1)
 
 apply(boost.initialpred, 1, which.max)
 nrow(forestdata1.test)
+
+
+# Extra Trees 
+
+library(extraTrees)
+
+et <- extraTrees(x,y, mtry=13,numRandomCuts = 2,nodesize = 3,numThreads = 3)
+yhat <- predict(et, xtest)
+
+# Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
+
+
+
 
 
 
