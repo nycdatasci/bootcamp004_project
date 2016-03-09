@@ -1,5 +1,3 @@
-
-
 # # Data Description - Forest Cover Classification - Machine learning data
 # #   
 # Given is the attribute name, attribute type, the measurement unit and
@@ -22,7 +20,6 @@
 # Wilderness_Area (4 binary columns)      qualitative     0 (absence) or 1 (presence)  Wilderness area designation
 # Soil_Type (40 binary columns)           qualitative     0 (absence) or 1 (presence)  Soil Type designation
 # Cover_Type (7 types)                    integer         1 to 7                       Forest Cover Type designation
-# 
 # 
 # Code Designations:
 #   
@@ -98,9 +95,7 @@
 # 7 -- Krummholz
 
 
-setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-
-
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
@@ -116,9 +111,8 @@ library(gbm)
 library(NISTunits)
 
 forestdata = read.csv('train.csv', header=TRUE)
-View(forestdata)
-summary(forestdata[,2:11])
-
+# View(forestdata)
+# summary(forestdata[,2:11])
 
 # adding a new variable for covernames based on cover type
 
@@ -131,21 +125,14 @@ forestdata$covername[forestdata$Cover_Type==5] = 'Aspen'
 forestdata$covername[forestdata$Cover_Type==6] = 'Douglas-fir'
 forestdata$covername[forestdata$Cover_Type==7] = 'Krummholz'
 
-
-
 # Create single Wilderness_Area column
 forestdata$Wilderness_Area = 0
 for (i in 12:15) {
   forestdata$Wilderness_Area[forestdata[,i] == 1] = i-11  
 }
 
-
-
 #plotting the correlation matrix of the quantitative factors 
 forestcorrelation=cor(forestdata[,2:11])
-
-
-
 
 #creating mean of hillshade
 forestdata$Hillshade_mean = (forestdata$Hillshade_9am + forestdata$Hillshade_3pm + forestdata$Hillshade_Noon) / 3
@@ -172,8 +159,6 @@ for (i in 16:55) {
   forestdata$Soil_Type[forestdata[,i] == 1] = i-15  
 }
 
-
-
 #Create log Elevation 
 forestdata$log_elevation=log(forestdata$Elevation)
 
@@ -185,16 +170,13 @@ forestdata$Hillshade_3pm_sq=forestdata$Hillshade_3pm^2
 #Cosine of Slope
 forestdata$cosine_slope=cos(NISTdegTOradian(forestdata$Slope))
 
-
 #Whether aspect group shift is < 10 or not 
 forestdata$aspect_group_class=as.numeric(forestdata$aspect_group_shift)
 
 for (i in 1:nrow(forestdata)) {
   if (forestdata$aspect_group_class[i]>10) {
     forestdata$aspect_group_class[i]=0 
-  }
-    else
-   {
+  } else {
      forestdata$aspect_group_class[i]=1
    }
 }
@@ -206,20 +188,13 @@ forestdata$aspect_group_class=as.factor(forestdata$aspect_group_class)
 soil_family=c(1, 2, 3, 4, 2, 2, 5, 6, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 13, 14, 15, 16, 16, 16,
   16, 17, 16, 16, 18, 18, 16, 10, 16, 19, 20, 21, 20, 16, 19, 19)
 
-
 forestdata$soil_family=as.numeric(forestdata$Soil_Type)
-
-
 
 for (i in 1:nrow(forestdata)) {
 forestdata$soil_family[i]=soil_family[forestdata$soil_family[i]]
-
-
-  }
-
+}
 
 forestdata$soil_family=as.factor(forestdata$soil_family)
-
 
 rock_type=c('stony', 'stony', 'rubbly', 'rubbly', 'rubbly', 'stony', 'neither', 'neither', 'stony', 'rubbly', 'rubbly', 
   'stony', 'rubbly', 'neither', 'neither', 'neither', 'neither', 'stony', 'neither', 'neither', 'neither', 
@@ -235,7 +210,6 @@ forestdata$soil_rock_type=as.numeric(forestdata$Soil_Type)
 
 for (i in 1:nrow(forestdata)) {
 forestdata$soil_rock_type[i]=rock_type[forestdata$soil_rock_type[i]]
- 
 }
 
 forestdata$soil_rock_type=as.factor(forestdata$soil_rock_type)
@@ -244,9 +218,6 @@ forestdata$soil_rock_type=as.factor(forestdata$soil_rock_type)
 forestdata$interaction_9amnoon= forestdata$Hillshade_9am*forestdata$Hillshade_Noon
 forestdata$interaction_noon3pm=forestdata$Hillshade_Noon*forestdata$Hillshade_3pm
 forestdata$interaction_9am3pm= forestdata$Hillshade_9am*forestdata$Hillshade_3pm
-
-
-
 
 
 
@@ -260,14 +231,10 @@ forestdata$Cover_Type=as.factor(forestdata$Cover_Type)
 forestdata$aspect_group=as.factor(forestdata$aspect_group)
 forestdata$aspect_group_shift=as.factor(forestdata$aspect_group_shift)
 
-
 forestdata1= forestdata[,-c(22,30)]
 
-
-for(i in 12:53)
-{
+for(i in 12:53) {
   forestdata1[,i]= as.factor(forestdata1[,i])
-  
 }
 
 temp=forestdata1[,1:54]
@@ -275,19 +242,14 @@ forestdata2=forestdata1
 forestdata1=temp
 
 
-
-
-
 # replicating the feature  creations with TEST data set 
 
 foresttest = read.csv('test.csv', header = TRUE)
 foresttest$Cover_Type = sample(1:7, nrow(foresttest), replace = TRUE)
 testmodel=foresttest[,-c(22,30)]
-for(i in 12:54)
-{
+for(i in 12:54) {
   testmodel[,i] = as.factor(testmodel[,i])
 }
-
 
 foresttest$Soil_Type = 0
 for (i in 16:55) {
@@ -302,7 +264,6 @@ foresttest$Soil_Type = as.factor(foresttest$Soil_Type)
 foresttest$Wilderness_Area = as.factor(foresttest$Wilderness_Area)
 foresttest$Cover_Type = as.factor(foresttest$Cover_Type)
 
-
 # adding a new variable for covernames based on cover type
 
 foresttest$covername = 'a'
@@ -313,8 +274,6 @@ foresttest$covername[foresttest$Cover_Type==4] = 'Cottonwood-Willow'
 foresttest$covername[foresttest$Cover_Type==5] = 'Aspen'
 foresttest$covername[foresttest$Cover_Type==6] = 'Douglas-fir'
 foresttest$covername[foresttest$Cover_Type==7] = 'Krummholz'
-
-
 
 
 #creating mean of hillshade
@@ -337,7 +296,6 @@ foresttest$aspect_group_shift[foresttest$aspect_group_shift==20]= 2
 foresttest$aspect_group_shift[foresttest$aspect_group_shift==21]= 3 
 
 
-
 #Create log Elevation 
 foresttest$log_elevation=log(foresttest$Elevation)
 
@@ -349,14 +307,11 @@ foresttest$Hillshade_3pm_sq=foresttest$Hillshade_3pm^2
 #Cosine of Slope
 foresttest$cosine_slope=cos(NISTdegTOradian(foresttest$Slope))
 
-
 #Whether aspect group shift is < 10 or not 
 foresttest$aspect_group_class=as.numeric(foresttest$aspect_group_shift)
 foresttest$aspect_group_class=0
 
-
 foresttest$aspect_group_class[foresttest$aspect_group_shift >10]=1
-
 
 foresttest$aspect_group_class=as.factor(foresttest$aspect_group_class)
 
@@ -365,14 +320,11 @@ foresttest$aspect_group_class=as.factor(foresttest$aspect_group_class)
 soil_family=c(1, 2, 3, 4, 2, 2, 5, 6, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 13, 14, 15, 16, 16, 16,
               16, 17, 16, 16, 18, 18, 16, 10, 16, 19, 20, 21, 20, 16, 19, 19)
 
-
 foresttest$soil_family=as.numeric(foresttest$Soil_Type)
-
 
 foresttest$soil_family=soil_family[foresttest$soil_family]
 
 foresttest$soil_family=as.factor(foresttest$soil_family)
-
 
 rock_type=c('stony', 'stony', 'rubbly', 'rubbly', 'rubbly', 'stony', 'neither', 'neither', 'stony', 'rubbly', 'rubbly', 
             'stony', 'rubbly', 'neither', 'neither', 'neither', 'neither', 'stony', 'neither', 'neither', 'neither', 
@@ -387,7 +339,6 @@ rock_type=rock_type_factor[as.factor(rock_type)]
 foresttest$soil_rock_type=as.numeric(foresttest$Soil_Type)
 
 foresttest$soil_rock_type=rock_type[foresttest$Soil_Type]
-  
 
 foresttest$soil_rock_type=as.factor(foresttest$soil_rock_type)
 #interaction between hillshade noon and 9 am 
@@ -395,10 +346,6 @@ foresttest$soil_rock_type=as.factor(foresttest$soil_rock_type)
 foresttest$interaction_9amnoon= foresttest$Hillshade_9am*foresttest$Hillshade_Noon
 foresttest$interaction_noon3pm=foresttest$Hillshade_Noon*foresttest$Hillshade_3pm
 foresttest$interaction_9am3pm= foresttest$Hillshade_9am*foresttest$Hillshade_3pm
-
-
-
-
 
 
 xfactors <- model.matrix(forestdata$Cover_Type ~ forestdata$Elevation +
@@ -427,7 +374,6 @@ y = forestdata$Cover_Type
 y.test = y[test]
 
 
-
 xfactorstest <- model.matrix(foresttest$Cover_Type ~ foresttest$Elevation +
                                foresttest$Aspect +
                                foresttest$Slope +
@@ -454,7 +400,6 @@ foresttest1$Soil_Type = 0
 for (i in 12:53) {
   foresttest1[,i]=as.factor(foresttest1[,i])
 }
-
 
 
 foresttest$Soil_Type=as.factor(foresttest$Soil_Type)
@@ -515,8 +460,6 @@ ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
 ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area )) +
   geom_bar() +
   coord_polar()
-
-
 
 
 #The aspect value is higher across once side of the direction of slope,
@@ -604,14 +547,9 @@ set.seed(100)
 library(plotly)
 plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers",color = Cover_Type)
 
-
 plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = Cover_Type)
 
-
-
-
 plot_ly(forestdata, x =Hillshade_3pm, y = cosine_slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = Cover_Type)
-
 
 
 
@@ -661,14 +599,9 @@ chisq.test(table7clusters)
 
 
 
-
-
-
-
 # Functions to save model details
 summary_table = data.frame()
-modelsummary = function(confusion_matrix, table, model_name, kaggle_score, kaggle_rank)
-{
+modelsummary = function(confusion_matrix, table, model_name, kaggle_score, kaggle_rank) {
   # Creates summary statistics for each model
   temp = as.data.frame(colMeans(confusion_matrix$byClass))
   model_names = t(as.data.frame(c(model_name, kaggle_score, kaggle_rank)))
@@ -680,14 +613,12 @@ modelsummary = function(confusion_matrix, table, model_name, kaggle_score, kaggl
 }
 
 fitted_class_df = data.frame(1:15120)
-append_fitted_class = function(fitted_classes, table, model_name)
-{
+append_fitted_class = function(fitted_classes, table, model_name) {
   # adds a column with the fitted classifications for each model
   temp = as.data.frame(fitted_classes)
   colnames(temp) = model_name
   table = cbind(table, temp)
-  if (colnames(table)[1] == "X1.15120")
-  {
+  if (colnames(table)[1] == "X1.15120") {
     table = table[-1]
   }
   return(table)
@@ -771,8 +702,7 @@ write.csv(ridge_submission1, 'ridge2_submission2.csv', row.names = FALSE)
 
 
 k = as.data.frame(1:565892)
-for (i in 1:99)
-{
+for (i in 1:99) {
   print(i)
   temp = predict(glmmod.cv.lasso, type = "class", s = glmmod.cv.lasso$lambda[i], xtest)
   temp = as.data.frame(temp)
@@ -783,8 +713,7 @@ for (i in 1:99)
 library(modeest)
 apply(as.numeric(k[1,]), 1, mfv)
 modes = 1:565892
-for (i in 1:nrow(k))
-{
+for (i in 1:nrow(k)) {
   modes[i] = mfv(as.numeric(k[i,]))
 }
 
@@ -1041,10 +970,6 @@ write.csv(featurerandomforest30, 'rf_featureengineering30.csv', row.names = FALS
 
 
 
-
-
-
-
 # Boosting
 
 boost.forestdata1 = gbm( Cover_Type~ . -Id, data = forestdata1.train,
@@ -1150,10 +1075,8 @@ forestdata1.test.scaled.nnet = model.matrix(formula1, data=forestdata1.test.scal
 forestdata1.train.scaled.nnet = cbind(forestdata1.train.scaled.nnet, rep(0, dim(forestdata1.train.scaled.nnet)[1]))
 colnames(forestdata1.train.scaled.nnet)[60] = 'Cover_Type1'
 # Add Cover_Type1 column
-for (i in 1:dim(forestdata1.train.scaled.nnet)[1])
-{
-  if (sum(forestdata1.train.scaled.nnet[i,54:59]) == 0) 
-    {
+for (i in 1:dim(forestdata1.train.scaled.nnet)[1]) {
+  if (sum(forestdata1.train.scaled.nnet[i,54:59]) == 0) {
       forestdata1.train.scaled.nnet[i,60] = 1
     }
 }
@@ -1161,10 +1084,8 @@ for (i in 1:dim(forestdata1.train.scaled.nnet)[1])
 forestdata1.test.scaled.nnet = cbind(forestdata1.test.scaled.nnet, rep(0, dim(forestdata1.test.scaled.nnet)[1]))
 colnames(forestdata1.test.scaled.nnet)[60] = 'Cover_Type1'
 # Add Cover_Type1 column
-for (i in 1:dim(forestdata1.test.scaled.nnet)[1])
-{
-  if (sum(forestdata1.test.scaled.nnet[i,54:59]) == 0) 
-  {
+for (i in 1:dim(forestdata1.test.scaled.nnet)[1]) {
+  if (sum(forestdata1.test.scaled.nnet[i,54:59]) == 0) {
     forestdata1.test.scaled.nnet[i,60] = 1
   }
 }
