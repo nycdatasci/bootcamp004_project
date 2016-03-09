@@ -269,9 +269,10 @@ for(i in 12:53)
   forestdata1[,i]= as.factor(forestdata1[,i])
   
 }
-forestdata1=forestdata1[,1:54]
 
-
+temp=forestdata1[,1:54]
+forestdata2=forestdata1
+forestdata1=temp
 
 
 
@@ -285,8 +286,8 @@ testmodel=foresttest[,-c(22,30)]
 for(i in 12:54)
 {
   testmodel[,i] = as.factor(testmodel[,i])
-  
 }
+
 
 foresttest$Soil_Type = 0
 for (i in 16:55) {
@@ -334,12 +335,6 @@ foresttest$aspect_group_shift= foresttest$aspect_group+3
 foresttest$aspect_group_shift[foresttest$aspect_group_shift==19]= 1 
 foresttest$aspect_group_shift[foresttest$aspect_group_shift==20]= 2 
 foresttest$aspect_group_shift[foresttest$aspect_group_shift==21]= 3 
-
-# Create single Soil_Type column
-foresttest$Soil_Type = 0
-for (i in 16:55) {
-  foresttest$Soil_Type[foresttest[,i] == 1] = i-15  
-}
 
 
 
@@ -452,10 +447,36 @@ xtest=as.matrix(xfactorstest)
 xtest = xtest[, -c(20, 28)]
 
 
+foresttest1= foresttest[,-c(22,30)]
+
+
+foresttest1$Soil_Type = 0
+for (i in 12:53) {
+  foresttest1[,i]=as.factor(foresttest1[,i])
+}
 
 
 
+foresttest$Soil_Type=as.factor(foresttest$Soil_Type)
+foresttest$Wilderness_Area=as.factor(foresttest$Wilderness_Area)
 
+foresttest$covername=as.factor(foresttest$covername)
+foresttest$Cover_Type=as.factor(foresttest$Cover_Type)
+foresttest$aspect_group=as.factor(foresttest$aspect_group)
+foresttest$aspect_group_shift=as.factor(foresttest$aspect_group_shift)
+foresttest$soil_family=as.factor(foresttest$soil_family)
+foresttest$aspect_group_class=as.factor(foresttest$aspect_group_class)
+
+
+foresttest1$Soil_Type=as.factor(foresttest1$Soil_Type)
+foresttest1$Wilderness_Area=as.factor(foresttest1$Wilderness_Area)
+
+foresttest1$soil_family=as.factor(foresttest1$soil_family)
+foresttest1$covername=as.factor(foresttest1$covername)
+foresttest1$Cover_Type=as.factor(foresttest1$Cover_Type)
+foresttest1$aspect_group=as.factor(foresttest1$aspect_group)
+foresttest1$aspect_group_shift=as.factor(foresttest1$aspect_group_shift)
+foresttest1$aspect_group_class=as.factor(foresttest1$aspect_group_class)
 
 
 
@@ -871,8 +892,7 @@ plot(1:30, accuracy, pch = 16, type = "b",
 
 #finally choosing mtry=13 and ntree=500 on the whole dataset based on the accuracy plot 
 
-rf.tuned = randomForest(Cover_Type ~ . - Id, data = forestdata1, importance = TRUE, ntree=500,mtry=13) # subset
-
+rf.tuned = randomForest(Cover_Type ~ . - Id , data = forestdata1, importance = TRUE, ntree=500,mtry=13) # subset
 importance(rf.tuned)
 varImpPlot(rf.tuned)
 
@@ -886,6 +906,69 @@ tunedrandomforest1$Cover_Type = rf.tunedtest[,1]
 
 write.csv(tunedrandomforest1, 'rf_tunedtomtry13.csv', row.names = FALSE)
 # This improved the accuracy of Kaggle test set to 0.75168 Rank 792.
+
+
+
+
+
+
+# After feature engineering -tuning again
+foresttrain2 = sample(1:nrow(forestdata2), 8*nrow(forestdata2)/10)
+forestdata2.train = forestdata2[foresttrain2, ]
+forestdata2.test = forestdata2[-foresttrain2, ]
+
+
+accuracy = numeric(30)
+for (mtry in 1:30) {
+  fit1 = randomForest(Cover_Type ~ . - Id- covername -Wilderness_Area, data = forestdata2[,-c(61,68)], subset=foresttrain2,importance = TRUE, ntree=100, mtry = mtry)
+  fit1.pred = predict(fit1, forestdata2.test, type="class")
+  accuracy[mtry]=confusionMatrix(fit1.pred, forestdata1.test[,54], positive='1')$overall[1]
+  cat("We're performing iteration", mtry, "\n")
+}
+
+#Visualizing the OOB error.
+plot(1:30, accuracy, pch = 16, type = "b",
+     xlab = "Variables Considered at Each Split",
+     ylab = "accuracy",
+     main = "Random Forest changing Variables")
+
+
+
+
+
+
+
+
+
+rf_feature = randomForest(Cover_Type ~ . - Id -covername -Wilderness_Area, data = forestdata2[,-c(61,68)], importance = TRUE, ntree=500,mtry=13) # subset
+importance(rf_feature)
+varImpPlot(rf_feature)
+
+#final testing 
+
+
+
+rf.feature.test = predict(rf_feature,foresttest1[,-c(55,68)], type = "class")
+rf.feature.test = as.data.frame(rf.feature.test)
+
+featurerandomforest1 = foresttest[,c(1,56)]
+featurerandomforest1$Cover_Type = rf.feature.test[,1]
+
+write.csv(featurerandomforest1, 'rf_featureengineering13.csv', row.names = FALSE)
+
+# this resulted only in 0.69115
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
