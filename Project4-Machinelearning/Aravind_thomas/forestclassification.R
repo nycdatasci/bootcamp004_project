@@ -597,11 +597,20 @@ ggpairs(data = forestdata, columns = c(5,6,7,11), title = "Correlations", mappin
 
 ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3))
 
+#3d Scatter plot
+
+set.seed(100)
+
+library(plotly)
+plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers",color = Cover_Type)
+
+
+plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = Cover_Type)
 
 
 
 
-
+plot_ly(forestdata, x =Hillshade_3pm, y = cosine_slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = Cover_Type)
 
 
 
@@ -884,10 +893,22 @@ for (mtry in 1:30) {
 }
 
 #Visualizing the OOB error.
+ggplot()
 plot(1:30, accuracy, pch = 16, type = "b",
      xlab = "Variables Considered at Each Split",
      ylab = "accuracy",
      main = "Random Forest changing Variables")
+
+dev.off()
+
+accuracy=as.data.frame(accuracy)
+accuracy$Variables=1:30
+ggplot(data=accuracy,
+       aes(x=Variables, y=accuracy, colour="red")) +
+  geom_line()
+
+ggplotly()
+
 
 
 #finally choosing mtry=13 and ntree=500 on the whole dataset based on the accuracy plot 
@@ -908,6 +929,22 @@ write.csv(tunedrandomforest1, 'rf_tunedtomtry13.csv', row.names = FALSE)
 # This improved the accuracy of Kaggle test set to 0.75168 Rank 792.
 
 
+rf.tuned17 = randomForest(Cover_Type ~ . - Id , data = forestdata1, importance = TRUE, ntree=500,mtry=17) # subset
+importance(rf.tuned17)
+varImpPlot(rf.tuned17)
+
+#final testing 
+
+rf.tunedtest = predict(rf.tuned17, testmodel, type = "class")
+rf.tunedtest = as.data.frame(rf.tunedtest)
+
+tunedrandomforest1 = foresttest[,c(1,56)]
+tunedrandomforest1$Cover_Type = rf.tunedtest[,1]
+
+write.csv(tunedrandomforest1, 'rf_tunedtomtry17.csv', row.names = FALSE)
+
+# This marginally improves Kaggle score to 0.754 Rank 672
+
 
 
 
@@ -918,23 +955,19 @@ forestdata2.train = forestdata2[foresttrain2, ]
 forestdata2.test = forestdata2[-foresttrain2, ]
 
 
-accuracy = numeric(30)
+accuracy2 = numeric(30)
 for (mtry in 1:30) {
-  fit1 = randomForest(Cover_Type ~ . - Id- covername -Wilderness_Area, data = forestdata2[,-c(61,68)], subset=foresttrain2,importance = TRUE, ntree=100, mtry = mtry)
+  fit1 = randomForest(Cover_Type ~ . - Id- covername -Wilderness_Area, data = forestdata2[,-c(61,68,67,69)], subset=foresttrain2,importance = TRUE, ntree=100, mtry = mtry)
   fit1.pred = predict(fit1, forestdata2.test, type="class")
-  accuracy[mtry]=confusionMatrix(fit1.pred, forestdata1.test[,54], positive='1')$overall[1]
+  accuracy2[mtry]=confusionMatrix(fit1.pred, forestdata1.test[,54], positive='1')$overall[1]
   cat("We're performing iteration", mtry, "\n")
 }
 
 #Visualizing the OOB error.
-plot(1:30, accuracy, pch = 16, type = "b",
+plot(1:30, accuracy2, pch = 16, type = "b",
      xlab = "Variables Considered at Each Split",
-     ylab = "accuracy",
+     ylab = "accuracy2",
      main = "Random Forest changing Variables")
-
-
-
-
 
 
 
@@ -958,6 +991,45 @@ write.csv(featurerandomforest1, 'rf_featureengineering13.csv', row.names = FALSE
 
 # this resulted only in 0.69115
 
+
+
+
+rf_feature20 = randomForest(Cover_Type ~ . - Id -covername -Wilderness_Area, data = forestdata2[,-c(61,68)], importance = TRUE, ntree=500,mtry=20) # subset
+importance(rf_feature20)
+varImpPlot(rf_feature20)
+
+#final testing 
+
+
+
+rf.feature.test20 = predict(rf_feature20,foresttest1[,-c(55,68)], type = "class")
+rf.feature.test20 = as.data.frame(rf.feature.test20)
+
+featurerandomforest20 = foresttest[,c(1,56)]
+featurerandomforest20$Cover_Type = rf.feature.test20[,1]
+
+write.csv(featurerandomforest20, 'rf_featureengineering20.csv', row.names = FALSE)
+
+# this resulted  in improvement to 0.71929 
+
+
+
+
+rf_feature30 = randomForest(Cover_Type ~ . - Id -covername -Wilderness_Area, data = forestdata2[,-c(61,68,67,69)], importance = TRUE, ntree=500,mtry=30) # subset
+importance(rf_feature30)
+varImpPlot(rf_feature30)
+
+#final testing 
+
+
+
+rf.feature.test30 = predict(rf_feature30,foresttest1[,-c(55,68,67,69)], type = "class")
+rf.feature.test30 = as.data.frame(rf.feature.test30)
+
+featurerandomforest30 = foresttest[,c(1,56)]
+featurerandomforest30$Cover_Type = rf.feature.test30[,1]
+
+write.csv(featurerandomforest30, 'rf_featureengineering30.csv', row.names = FALSE)
 
 
 
