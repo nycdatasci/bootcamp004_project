@@ -35,46 +35,46 @@
 # Landtype Units (ELUs) for this study area:
 #   
 #   Study Code USFS ELU Code			Description
-# 1	   2702		Cathedral family - Rock outcrop complex, extremely stony.
-# 2	   2703		Vanet - Ratake families complex, very stony.
-# 3	   2704		Haploborolis - Rock outcrop complex, rubbly.
-# 4	   2705		Ratake family - Rock outcrop complex, rubbly.
-# 5	   2706		Vanet family - Rock outcrop complex complex, rubbly.
-# 6	   2717		Vanet - Wetmore families - Rock outcrop complex, stony.
-# 7	   3501		Gothic family.
-# 8	   3502		Supervisor - Limber families complex.
-# 9	   4201		Troutville family, very stony.
-# 10	   4703		Bullwark - Catamount families - Rock outcrop complex, rubbly.
-# 11	   4704		Bullwark - Catamount families - Rock land complex, rubbly.
-# 12	   4744		Legault family - Rock land complex, stony.
-# 13	   4758		Catamount family - Rock land - Bullwark family complex, rubbly.
-# 14	   5101		Pachic Argiborolis - Aquolis complex.
-# 15	   5151		unspecified in the USFS Soil and ELU Survey.
-# 16	   6101		Cryaquolis - Cryoborolis complex.
-# 17	   6102		Gateview family - Cryaquolis complex.
-# 18	   6731		Rogert family, very stony.
-# 19	   7101		Typic Cryaquolis - Borohemists complex.
-# 20	   7102		Typic Cryaquepts - Typic Cryaquolls complex.
-# 21	   7103		Typic Cryaquolls - Leighcan family, till substratum complex.
-# 22	   7201		Leighcan family, till substratum, extremely bouldery.
-# 23	   7202		Leighcan family, till substratum - Typic Cryaquolls complex.
-# 24	   7700		Leighcan family, extremely stony.
-# 25	   7701		Leighcan family, warm, extremely stony.
-# 26	   7702		Granile - Catamount families complex, very stony.
-# 27	   7709		Leighcan family, warm - Rock outcrop complex, extremely stony.
-# 28	   7710		Leighcan family - Rock outcrop complex, extremely stony.
-# 29	   7745		Como - Legault families complex, extremely stony.
-# 30	   7746		Como family - Rock land - Legault family complex, extremely stony.
-# 31	   7755		Leighcan - Catamount families complex, extremely stony.
-# 32	   7756		Catamount family - Rock outcrop - Leighcan family complex, extremely stony.
-# 33	   7757		Leighcan - Catamount families - Rock outcrop complex, extremely stony.
-# 34	   7790		Cryorthents - Rock land complex, extremely stony.
-# 35	   8703		Cryumbrepts - Rock outcrop - Cryaquepts complex.
-# 36	   8707		Bross family - Rock land - Cryumbrepts complex, extremely stony.
-# 37	   8708		Rock outcrop - Cryumbrepts - Cryorthents complex, extremely stony.
-# 38	   8771		Leighcan - Moran families - Cryaquolls complex, extremely stony.
-# 39	   8772		Moran family - Cryorthents - Leighcan family complex, extremely stony.
-# 40	   8776		Moran family - Cryorthents - Rock land complex, extremely stony.
+# 1	   2702	1	Cathedral family - Rock outcrop complex, extremely stony.
+# 2	   2703	2	Vanet - Ratake families complex, very stony.
+# 3	   2704	3	Haploborolis - Rock outcrop complex, rubbly.
+# 4	   2705	4	Ratake family - Rock outcrop complex, rubbly.
+# 5	   2706	2	Vanet family - Rock outcrop complex complex, rubbly.
+# 6	   2717	2	Vanet - Wetmore families - Rock outcrop complex, stony.
+# 7	   3501	5	Gothic family.
+# 8	   3502	6	Supervisor - Limber families complex.
+# 9	   4201	7	Troutville family, very stony.
+# 10	 4703  8	Bullwark - Catamount families - Rock outcrop complex, rubbly.
+# 11	   4704	8	Bullwark - Catamount families - Rock land complex, rubbly.
+# 12	   4744	9	Legault family - Rock land complex, stony.
+# 13	   4758	10	Catamount family - Rock land - Bullwark family complex, rubbly.
+# 14	   5101	11	Pachic Argiborolis - Aquolis complex.
+# 15	   5151	12	unspecified in the USFS Soil and ELU Survey.
+# 16	   6101	13 	Cryaquolis - Cryoborolis complex.
+# 17	   6102	14	Gateview family - Cryaquolis complex.
+# 18	   6731	15	Rogert family, very stony.
+# 19	   7101	13	Typic Cryaquolis - Borohemists complex.
+# 20	   7102	14	Typic Cryaquepts - Typic Cryaquolls complex.
+# 21	   7103 15		Typic Cryaquolls - Leighcan family, till substratum complex.
+# 22	   7201	16	Leighcan family, till substratum, extremely bouldery.
+# 23	   7202	16	Leighcan family, till substratum - Typic Cryaquolls complex.
+# 24	   7700	16	Leighcan family, extremely stony.
+# 25	   7701	16	Leighcan family, warm, extremely stony.
+# 26	   7702	17	Granile - Catamount families complex, very stony.
+# 27	   7709	16	Leighcan family, warm - Rock outcrop complex, extremely stony.
+# 28	   7710	16	Leighcan family - Rock outcrop complex, extremely stony.
+# 29	   7745	18	Como - Legault families complex, extremely stony.
+# 30	   7746	18	Como family - Rock land - Legault family complex, extremely stony.
+# 31	   7755	16	Leighcan - Catamount families complex, extremely stony.
+# 32	   7756	10	Catamount family - Rock outcrop - Leighcan family complex, extremely stony.
+# 33	   7757	16	Leighcan - Catamount families - Rock outcrop complex, extremely stony.
+# 34	   7790	19	Cryorthents - Rock land complex, extremely stony.
+# 35	   8703	20	Cryumbrepts - Rock outcrop - Cryaquepts complex.
+# 36	   8707	21	Bross family - Rock land - Cryumbrepts complex, extremely stony.
+# 37	   8708	20	Rock outcrop - Cryumbrepts - Cryorthents complex, extremely stony.
+# 38	   8771	16	Leighcan - Moran families - Cryaquolls complex, extremely stony.
+# 39	   8772	19	Moran family - Cryorthents - Leighcan family complex, extremely stony.
+# 40	   8776	19	Moran family - Cryorthents - Rock land complex, extremely stony.
 # 
 # Note:   First digit:  climatic zone             Second digit:  geologic zones
 # 1.  lower montane dry                   1.  alluvium
@@ -113,6 +113,7 @@ library(glmnet)
 library(tree)
 library(randomForest)
 library(gbm)
+library(NISTunits)
 
 forestdata = read.csv('train.csv', header=TRUE)
 View(forestdata)
@@ -145,7 +146,12 @@ forestcorrelation=cor(forestdata[,2:11])
 
 
 
+
+#creating mean of hillshade
 forestdata$Hillshade_mean = (forestdata$Hillshade_9am + forestdata$Hillshade_3pm + forestdata$Hillshade_Noon) / 3
+
+
+#creating distance to hydrology as a function of horizontal and vertical 
 forestdata$Euclidean_Distance_To_Hydrology = (forestdata$Horizontal_Distance_To_Hydrology^2 + forestdata$Vertical_Distance_To_Hydrology^2)^.5
 
 forestdata$Aspect[forestdata$Aspect == 360] = 0
@@ -166,6 +172,84 @@ for (i in 16:55) {
   forestdata$Soil_Type[forestdata[,i] == 1] = i-15  
 }
 
+
+
+#Create log Elevation 
+forestdata$log_elevation=log(forestdata$Elevation)
+
+#Squared Hillshades 
+forestdata$Hillshade_9am_sq=forestdata$Hillshade_9am^2
+forestdata$Hillshade_noon_sq=forestdata$Hillshade_Noon^2
+forestdata$Hillshade_3pm_sq=forestdata$Hillshade_3pm^2
+
+#Cosine of Slope
+forestdata$cosine_slope=cos(NISTdegTOradian(forestdata$Slope))
+
+
+#Whether aspect group shift is < 10 or not 
+forestdata$aspect_group_class=as.numeric(forestdata$aspect_group_shift)
+
+for (i in 1:nrow(forestdata)) {
+  if (forestdata$aspect_group_class[i]>10) {
+    forestdata$aspect_group_class[i]=0 
+  }
+    else
+   {
+     forestdata$aspect_group_class[i]=1
+   }
+}
+
+forestdata$aspect_group_class=as.factor(forestdata$aspect_group_class)
+
+# Group families 
+
+soil_family=c(1, 2, 3, 4, 2, 2, 5, 6, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 13, 14, 15, 16, 16, 16,
+  16, 17, 16, 16, 18, 18, 16, 10, 16, 19, 20, 21, 20, 16, 19, 19)
+
+
+forestdata$soil_family=as.numeric(forestdata$Soil_Type)
+
+
+
+for (i in 1:nrow(forestdata)) {
+forestdata$soil_family[i]=soil_family[forestdata$soil_family[i]]
+
+
+  }
+
+
+forestdata$soil_family=as.factor(forestdata$soil_family)
+
+
+rock_type=c('stony', 'stony', 'rubbly', 'rubbly', 'rubbly', 'stony', 'neither', 'neither', 'stony', 'rubbly', 'rubbly', 
+  'stony', 'rubbly', 'neither', 'neither', 'neither', 'neither', 'stony', 'neither', 'neither', 'neither', 
+  'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 
+  'stony', 'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony')
+
+rock_type_factor = c(1,2,3)
+rock_type=rock_type_factor[as.factor(rock_type)]
+
+#3 - stony, 1 -neither 2- rubbly 
+
+forestdata$soil_rock_type=as.numeric(forestdata$Soil_Type)
+
+for (i in 1:nrow(forestdata)) {
+forestdata$soil_rock_type[i]=rock_type[forestdata$soil_rock_type[i]]
+ 
+}
+
+forestdata$soil_rock_type=as.factor(forestdata$soil_rock_type)
+#interaction between hillshade noon and 9 am 
+
+forestdata$interaction_9amnoon= forestdata$Hillshade_9am*forestdata$Hillshade_Noon
+forestdata$interaction_noon3pm=forestdata$Hillshade_Noon*forestdata$Hillshade_3pm
+forestdata$interaction_9am3pm= forestdata$Hillshade_9am*forestdata$Hillshade_3pm
+
+
+
+
+
+
 #################### converting to factors ########################
 
 forestdata$Soil_Type=as.factor(forestdata$Soil_Type)
@@ -176,6 +260,7 @@ forestdata$Cover_Type=as.factor(forestdata$Cover_Type)
 forestdata$aspect_group=as.factor(forestdata$aspect_group)
 forestdata$aspect_group_shift=as.factor(forestdata$aspect_group_shift)
 
+
 forestdata1= forestdata[,-c(22,30)]
 
 
@@ -185,6 +270,137 @@ for(i in 12:53)
   
 }
 forestdata1=forestdata1[,1:54]
+
+
+
+
+
+
+
+# replicating the feature  creations with TEST data set 
+
+foresttest = read.csv('test.csv', header = TRUE)
+foresttest$Cover_Type = sample(1:7, nrow(foresttest), replace = TRUE)
+testmodel=foresttest[,-c(22,30)]
+for(i in 12:54)
+{
+  testmodel[,i] = as.factor(testmodel[,i])
+  
+}
+
+foresttest$Soil_Type = 0
+for (i in 16:55) {
+  foresttest$Soil_Type[foresttest[,i] == 1] = i-15  
+}
+foresttest$Wilderness_Area = 0
+for (i in 12:15) {
+  foresttest$Wilderness_Area[foresttest[,i] == 1] = i-11  
+}
+
+foresttest$Soil_Type = as.factor(foresttest$Soil_Type)
+foresttest$Wilderness_Area = as.factor(foresttest$Wilderness_Area)
+foresttest$Cover_Type = as.factor(foresttest$Cover_Type)
+
+
+# adding a new variable for covernames based on cover type
+
+foresttest$covername = 'a'
+foresttest$covername[foresttest$Cover_Type==1] = 'Spruce-fir'
+foresttest$covername[foresttest$Cover_Type==2] = 'Lodgepole Pine'
+foresttest$covername[foresttest$Cover_Type==3] = 'Ponderosa Pine'
+foresttest$covername[foresttest$Cover_Type==4] = 'Cottonwood-Willow'
+foresttest$covername[foresttest$Cover_Type==5] = 'Aspen'
+foresttest$covername[foresttest$Cover_Type==6] = 'Douglas-fir'
+foresttest$covername[foresttest$Cover_Type==7] = 'Krummholz'
+
+
+
+
+#creating mean of hillshade
+foresttest$Hillshade_mean = (foresttest$Hillshade_9am + foresttest$Hillshade_3pm + foresttest$Hillshade_Noon) / 3
+
+
+#creating distance to hydrology as a function of horizontal and vertical 
+foresttest$Euclidean_Distance_To_Hydrology = (foresttest$Horizontal_Distance_To_Hydrology^2 + foresttest$Vertical_Distance_To_Hydrology^2)^.5
+
+foresttest$Aspect[foresttest$Aspect == 360] = 0
+
+rose_diagram_df = foresttest[c('Aspect', 'covername')]
+
+rose_diagram_df['aspect_group'] = cut(rose_diagram_df$Aspect, breaks=c(-1,seq(20,360, by = 20)), labels=FALSE)
+
+foresttest$aspect_group=rose_diagram_df$aspect_group
+foresttest$aspect_group_shift= foresttest$aspect_group+3
+foresttest$aspect_group_shift[foresttest$aspect_group_shift==19]= 1 
+foresttest$aspect_group_shift[foresttest$aspect_group_shift==20]= 2 
+foresttest$aspect_group_shift[foresttest$aspect_group_shift==21]= 3 
+
+# Create single Soil_Type column
+foresttest$Soil_Type = 0
+for (i in 16:55) {
+  foresttest$Soil_Type[foresttest[,i] == 1] = i-15  
+}
+
+
+
+#Create log Elevation 
+foresttest$log_elevation=log(foresttest$Elevation)
+
+#Squared Hillshades 
+foresttest$Hillshade_9am_sq=foresttest$Hillshade_9am^2
+foresttest$Hillshade_noon_sq=foresttest$Hillshade_Noon^2
+foresttest$Hillshade_3pm_sq=foresttest$Hillshade_3pm^2
+
+#Cosine of Slope
+foresttest$cosine_slope=cos(NISTdegTOradian(foresttest$Slope))
+
+
+#Whether aspect group shift is < 10 or not 
+foresttest$aspect_group_class=as.numeric(foresttest$aspect_group_shift)
+foresttest$aspect_group_class=0
+
+
+foresttest$aspect_group_class[foresttest$aspect_group_shift >10]=1
+
+
+foresttest$aspect_group_class=as.factor(foresttest$aspect_group_class)
+
+# Group families 
+
+soil_family=c(1, 2, 3, 4, 2, 2, 5, 6, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 13, 14, 15, 16, 16, 16,
+              16, 17, 16, 16, 18, 18, 16, 10, 16, 19, 20, 21, 20, 16, 19, 19)
+
+
+foresttest$soil_family=as.numeric(foresttest$Soil_Type)
+
+
+foresttest$soil_family=soil_family[foresttest$soil_family]
+
+foresttest$soil_family=as.factor(foresttest$soil_family)
+
+
+rock_type=c('stony', 'stony', 'rubbly', 'rubbly', 'rubbly', 'stony', 'neither', 'neither', 'stony', 'rubbly', 'rubbly', 
+            'stony', 'rubbly', 'neither', 'neither', 'neither', 'neither', 'stony', 'neither', 'neither', 'neither', 
+            'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 
+            'stony', 'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony')
+
+rock_type_factor = c(1,2,3)
+rock_type=rock_type_factor[as.factor(rock_type)]
+
+#3 - stony, 1 -neither 2- rubbly 
+
+foresttest$soil_rock_type=as.numeric(foresttest$Soil_Type)
+
+foresttest$soil_rock_type=rock_type[foresttest$Soil_Type]
+  
+
+foresttest$soil_rock_type=as.factor(foresttest$soil_rock_type)
+#interaction between hillshade noon and 9 am 
+
+foresttest$interaction_9amnoon= foresttest$Hillshade_9am*foresttest$Hillshade_Noon
+foresttest$interaction_noon3pm=foresttest$Hillshade_Noon*foresttest$Hillshade_3pm
+foresttest$interaction_9am3pm= foresttest$Hillshade_9am*foresttest$Hillshade_3pm
+
 
 
 
@@ -214,33 +430,6 @@ test = (-train)
 
 y = forestdata$Cover_Type
 y.test = y[test]
-
-foresttest = read.csv('test.csv', header = TRUE)
-foresttest$Cover_Type = sample(1:7, nrow(foresttest), replace = TRUE)
-testmodel=foresttest[,-c(22,30)]
-for(i in 12:54)
-{
-  testmodel[,i] = as.factor(testmodel[,i])
-  
-}
-
-foresttest$Soil_Type = 0
-for (i in 16:55) {
-  foresttest$Soil_Type[foresttest[,i] == 1] = i-15  
-}
-foresttest$Wilderness_Area = 0
-for (i in 12:15) {
-  foresttest$Wilderness_Area[foresttest[,i] == 1] = i-11  
-}
-
-foresttest$Soil_Type = as.factor(foresttest$Soil_Type)
-foresttest$Wilderness_Area = as.factor(foresttest$Wilderness_Area)
-foresttest$Cover_Type = as.factor(foresttest$Cover_Type)
-
-
-confusionMatrix(glmmod_best_lambda[,1], y.test, positive = '1')
-glmmod_best_lambda = predict(glmmod.cv, type = "class", s = best_lambda, as.matrix(foresttest))
-glmmod_best_lambda = as.data.frame(glmmod_best_lambda)
 
 
 
@@ -390,11 +579,6 @@ ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes
 
 
 
-# Feature Engineering 
-
-Elevation
-
-
 
 
 
@@ -537,6 +721,11 @@ coef(glmmod.cv.elastic)
 
 # Run on test set ####
 
+glmmod_best_lambda = predict(glmmod.cv, type = "class", s = best_lambda, as.matrix(foresttest))
+glmmod_best_lambda = as.data.frame(glmmod_best_lambda)
+confusionMatrix(glmmod_best_lambda[,1], y.test, positive = '1')
+
+
 glmmod_best_lambda_ridge_test = predict(glmmod.cv.ridge, type = "class", s = best_lambda_ridge, xtest)
 glmmod_best_lambda_ridge_test = as.data.frame(glgmmod_best_lambda_ridge_test)
 
@@ -545,6 +734,7 @@ ridge_submission1 = foresttest[,c(1,56)]
 ridge_submission1$Cover_Type = glmmod_best_lambda_ridge_test[,1]
 
 write.csv(ridge_submission1, 'ridge2_submission2.csv', row.names = FALSE)
+
 # kaggle score = 0.55696, 1489th place for 70-30 split
 # kaggle score = 0.59550, 1414th place for 85-15 split
 # 
