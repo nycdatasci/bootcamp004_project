@@ -95,7 +95,7 @@
 # 7 -- Krummholz
 
 
-setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
@@ -1367,21 +1367,28 @@ multiplot(p1,p2)
 
 # Extra Trees 
 
-library(extraTrees)
+options( java.parameters = "-Xmx4g" )
 library(rJava)
-et <- extraTrees(x,y, mtry=13,numRandomCuts = 2,nodesize = 3,numThreads = 3,ntree=500)
-yhat <- predict(et, xtest)
 
+library( "RWeka" )
+
+library(extraTrees)
+y= as.factor(y[,1])
+
+et <- extraTrees(x, y, mtry=13, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=500)
+yhat <- predict(et, xtest)
 # Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
 
 
+yhat = as.numeric(yhat)
+yhat = yhat - rep(1, length(yhat))
+yhat = as.data.frame(yhat)
 
+extratrees_submission1 = foresttest[,c(1,56)]
+extratrees_submission1$Cover_Type = yhat[,1]
 
-
-
-
-
-
+write.csv(extratrees_submission1, 'extratrees_submission1.csv', row.names = FALSE)
+# kaggle accuracy = 0.79220, rank = 224
 
 
 
