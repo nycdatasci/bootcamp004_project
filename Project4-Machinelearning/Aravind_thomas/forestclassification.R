@@ -1023,7 +1023,7 @@ confusionMatrix(nnet.pred2summary, forestdata1.test.scaled[,53], positive='1')
 # .8194 for maxit=500
 
 # run on all train
-nnet.pred2.all = nnet(forestdata1.scaled[,1:52], class.ind(forestdata1.scaled[,53]), size=25, softmax=TRUE,MaxNWts=2000,maxit=300)
+nnet.pred2.all = nnet(forestdata1.scaled[,1:52], class.ind(forestdata1.scaled[,53]), size=100, softmax=TRUE,MaxNWts=4000,maxit=400)
 nnet.pred2summary.all=predict(nnet.pred2, foresttest.scaled[,1:52], type="class")
 
 nnet.pred2summary.all = as.data.frame(nnet.pred2summary.all)
@@ -1209,55 +1209,83 @@ xgb_submission1$Cover_Type = pred_xgb1_summary[,1]
 
 write.csv(xgb_submission1, 'xgb_submission2_800_feature.csv', row.names = FALSE)
 
+# Compute feature importance matrix
+library(Ckmeans.1d.dp)
 
 names <- dimnames(forestdataxgb)[[2]]
 
-# Compute feature importance matrix
+
 importance_matrix <- xgb.importance(names, model = bst)
 
 
 xgb.plot.importance(importance_matrix[1:20,])
 
 
-library(Ckmeans.1d.dp)
+
+y = as.matrix(as.numeric(forestdata2[,54]) - 1)
+forestdataxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id -covername-Wilderness_Area, data = forestdata2[,-c(61,68,69)])
+foresttestxgb = foresttest1
+foresttestxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id-covername-Wilderness_Area, data = foresttest1[,-c(55,68,69)]) #as.matrix(foresttestxgb)
+
 
 
 
 #re order the dataset in the order of importance of features run the XGBOOST again
 
-reducednames=importance_matrix[1:20,]$Feature
-reducednames[21]="Cover_Type"
+loglossxg= 2:72
+accuracyxg=2:72
 
-y = as.matrix(as.numeric(forestdata2[,54]) - 1)
-forestdataxgb = sparse.model.matrix(Cover_Type ~ .-1, data = forestdata2[reducednames])
-foresttestxgb = foresttest1
-foresttestxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id-covername-Wilderness_Area, data = foresttest1[,-c(55,68,69)]) #as.matrix(foresttestxgb)
+for (j in 2:72)
+{
+  reducednames=importance_matrix[1:j,]$Feature
+  forestdataxgb1=forestdataxgb[,reducednames]
+
+}
+
+
+
+
+
+
+for (j in 2:72)
+
+{  
+  
+reducednames=importance_matrix[1:j,]$Feature
+reducednames
+forestdataxgb1=forestdataxgb[,reducednames]
+
 
 param = list("objective" = "multi:softprob",
              "eval_metric" = "mlogloss",
              "num_class" = 7+1)
 
-cv.nround = 200
+cv.nround = 150
 cv.nfold = 3
 
-bst.cv = xgb.cv(param=param, data = forestdataxgb, label = y,
+bst.cv = xgb.cv(param=param, data = forestdataxgb1, label = y,
                 nfold = cv.nfold, nrounds = cv.nround, prediction = T)
 
 min.logloss.dx = which.min(bst.cv$dt[, test.mlogloss.mean])
 
-min.logloss.dx 
+loglossxg[j]=min.logloss.dx 
 
 pred.cv = matrix(bst.cv$pred, nrow=length(bst.cv$pred)/8, ncol=8)
 pred.cv = max.col(pred.cv, "last")
 
-confusionMatrix(factor(y+1), factor(pred.cv))
+k=confusionMatrix(factor(y+1), factor(pred.cv),positive='1')
+accuracyxg[j]=k$overall[1]
+
+}
 
 
 
-bst = xgboost(param=param, data = forestdataxgb, label = y,
-              nfold = cv.nfold, nrounds = min.logloss.dx)
 
-pred_xgb1 = predict(bst, foresttestxgb)
+
+bst = xgboost(param=param, data = forestdataxgb[,reducednames[1:62]], label = y,
+              nfold = 10, nrounds = 109)
+
+pred_xgb1 = predict(bst, foresttestxgb[,reducednames[1:62]])
 
 pred_xgb1 = matrix(pred_xgb1, nrow=8, ncol=length(pred_xgb1)/8)
 pred_xgb1 = t(pred_xgb1)
@@ -1270,13 +1298,65 @@ pred_xgb1_summary = as.data.frame(pred_xgb1)
 xgb_submission1 = foresttest[,c(1,56)]
 xgb_submission1$Cover_Type = pred_xgb1_summary[,1]
 
-write.csv(xgb_submission1, 'xgb_submission2_800_feature.csv', row.names = FALSE)
+write.csv(xgb_submission1, 'xgb_final_submission_62var.csv', row.names = FALSE)
 
 
 
+loglossxg=loglossxg[2:72,]
+loglossxg=as.data.frame(loglossxg)
+
+Variables=2:72
+p1=ggplot(data=accuracyxg,
+       aes(x=Variables, y=accuracyxg$`accuracyxg[2:72]`)) +
+  geom_line(colour="red")+ ggtitle("Xgboost Cross Validation Accuracy - Sequential Variable Addition")+ 
+    xlab("Number of Variables added")+ ylab("Accuracy levels")
+
+p2=ggplot(data=loglossxg,
+       aes(x=Variables, y=loglossxg)) +
+  geom_line(colour="blue")+ ggtitle("Xgboost Cross Validation min logloss round - Sequential Variable Addition")+ 
+  xlab("Number of Variables added")+ ylab("Number of rounds for minimized logloss  ")
+
+ggplotly()
 
 
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
 
+
+multiplot(p1,p2)
 
 
 
