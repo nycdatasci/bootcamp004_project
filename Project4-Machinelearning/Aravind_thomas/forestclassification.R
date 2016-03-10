@@ -1105,8 +1105,13 @@ plot(predicted_strength3, concrete_test$strength)
 
 
 
+# Tuning Neural Networks
 
-# XGBOOST
+
+
+
+
+#-------------------------------- XGBOOST -------------------------------------
 
 library(xgboost)
 library(methods) #?
@@ -1239,43 +1244,35 @@ for (j in 2:72)
 {
   reducednames=importance_matrix[1:j,]$Feature
   forestdataxgb1=forestdataxgb[,reducednames]
-
 }
 
 
 
-
-
-
 for (j in 2:72)
-
 {  
+  reducednames=importance_matrix[1:j,]$Feature
+  reducednames
+  forestdataxgb1=forestdataxgb[,reducednames]
   
-reducednames=importance_matrix[1:j,]$Feature
-reducednames
-forestdataxgb1=forestdataxgb[,reducednames]
-
-
-param = list("objective" = "multi:softprob",
-             "eval_metric" = "mlogloss",
-             "num_class" = 7+1)
-
-cv.nround = 150
-cv.nfold = 3
-
-bst.cv = xgb.cv(param=param, data = forestdataxgb1, label = y,
-                nfold = cv.nfold, nrounds = cv.nround, prediction = T)
-
-min.logloss.dx = which.min(bst.cv$dt[, test.mlogloss.mean])
-
-loglossxg[j]=min.logloss.dx 
-
-pred.cv = matrix(bst.cv$pred, nrow=length(bst.cv$pred)/8, ncol=8)
-pred.cv = max.col(pred.cv, "last")
-
-k=confusionMatrix(factor(y+1), factor(pred.cv),positive='1')
-accuracyxg[j]=k$overall[1]
-
+  param = list("objective" = "multi:softprob",
+               "eval_metric" = "mlogloss",
+               "num_class" = 7+1)
+  
+  cv.nround = 150
+  cv.nfold = 3
+  
+  bst.cv = xgb.cv(param=param, data = forestdataxgb1, label = y,
+                  nfold = cv.nfold, nrounds = cv.nround, prediction = T)
+  
+  min.logloss.dx = which.min(bst.cv$dt[, test.mlogloss.mean])
+  
+  loglossxg[j]=min.logloss.dx 
+  
+  pred.cv = matrix(bst.cv$pred, nrow=length(bst.cv$pred)/8, ncol=8)
+  pred.cv = max.col(pred.cv, "last")
+  
+  k=confusionMatrix(factor(y+1), factor(pred.cv),positive='1')
+  accuracyxg[j]=k$overall[1]
 }
 
 
@@ -1318,7 +1315,7 @@ p2=ggplot(data=loglossxg,
 
 ggplotly()
 
-
+# function found at http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
   
@@ -1329,16 +1326,12 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   
   # If layout is NULL, then use 'cols' to determine layout
   if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
+    # ncol: Number of columns of plots, nrow: Number of rows needed, calculated from # of cols
     layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
                      ncol = cols, nrow = ceiling(numPlots/cols))
   }
-  
   if (numPlots==1) {
     print(plots[[1]])
-    
   } else {
     # Set up the page
     grid.newpage()
@@ -1354,7 +1347,6 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
-
 
 multiplot(p1,p2)
 
