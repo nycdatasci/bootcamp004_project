@@ -1113,3 +1113,57 @@ apply(neuralnet.pred2.test, 1, which.max)
 cor(predicted_strength3, concrete_test$strength)
 plot(predicted_strength3, concrete_test$strength)
 
+
+
+
+# XGBOOST
+
+library(xgboost)
+library(methods) #?
+
+
+# foresttestxgb = data.matrix(foresttest1)
+y = as.matrix(as.numeric(forestdata1[,54]) - 1)
+forestdataxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id, data = forestdata1)
+foresttestxgb = foresttest1
+foresttestxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id, data = testmodel) #as.matrix(foresttestxgb)
+
+param = list("objective" = "multi:softprob",
+              "eval_metric" = "mlogloss",
+              "num_class" = 7+1)
+
+cv.nround = 50
+cv.nfold = 3
+
+bst.cv = xgb.cv(param=param, data = forestdataxgb, label = y,
+                nfold = cv.nfold, nrounds = cv.nround, prediction = T)
+
+min.logloss.idx = which.min(bst.cv$dt[, test.mlogloss.mean]) 
+min.logloss.idx 
+
+pred.cv = matrix(bst.cv$pred, nrow=length(bst.cv$pred)/8, ncol=8)
+pred.cv = max.col(pred.cv, "last")
+
+confusionMatrix(factor(y+1), factor(pred.cv))
+
+
+bst = xgboost(param=param, data = forestdataxgb, label = y,
+                nfold = cv.nfold, nrounds = min.logloss.idx)
+
+pred_xgb1 = predict(bst, foresttestxgb)
+
+pred_xgb1 = matrix(pred_xgb1, nrow=8, ncol=length(pred_xgb1)/8)
+pred_xgb1 = t(pred_xgb1)
+pred_xgb1 = max.col(pred_xgb1, "last")
+
+
+
+pred_xgb1_summary = as.data.frame(pred_xgb1)
+
+xgb_submission1 = foresttest[,c(1,56)]
+xgb_submission1$Cover_Type = pred_xgb1_summary[,1]
+
+write.csv(xgb_submission1, 'xgb_submission1.csv', row.names = FALSE)
+# kaggle accuracy = 0.70033, rank = 1258
+
+
