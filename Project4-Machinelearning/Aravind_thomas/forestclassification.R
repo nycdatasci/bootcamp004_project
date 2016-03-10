@@ -95,7 +95,7 @@
 # 7 -- Krummholz
 
 
-#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
@@ -992,16 +992,6 @@ apply(boost.initialpred, 1, which.max)
 nrow(forestdata1.test)
 
 
-# Extra Trees 
-
-library(extraTrees)
-
-et <- extraTrees(x,y, mtry=13,numRandomCuts = 2,nodesize = 3,numThreads = 3)
-yhat <- predict(et, xtest)
-
-# Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
-
-
 
 
 
@@ -1120,7 +1110,7 @@ plot(predicted_strength3, concrete_test$strength)
 
 library(xgboost)
 library(methods) #?
-
+library(caret)
 
 # foresttestxgb = data.matrix(foresttest1)
 y = as.matrix(as.numeric(forestdata1[,54]) - 1)
@@ -1132,7 +1122,7 @@ param = list("objective" = "multi:softprob",
               "eval_metric" = "mlogloss",
               "num_class" = 7+1)
 
-cv.nround = 50
+cv.nround = 800
 cv.nfold = 3
 
 bst.cv = xgb.cv(param=param, data = forestdataxgb, label = y,
@@ -1163,7 +1153,157 @@ pred_xgb1_summary = as.data.frame(pred_xgb1)
 xgb_submission1 = foresttest[,c(1,56)]
 xgb_submission1$Cover_Type = pred_xgb1_summary[,1]
 
-write.csv(xgb_submission1, 'xgb_submission1.csv', row.names = FALSE)
-# kaggle accuracy = 0.70033, rank = 1258
+write.csv(xgb_submission1, 'xgb_submission2_800.csv', row.names = FALSE)
+# kaggle accuracy = 0.70033, rank = 1258 - nround=50
+
+# kaggle accuracy =0.73438 , rank = 991 - nround 104
+
+
+
+
+
+#Using XG Boost on the complete dataset 
+
+
+y = as.matrix(as.numeric(forestdata2[,54]) - 1)
+forestdataxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id -covername-Wilderness_Area, data = forestdata2[,-c(61,68,69)])
+foresttestxgb = foresttest1
+foresttestxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id-covername-Wilderness_Area, data = foresttest1[,-c(55,68,69)]) #as.matrix(foresttestxgb)
+
+param = list("objective" = "multi:softprob",
+             "eval_metric" = "mlogloss",
+             "num_class" = 7+1)
+
+cv.nround = 200
+cv.nfold = 3
+
+bst.cv = xgb.cv(param=param, data = forestdataxgb, label = y,
+                nfold = cv.nfold, nrounds = cv.nround, prediction = T)
+
+min.logloss.dx = which.min(bst.cv$dt[, test.mlogloss.mean])
+
+min.logloss.dx 
+
+pred.cv = matrix(bst.cv$pred, nrow=length(bst.cv$pred)/8, ncol=8)
+pred.cv = max.col(pred.cv, "last")
+
+confusionMatrix(factor(y+1), factor(pred.cv))
+
+
+
+bst = xgboost(param=param, data = forestdataxgb, label = y,
+              nfold = cv.nfold, nrounds = min.logloss.dx)
+
+pred_xgb1 = predict(bst, foresttestxgb)
+
+pred_xgb1 = matrix(pred_xgb1, nrow=8, ncol=length(pred_xgb1)/8)
+pred_xgb1 = t(pred_xgb1)
+pred_xgb1 = max.col(pred_xgb1, "last")
+
+
+
+pred_xgb1_summary = as.data.frame(pred_xgb1)
+
+xgb_submission1 = foresttest[,c(1,56)]
+xgb_submission1$Cover_Type = pred_xgb1_summary[,1]
+
+write.csv(xgb_submission1, 'xgb_submission2_800_feature.csv', row.names = FALSE)
+
+
+names <- dimnames(forestdataxgb)[[2]]
+
+# Compute feature importance matrix
+importance_matrix <- xgb.importance(names, model = bst)
+
+
+xgb.plot.importance(importance_matrix[1:20,])
+
+
+library(Ckmeans.1d.dp)
+
+
+
+#re order the dataset in the order of importance of features run the XGBOOST again
+
+reducednames=importance_matrix[1:20,]$Feature
+reducednames[21]="Cover_Type"
+
+y = as.matrix(as.numeric(forestdata2[,54]) - 1)
+forestdataxgb = sparse.model.matrix(Cover_Type ~ .-1, data = forestdata2[reducednames])
+foresttestxgb = foresttest1
+foresttestxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id-covername-Wilderness_Area, data = foresttest1[,-c(55,68,69)]) #as.matrix(foresttestxgb)
+
+param = list("objective" = "multi:softprob",
+             "eval_metric" = "mlogloss",
+             "num_class" = 7+1)
+
+cv.nround = 200
+cv.nfold = 3
+
+bst.cv = xgb.cv(param=param, data = forestdataxgb, label = y,
+                nfold = cv.nfold, nrounds = cv.nround, prediction = T)
+
+min.logloss.dx = which.min(bst.cv$dt[, test.mlogloss.mean])
+
+min.logloss.dx 
+
+pred.cv = matrix(bst.cv$pred, nrow=length(bst.cv$pred)/8, ncol=8)
+pred.cv = max.col(pred.cv, "last")
+
+confusionMatrix(factor(y+1), factor(pred.cv))
+
+
+
+bst = xgboost(param=param, data = forestdataxgb, label = y,
+              nfold = cv.nfold, nrounds = min.logloss.dx)
+
+pred_xgb1 = predict(bst, foresttestxgb)
+
+pred_xgb1 = matrix(pred_xgb1, nrow=8, ncol=length(pred_xgb1)/8)
+pred_xgb1 = t(pred_xgb1)
+pred_xgb1 = max.col(pred_xgb1, "last")
+
+
+
+pred_xgb1_summary = as.data.frame(pred_xgb1)
+
+xgb_submission1 = foresttest[,c(1,56)]
+xgb_submission1$Cover_Type = pred_xgb1_summary[,1]
+
+write.csv(xgb_submission1, 'xgb_submission2_800_feature.csv', row.names = FALSE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Extra Trees 
+
+library(extraTrees)
+library(rJava)
+et <- extraTrees(x,y, mtry=13,numRandomCuts = 2,nodesize = 3,numThreads = 3,ntree=500)
+yhat <- predict(et, xtest)
+
+# Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
+
+
+
+
+
+
+
+
+
+
+
+
 
 
