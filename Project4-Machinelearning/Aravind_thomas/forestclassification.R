@@ -1434,30 +1434,65 @@ plot(mtry_et, accuracy_et2, pch = 16, type = "b",
 # choose 8-10 variables (n^.5 is the suggested number)
 
 
-numRandomCuts = 1:10
-nodesize = 1:10
-accuracy_et3 = list()
-counter=1
-for (i in 1:10)
+
+
+
+
+accuracy_et3 = matrix(ncol = 3, nrow = 100)
+counter=100
+for (i in 11:20)
 {
   for (j in 1:10)
   {
-    for (mtry in 8:10)
-    et_tune3 = extraTrees(x[train,], y[train], mtry=mtry, numRandomCuts = i, nodesize = j, numThreads = 3, ntree=200)
+    et_tune3 = extraTrees(x[train,], y[train], mtry=10, numRandomCuts = i, nodesize = j, numThreads = 3, ntree=200)
     yhat = predict(et_tune3, x[test,])
     confusion3 = confusionMatrix(yhat, y.test, positive = '1')
-    accuracy_et3[counter] = c(confusion3$overall[1],i,j,mtry)
-    counter=counter+1
+    accu = confusion3$overall[1]
+    accuracy_et3[counter,1] = accu
+    accuracy_et3[counter,2] = i
+    accuracy_et3[counter,3] = j
     print(counter)
+    counter = counter+1
   }
 }
 
 
+accuracy_et3=as.data.frame(accuracy_et3)
 
-plot(mtry_et, accuracy_et2, pch = 16, type = "b",
-     xlab = "Number of Variables",
-     ylab = "accuracy",
-     main = "Extra Trees Accuracy Changing Number of Variables at Each Split")
+library(plotly)
+colnames(accuracy_et3)=c("Accuracy","Number of random cuts","Node Size")
+
+plot_ly(accuracy_et3, x =`Number of random cuts` ,y =`Node Size`, z = Accuracy, type = "scatter3d", mode = "markers")
+
+
+plot_ly(accuracy_et3, x = `Number of random cuts` , y = `Accuracy`, 
+        mode = "markers", color=`Node Size`)
+
+
+
+
+
+#based on the plots we decided on the following for the final run without feature engineering 
+# mtry = 10 ,  ntrees = 200  ,  Node size = 2, Number of random cuts = 5
+
+
+et_tuned_final1 <- extraTrees(x, y, mtry=10, numRandomCuts = 5, nodesize = 2, numThreads = 3, ntree=200)
+yhat_tuned <- predict(et_tuned_final1, xtest)
+# Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
+
+
+yhat_tuned = as.data.frame(yhat_tuned)
+
+extratrees_submission1 = foresttest[,c(1,56)]
+extratrees_submission1$Cover_Type = yhat_tuned[,1]
+
+write.csv(extratrees_submission1, 'extratrees_submission_tuned1.csv', row.names = FALSE)
+# kaggle accuracy = 0.79247, rank = 224
+
+
+
+
+
 
 
 
