@@ -1384,13 +1384,94 @@ write.csv(extratrees_submission1, 'extratrees_submission1.csv', row.names = FALS
 
 
 
+# Tuning parameters
+
+set.seed(1)
+train = sample(1:nrow(x), 8*nrow(x)/10)
+test = (-train)
+
+y = forestdata$Cover_Type
+y.test = y[test]
+
+
+
+
+ntree = seq(50, 300, 10)
+accuracy_et = 1:length(ntree)
+
+for (i in 1:length(ntree))
+{
+  et_tune1 = extraTrees(x[train,], y[train], mtry=13, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=ntree[i])
+  yhat = predict(et_tune1, x[test,])
+  confusion = confusionMatrix(yhat, y.test, positive = '1')
+  accuracy_et[i] = confusion$overall[1]
+  print(i)
+}
+
+plot(ntree, accuracy_et, pch = 16, type = "b",
+     xlab = "Number of Trees",
+     ylab = "accuracy",
+     main = "Extra Trees Accuracy Changing Number of Trees")
+# choose 200 trees
+
+
+mtry_et = 1:30
+accuracy_et2 = 1:30
+
+for (i in 1:length(mtry_et))
+{
+  et_tune2 = extraTrees(x[train,], y[train], mtry=i, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=200)
+  yhat = predict(et_tune2, x[test,])
+  confusion2 = confusionMatrix(yhat, y.test, positive = '1')
+  accuracy_et2[i] = confusion2$overall[1]
+  print(i)
+}
+
+plot(mtry_et, accuracy_et2, pch = 16, type = "b",
+     xlab = "Number of Variables",
+     ylab = "accuracy",
+     main = "Extra Trees Accuracy Changing Number of Variables at Each Split")
+# choose 8-10 variables (n^.5 is the suggested number)
+
+
+numRandomCuts = 1:10
+nodesize = 1:10
+accuracy_et3 = list()
+counter=1
+for (i in 1:10)
+{
+  for (j in 1:10)
+  {
+    for (mtry in 8:10)
+    et_tune3 = extraTrees(x[train,], y[train], mtry=mtry, numRandomCuts = i, nodesize = j, numThreads = 3, ntree=200)
+    yhat = predict(et_tune3, x[test,])
+    confusion3 = confusionMatrix(yhat, y.test, positive = '1')
+    accuracy_et3[counter] = c(confusion3$overall[1],i,j,mtry)
+    counter=counter+1
+    print(counter)
+  }
+}
+
+
+
+plot(mtry_et, accuracy_et2, pch = 16, type = "b",
+     xlab = "Number of Variables",
+     ylab = "accuracy",
+     main = "Extra Trees Accuracy Changing Number of Variables at Each Split")
+
+
+
+
+
+
+
+
+
 # creating matrices for Feature engineered data
 
 
-
-xfactors_extra <- model.matrix(Cover_Type ~. - Id - Soil_Type - soil_family -covername - Wilderness_Area ,data = forestdata2)[,-1]
-x=as.matrix(xfactors_extra)
-
+xfactors_extra <- model.matrix(Cover_Type ~. - Id - Soil_Type - soil_family -covername - Wilderness_Area , data = forestdata2)[,-1]
+x = as.matrix(xfactors_extra)
 
 set.seed(0)
 train_extra = sample(1:nrow(x), 80*nrow(x)/100)
@@ -1401,8 +1482,8 @@ y_extra.test = y_extra[test]
 
 xtest_extra <- model.matrix(Cover_Type ~. - Id - Soil_Type - soil_family -covername - Wilderness_Area ,data = foresttest)[,-1]
 
-xtest_extra= xtest_extra[,-c(21,29)]
-xtest_extra=as.matrix(xtest_extra)
+xtest_extra = xtest_extra[,-c(21,29)]
+xtest_extra = as.matrix(xtest_extra)
 
 
 
@@ -1413,7 +1494,7 @@ yhat2 <- predict(et, xtest_extra)
 
 yhat2 = as.numeric(yhat)
 yhat2 = yhat - rep(1, length(yhat))
-yhat2= as.data.frame(yhat)
+yhat2 = as.data.frame(yhat)
 
 extratrees_submission2 = foresttest[,c(1,56)]
 extratrees_submission2$Cover_Type = yhat2[,1]
