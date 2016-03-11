@@ -1494,14 +1494,6 @@ write.csv(extratrees_submission1, 'extratrees_submission_tuned1.csv', row.names 
 
 
 
-
-
-
-
-
-
-
-
 # creating matrices for Feature engineered data
 
 
@@ -1549,10 +1541,233 @@ write.csv(extratrees_submission2, 'extratrees_submission2_allfeatures.csv', row.
 
 
 
+#  Deep learning with H20
+
+
+# The following two commands remove any previously installed H2O packages for R.
+if ("package:h2o" %in% search()) { detach("package:h2o", unload=TRUE) }
+if ("h2o" %in% rownames(installed.packages())) { remove.packages("h2o") }
+
+# Next, we download packages that H2O depends on.
+pkgs <- c("methods","statmod","stats","graphics","RCurl","jsonlite","tools","utils")
+for (pkg in pkgs) {
+  if (! (pkg %in% rownames(installed.packages()))) { install.packages(pkg) }
+}
+
+# Now we download, install and initialize the H2O package for R.
+install.packages("h2o", type="source", repos=(c("http://h2o-release.s3.amazonaws.com/h2o/rel-turan/3/R")))
+library(h2o)
+l
+library(devtools)
+
+
+h2o.init(nthreads=-1, max_mem_size="3G")
+h2o.removeAll() ## clean slate - just in case
+
+# re-load the dataframe in H20 format
+forest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv"))
+
+foresttest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv"))
 
 
 
 
+# par(mfrow=c(1,1)) # reset canvas
+# plot(h2o.tabulate(forestdata1, "Elevation",                       "Cover_Type"))
+# plot(h2o.tabulate(df, "Horizontal_Distance_To_Roadways", "Cover_Type"))
+# plot(h2o.tabulate(df, "Soil_Type",                       "Cover_Type"))
+# plot(h2o.tabulate(df, "Horizontal_Distance_To_Roadways", "Elevation" ))
+# 
+
+forest_h20=forest_h20[,-1]
+
+for (i in 11:55)
+{
+  forest_h20[,i]=as.factor(forest_h20[,i])
+
+}
+  
+
+
+for (i in 12:55)
+{
+  foresttest_h20[,i]=as.factor(foresttest_h20[,i])
+  
+}
+
+response <- "Cover_Type"
+predictors <- setdiff(names(forest_h20), response)
+predictors
+
+
+set.seed(0)
+train_h20 = sample(1:nrow(x), 80*nrow(x)/100)
+train_h20=sort(train_h20)
+validation_h20 = (-train_h20)
+validation_h20=sort(validation_h20)
+
+
+forest_h20_train= forest_h20[train_h20,]
+forest_h20_validation=forest_h20[validation_h20,]
+
+
+
+m1 <- h2o.deeplearning(
+  model_id="deep_learning_initial", 
+  training_frame=forest_h20_train, 
+  validation_frame=forest_h20_validation,   ## validation dataset: used for scoring and early stopping
+  x=predictors,
+  y=response,
+  activation="Rectifier",  ## default
+  hidden=c(130,150,70),## default: 2 hidden layers with 200 neurons each, 
+  epochs = 20 ,    
+  variable_importances=T,
+  epsilon =1e-7 ## not enabled by default
+)
+summary(m1)
+
+
+
+
+m2 <- h2o.deeplearning(
+  model_id="dl_model_faster", 
+  training_frame=forest_h20_train, 
+  validation_frame=forest_h20_validation,
+  x=predictors,
+  y=response,
+  hidden=c(64,32,64),                  ## small network, runs faster
+  epochs=100000,                      ## hopefully converges earlier...
+  score_validation_samples=10000,      ## sample the validation dataset (faster)
+  stopping_rounds=2,
+  stopping_metric="misclassification", ## could be "MSE","logloss","r2"
+  stopping_tolerance=0.01,
+  epsilon=1e-7
+)
+summary(m2)
+plot(m2)
+
+
+
+
+m3 <- h2o.deeplearning(
+  model_id="dl_model_tuned", 
+  training_frame=forest_h20_train, 
+  validation_frame=forest_h20_validation, 
+  x=predictors, 
+  y=response, 
+  overwrite_with_best_model=F,    ## Return the final model after 10 epochs, even if not the best
+  hidden=c(128,128,128),          ## more hidden layers -> more complex interactions
+  epochs=10,                      ## to keep it short enough
+  score_validation_samples=10000, ## downsample validation set for faster scoring
+  score_duty_cycle=0.025,         ## don't score more than 2.5% of the wall time
+  adaptive_rate=F,                ## manually tuned learning rate
+  rate=0.01, 
+  rate_annealing=2e-6,            
+  momentum_start=0.2,             ## manually tuned momentum
+  momentum_stable=0.4, 
+  momentum_ramp=1e7, 
+  l1=1e-5,                        ## add some L1/L2 regularization
+  l2=1e-5,
+  max_w2=10                       ## helps stability for Rectifier
+) 
+summary(m3)
+
+
+
+h2o.performance(m3, train=T)       ## sampled training data (from model building)
+h2o.performance(m3, valid=T)       ## sampled validation data (from model building)
+h2o.performance(m3, data=forest_h20_train)    ## full training data
+h2o.performance(m3, data=forest_h20_validation)    ## full validation data
+
+
+head(as.data.frame(h2o.varimp(m1)))
+
+
+
+
+performancem2=h2o.performance(m2, train=T)  
+
+
+#Calculating accuracy:
+pred <- h2o.predict(m2,forest_h20_validation)
+pred
+Accuracy_m2 <- pred$predict == forest_h20_validation$Cover_Type
+mean(Accuracy_m2)
+
+
+
+
+
+
+#hyperparameter tuning
+
+
+hyper_params <- list(
+  hidden=list(c(30),c(50),c(70),c(100),c(130),c(160),c(200),c(250),c(30,60),c(60,90),c(90,120),c(120,150),c(30,60,90),c(60,90,120),c(90,120,160)), 
+  input_dropout_ratio=c(0,0.05),
+  rate=c(0.01,0.02),
+  rate_annealing=c(1e-8,1e-7,1e-6))
+
+hyper_params
+grid <- h2o.grid(
+  "deeplearning",
+  model_id="dl_grid", 
+  training_frame=forest_h20_train,
+  validation_frame=forest_h20_validation, 
+  x=predictors, 
+  y=response,
+  epochs=10,
+  stopping_metric="misclassification",
+  stopping_tolerance=1e-2,        ## stop when logloss does not improve by >=1% for 2 scoring events
+  stopping_rounds=2,
+  score_validation_samples=10000, ## downsample validation set for faster scoring
+  score_duty_cycle=0.025,         ## don't score more than 2.5% of the wall time
+  adaptive_rate=F,                ## manually tuned learning rate
+  momentum_start=0.5,             ## manually tuned momentum
+  momentum_stable=0.9, 
+  momentum_ramp=1e7, 
+  l1=1e-5,
+  l2=1e-5,
+  activation=c("Rectifier"),
+  max_w2=10,                      ## can help improve stability for Rectifier
+  hyper_params=hyper_params
+)
+
+
+
+scores <- cbind(as.data.frame(unlist((lapply(grid@model_ids, function(x) 
+{ h2o.confusionMatrix(h2o.performance(h2o.getModel(x),valid=T))$Error[8] })) )), unlist(grid@model_ids))
+names(scores) <- c("misclassification","model")
+sorted_scores <- scores[order(scores$misclassification),]
+head(sorted_scores)
+best_model <- h2o.getModel(as.character(sorted_scores$model[1]))
+print(best_model@allparameters)
+best_err <- sorted_scores$misclassification[1]
+print(best_err)
+
+
+
+pred_final_deeplearning <- h2o.predict(best_model,foresttest_h20[,-1] )
+deeplearning_pred=as.data.frame(pred_final_deeplearning[,1])
+head(deeplearning_pred)
+
+
+deeplearning_submission1 = foresttest[,c(1,56)]
+deeplearning_submission1$Cover_Type = deeplearning_pred[,1]
+
+write.csv(deeplearning_submission1, 'deep_learing_submission1.csv', row.names = FALSE)
+
+# 0.59460 with 1418
+
+
+
+
+
+
+
+
+
+h2o.shutdown(prompt=FALSE)
 
 
 
