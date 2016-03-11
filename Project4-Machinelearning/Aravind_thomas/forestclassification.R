@@ -95,7 +95,7 @@
 # 7 -- Krummholz
 
 
-setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
@@ -1555,9 +1555,8 @@ for (pkg in pkgs) {
 }
 
 # Now we download, install and initialize the H2O package for R.
-install.packages("h2o", type="source", repos=(c("http://h2o-release.s3.amazonaws.com/h2o/rel-turan/3/R")))
+#install.packages("h2o", type="source", repos=(c("http://h2o-release.s3.amazonaws.com/h2o/rel-turan/3/R")))
 library(h2o)
-l
 library(devtools)
 
 
@@ -1565,10 +1564,10 @@ h2o.init(nthreads=-1, max_mem_size="3G")
 h2o.removeAll() ## clean slate - just in case
 
 # re-load the dataframe in H20 format
-forest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv"))
-
-foresttest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv"))
-
+#forest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv"))
+#foresttest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv"))
+forest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv'))
+foresttest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv'))
 
 
 
@@ -1579,20 +1578,16 @@ foresttest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documen
 # plot(h2o.tabulate(df, "Horizontal_Distance_To_Roadways", "Elevation" ))
 # 
 
-forest_h20=forest_h20[,-1]
+forest_h20 = forest_h20[,-1]
 
 for (i in 11:55)
 {
   forest_h20[,i]=as.factor(forest_h20[,i])
-
 }
   
-
-
 for (i in 12:55)
 {
   foresttest_h20[,i]=as.factor(foresttest_h20[,i])
-  
 }
 
 response <- "Cover_Type"
@@ -1757,7 +1752,7 @@ deeplearning_submission1$Cover_Type = deeplearning_pred[,1]
 
 write.csv(deeplearning_submission1, 'deep_learing_submission1.csv', row.names = FALSE)
 
-# 0.59460 with 1418
+# accuracy = 0.59460, rank = 1418
 
 
 
