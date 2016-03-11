@@ -95,7 +95,7 @@
 # 7 -- Krummholz
 
 
-#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
@@ -1365,9 +1365,9 @@ library(rJava)
 library( "RWeka" )
 
 library(extraTrees)
-y= as.factor(y[,1])
 
-et <- extraTrees(x, y, mtry=13, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=500)
+
+et <- extraTrees(x, y, mtry=13, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=50)
 yhat <- predict(et, xtest)
 # Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
 
@@ -1381,6 +1381,60 @@ extratrees_submission1$Cover_Type = yhat[,1]
 
 write.csv(extratrees_submission1, 'extratrees_submission1.csv', row.names = FALSE)
 # kaggle accuracy = 0.79220, rank = 224
+
+
+
+# creating matrices for Feature engineered data
+
+
+
+xfactors_extra <- model.matrix(Cover_Type ~. - Id - Soil_Type - soil_family -covername - Wilderness_Area ,data = forestdata2)[,-1]
+x=as.matrix(xfactors_extra)
+
+
+set.seed(0)
+train_extra = sample(1:nrow(x), 80*nrow(x)/100)
+test_extra = (-train)
+
+y_extra = forestdata2$Cover_Type
+y_extra.test = y_extra[test]
+
+xtest_extra <- model.matrix(Cover_Type ~. - Id - Soil_Type - soil_family -covername - Wilderness_Area ,data = foresttest)[,-1]
+
+xtest_extra= xtest_extra[,-c(21,29)]
+xtest_extra=as.matrix(xtest_extra)
+
+
+
+
+et2 <- extraTrees(xfactors_extra, y_extra, mtry=13, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=700)
+yhat2 <- predict(et, xtest_extra)
+
+
+yhat2 = as.numeric(yhat)
+yhat2 = yhat - rep(1, length(yhat))
+yhat2= as.data.frame(yhat)
+
+extratrees_submission2 = foresttest[,c(1,56)]
+extratrees_submission2$Cover_Type = yhat2[,1]
+
+write.csv(extratrees_submission2, 'extratrees_submission2_allfeatures.csv', row.names = FALSE)
+
+
+# Extra trees feature engineering resulted in  0.78739 rank 308 ---mtry=13, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=700
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
