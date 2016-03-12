@@ -4,8 +4,6 @@ author: "Thomas Kolasa and Aravind Kolumum Raja"
 output: html_document 
 ---
 
-### The Dataset
-
 We found the Forest Covertype in the UCI Machine Learning Repository that takes forestry data from the [Roosevelt National Forest](https://tourbuilder.withgoogle.com/tour/ahJzfmd3ZWItdG91cmJ1aWxkZXJyEQsSBFRvdXIYgICAk5uU5AoM) in northern Colorado. The observations are taken from 30m by 30m patches of forest that are classified as one of seven forest types:
 
 1. Spruce/Fir
@@ -361,7 +359,7 @@ foresttest1$aspect_group_class=as.factor(foresttest1$aspect_group_class)
 
 ```
 ----------------------
-```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1920px",height="1080px",message=FALSE}
+```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
 
 
 
@@ -379,14 +377,12 @@ ggpairs(data = forestdata, columns = 8:10, title = "Correlations", mapping = aes
 
 #One of the interesting things observed in the dataset was Hillshade information 
 
-Hillshade = 255.0 * ( ( \cos(Zenith_rad) * \cos(Slope_rad) ) + ( \sin(Zenith_rad) * \sin(Slope_rad) * \cos(Azimuth_rad - Aspect_rad) ) )
 
 
 
+
+```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
 library(plotly)
-
-```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1920px",height="1080px",message=FALSE}
-
 plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers",color = Cover_Type)
 
 
@@ -394,7 +390,10 @@ plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, ty
 
 
 The Class seperation is clearly seen  the following plot of Elevation 
-```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1920px",height="1080px",message=FALSE}
+
+
+
+```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
 
 plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = Cover_Type)
 
@@ -410,6 +409,13 @@ ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) +
 ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area )) +
   geom_bar() +
   coord_polar()
+
+
+
+ggpairs(data = forestdata, columns = 9:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3))
+
+
+
 
 
 ```

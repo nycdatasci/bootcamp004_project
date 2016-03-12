@@ -95,7 +95,7 @@
 # 7 -- Krummholz
 
 
-#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
@@ -438,7 +438,7 @@ ggplot(forestdata, aes(x=covername)) + geom_bar(aes(group=covername, colour=cove
 
 
 # Studying Elevation distribution and densities across Cover type
-ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('Histogram of Elevation')
 ggplot(forestdata, aes(x=Elevation)) + geom_density()
 ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 
@@ -756,9 +756,58 @@ write.csv(elastic_submission3, 'elastic_submission3.csv', row.names = FALSE)
 
 
 
+# Support Vector Machines 
+library(e1071)
+library(rgl)
+set.seed(0)
+train.index = sample(1:nrow(forestdata1), 8*nrow(forestdata1)/10)
+forestdata1.train = forestdata1[train.index, ]
+forestdata1.test = forestdata1[-train.index, ]
 
 
-# DECISION TREES
+cv.multi = tune(svm,Cover_Type ~.-Id,data = forestdata1[train.index, ],
+                kernel = "linear",
+                ranges = list(cost = 10^(seq(-1, 1.5, length = 2)),
+                          gamma = 10^(seq(-2, 1, length = 2)), tune.control=3))
+
+#Inspecting the cross-validation output.
+summary(cv.multi)
+
+#Plotting the cross-validation results.
+plot3d(cv.multi$performances$cost,
+       cv.multi$performances$gamma,
+       cv.multi$performances$error,
+       xlab = "Cost",
+       ylab = "Gamma",
+       zlab = "Error",
+       type = "s",
+       size = 1)
+
+#Inspecting the best model.
+best.multi.model = cv.multi$best.model
+summary(best.multi.model)
+
+#Using the best model to predict the test data.
+ypred = predict(best.multi.model, multi[test.index, ])
+table("Predicted Values" = ypred, "True Values" = multi[test.index, "y"])
+
+#Constructing and visualizing the final model.
+svm.best.multi = svm(y ~ .,
+                     data = multi,
+                     kernel = "radial",
+                     cost = best.multi.model$cost,
+                     gamma = best.multi.model$gamma)
+plot(svm.best.multi, multi)
+summary(svm.best.multi)
+svm.best.multi$index
+ypred = predict(svm.best.multi, multi)
+table("Predicted Values" = ypred, "True Values" = multi[, "y"])
+
+
+
+
+
+# Decision trees
 
 foresttrain = sample(1:nrow(forestdata1), 8*nrow(forestdata1)/10)
 forestdata1.train = forestdata1[foresttrain, ]
