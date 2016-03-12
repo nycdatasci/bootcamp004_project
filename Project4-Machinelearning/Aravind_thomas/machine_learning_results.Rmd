@@ -17,14 +17,15 @@ We found the Forest Covertype in the UCI Machine Learning Repository that takes 
 Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative size of the training and test sets makes classification of cover type a challenging problem.
 
 ```{r, echo=FALSE, message=FALSE}
+# data load next 340 lines
 #setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-#setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
 library(dplyr)
 library(GGally)
-library(clusterSim)
+#library(clusterSim)
 #library(VGAM)
 library(caret)
 library(glmnet)
@@ -143,7 +144,6 @@ forestdata$interaction_noon3pm=forestdata$Hillshade_Noon*forestdata$Hillshade_3p
 forestdata$interaction_9am3pm= forestdata$Hillshade_9am*forestdata$Hillshade_3pm
 
 
-
 #################### converting to factors ########################
 
 forestdata$Soil_Type=as.factor(forestdata$Soil_Type)
@@ -163,7 +163,6 @@ for(i in 12:53) {
 temp=forestdata1[,1:54]
 forestdata2=forestdata1
 forestdata1=temp
-
 
 # replicating the feature  creations with TEST data set 
 
@@ -198,10 +197,8 @@ foresttest$covername[foresttest$Cover_Type==5] = 'Aspen'
 foresttest$covername[foresttest$Cover_Type==6] = 'Douglas-fir'
 foresttest$covername[foresttest$Cover_Type==7] = 'Krummholz'
 
-
 #creating mean of hillshade
 foresttest$Hillshade_mean = (foresttest$Hillshade_9am + foresttest$Hillshade_3pm + foresttest$Hillshade_Noon) / 3
-
 
 #creating distance to hydrology as a function of horizontal and vertical 
 foresttest$Euclidean_Distance_To_Hydrology = (foresttest$Horizontal_Distance_To_Hydrology^2 + foresttest$Vertical_Distance_To_Hydrology^2)^.5
@@ -288,14 +285,12 @@ xfactors <- model.matrix(forestdata$Cover_Type ~ forestdata$Elevation +
                            forestdata$Soil_Type1)[,-1]
 x=as.matrix(xfactors)
 
-
 set.seed(0)
 train = sample(1:nrow(x), 85*nrow(x)/100)
 test = (-train)
 
 y = forestdata$Cover_Type
 y.test = y[test]
-
 
 xfactorstest <- model.matrix(foresttest$Cover_Type ~ foresttest$Elevation +
                                foresttest$Aspect +
@@ -315,15 +310,12 @@ xtest=as.matrix(xfactorstest)
 
 xtest = xtest[, -c(20, 28)]
 
-
 foresttest1= foresttest[,-c(22,30)]
-
 
 foresttest1$Soil_Type = 0
 for (i in 12:53) {
   foresttest1[,i]=as.factor(foresttest1[,i])
 }
-
 
 foresttest$Soil_Type=as.factor(foresttest$Soil_Type)
 foresttest$Wilderness_Area=as.factor(foresttest$Wilderness_Area)
@@ -334,7 +326,6 @@ foresttest$aspect_group=as.factor(foresttest$aspect_group)
 foresttest$aspect_group_shift=as.factor(foresttest$aspect_group_shift)
 foresttest$soil_family=as.factor(foresttest$soil_family)
 foresttest$aspect_group_class=as.factor(foresttest$aspect_group_class)
-
 
 foresttest1$Soil_Type=as.factor(foresttest1$Soil_Type)
 foresttest1$Wilderness_Area=as.factor(foresttest1$Wilderness_Area)
@@ -348,42 +339,36 @@ foresttest1$aspect_group_class=as.factor(foresttest1$aspect_group_class)
 
 
 
-
-
-
-
-
-
-
-
-
 ```
-----------------------
+
+
+###Data Exploration Graphs
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
 
 
 
-ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
-ggplot(forestdata, aes(x=Elevation)) + geom_density()
-ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
+ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+```
 
-
-
-ggpairs(data = forestdata, columns = 8:10, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3))
+```{r, echo=FALSE, fig.width=16, fig.height=16, dpi=300}
+columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
+ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
 
 ```
 
 
 
-#One of the interesting things observed in the dataset was Hillshade information 
+One of the interesting things observed in the dataset was Hillshade information 
 
 
 
 
 
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-library(plotly)
-plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers",color = Cover_Type)
+# library(plotly)
+# plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers",color = Cover_Type)
 
 
 ```
@@ -395,27 +380,27 @@ The Class seperation is clearly seen  the following plot of Elevation
 
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
 
-plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = Cover_Type)
-
-
- ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
-  geom_bar() +
-  coord_polar()
-
-ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) +
-  geom_bar() +
-  coord_polar()
-
-ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area )) +
-  geom_bar() +
-  coord_polar()
-
-
-
-ggpairs(data = forestdata, columns = 9:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3))
-
-
-
-
+# plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = Cover_Type)
+# 
+# 
+#  ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
+#   geom_bar() +
+#   coord_polar()
+# 
+# ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) +
+#   geom_bar() +
+#   coord_polar()
+# 
+# ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area )) +
+#   geom_bar() +
+#   coord_polar()
+# 
+# 
+# 
+# ggpairs(data = forestdata, columns = 9:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3))
+# 
+# 
+# 
+# 
 
 ```
