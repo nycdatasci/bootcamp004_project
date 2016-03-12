@@ -1594,13 +1594,22 @@ response <- "Cover_Type"
 predictors <- setdiff(names(forest_h20), response)
 predictors
 
-
+#initial sampling
 set.seed(0)
 train_h20 = sample(1:nrow(x), 80*nrow(x)/100)
 train_h20=sort(train_h20)
 validation_h20 = (-train_h20)
 validation_h20=sort(validation_h20)
 
+forest_h20_train= forest_h20[train_h20,]
+forest_h20_validation=forest_h20[validation_h20,]
+
+# final sampling
+set.seed(0)
+train_h20_final = sample(1:nrow(x), 95*nrow(x)/100)
+train_h20=sort(train_h20)
+validation_h20 = (-train_h20)
+validation_h20=sort(validation_h20)
 
 forest_h20_train= forest_h20[train_h20,]
 forest_h20_validation=forest_h20[validation_h20,]
@@ -1758,11 +1767,188 @@ write.csv(deeplearning_submission1, 'deep_learing_submission1.csv', row.names = 
 
 
 
+# GBM via H2O -------------------------------------------
 
+gbm1 = h2o.gbm(
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covType1",
+  seed = 7)
+
+summary(gbm1)
+
+# accuracy
+h2o.hit_ratio_table(gbm1,valid = T)[1,2]
+# accuracy = .818783 for default parameters
+
+
+gbm2 = h2o.gbm(
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covType2",
+  seed = 7,
+  ntrees = 250,
+  max_depth = 18,
+  min_rows = 10,
+  learn_rate = .1  )
+
+# accuracy
+h2o.hit_ratio_table(gbm2,valid = T)[1,2]
+# 0.88459
+
+pred_final_gbm_h2o <- h2o.predict(gbm2,foresttest_h20[,-1] )
+pred_final_gbm_h2o=as.data.frame(pred_final_gbm_h2o[,1])
+head(pred_final_gbm_h2o)
+
+
+gbm_h2o_submission1 = foresttest[,c(1,56)]
+gbm_h2o_submission1$Cover_Type = pred_final_gbm_h2o[,1]
+
+write.csv(gbm_h2o_submission1, 'gbm_h2o_submission1.csv', row.names = FALSE)
+
+# kaggle accuracy = 0.76640, rank = 467
+
+
+
+
+gbm3 = h2o.gbm(
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covType3",
+  seed = 7,
+  ntrees = 1000,
+  max_depth = 18,
+  min_rows = 10,
+  learn_rate = .01,
+  sample_rate = 0.7,          ## use a random 70% of the rows to fit each tree
+  col_sample_rate = 0.7,       ## use 70% of the columns to fit each tree
+  stopping_rounds  = 2,
+  stopping_tolerance = 0.01,
+  score_each_iteration = T)
+
+# accuracy
+h2o.hit_ratio_table(gbm3,valid = T)[1,2]
+# 0.8561508
+
+
+# found that ntrees is the same after 40, so we will try 40 and 200
+# found max_depth of 20 is best for ntrees = 100 or 50
+hyper_params_gbm = list(
+  ntrees = c(40, 100, 200),
+  max_depth = 20,
+  min_rows = c(5, 10, 15),
+  learn_rate = c(.01, .1, .3)
+)
+
+grid_gbm = h2o.grid(
+  "gbm",
+  model_id = "gbm_covType3",  
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  seed = 7,
+  sample_rate = 0.7,
+  col_sample_rate = 0.7,
+  stopping_rounds  = 2,
+  stopping_tolerance = 0.01,
+  score_each_iteration = T,
+  #max_depth = 18,
+  #min_rows = 10,
+  #learn_rate = .1,
+  hyper_params = hyper_params_gbm)
+
+
+scores <- cbind(as.data.frame(unlist((lapply(grid_gbm@model_ids, function(x) 
+{ h2o.confusionMatrix(h2o.performance(h2o.getModel(x),valid=T))$Error[8] })) )), unlist(grid_gbm@model_ids))
+names(scores) <- c("misclassification","model")
+sorted_scores <- scores[order(scores$misclassification),]
+sorted_scores
+
+# best result had ntrees=200, max_depth=20, learn_rate=.1, min_rows=10
+# 2nd best result had ntrees=100, max_depth=20, learn_rate=.1, min_rows=10
+# 3rd best result had ntrees=40, max_depth=20, learn_rate=.1, min_rows=10
+
+
+
+gbm_final = h2o.gbm(
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covTypefinal",
+  seed = 7,
+  ntrees = 200,
+  max_depth = 20,
+  min_rows = 10,
+  learn_rate = .1,
+  sample_rate = 0.7,          ## use a random 70% of the rows to fit each tree
+  col_sample_rate = 0.7,       ## use 70% of the columns to fit each tree
+  stopping_rounds  = 2,
+  stopping_tolerance = 0.01,
+  score_each_iteration = T,
+  nfolds = 10)
+
+pred_gbm_h2o_tuned1 <- h2o.predict(gbm_final,foresttest_h20[,-1] )
+pred_gbm_h2o_tuned1 = as.data.frame(pred_gbm_h2o_tuned1[,1])
+head(pred_gbm_h2o_tuned1)
+
+gbm_h2o_submission_tuned1 = foresttest[,c(1,56)]
+gbm_h2o_submission_tuned1$Cover_Type = pred_gbm_h2o_tuned1[,1]
+
+write.csv(gbm_h2o_submission_tuned1, 'gbm_h2o_submission_tuned2.csv', row.names = FALSE)
+# kaggle accuracy = 0.76119 when old was 0.76640, rank = 521
+# submission 2 with cv 80/20 kaggle accuracy = 0.74509, rank = 911
+
+
+
+
+
+gbm_final2 = h2o.gbm(
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covTypefinal",
+  seed = 7,
+  ntrees = 200,
+  max_depth = 20,
+  min_rows = 10,
+  learn_rate = .1#,
+#   sample_rate = 0.7,          ## use a random 70% of the rows to fit each tree
+#   col_sample_rate = 0.7,       ## use 70% of the columns to fit each tree
+#   stopping_rounds  = 2,
+#   stopping_tolerance = 0.01,
+#   score_each_iteration = T,
+#  nfolds = 10
+)
+
+pred_gbm_h2o_tuned2 <- h2o.predict(gbm_final2,foresttest_h20[,-1] )
+pred_gbm_h2o_tuned2 = as.data.frame(pred_gbm_h2o_tuned2[,1])
+head(pred_gbm_h2o_tuned2)
+
+gbm_h2o_submission_tuned2 = foresttest[,c(1,56)]
+gbm_h2o_submission_tuned2$Cover_Type = pred_gbm_h2o_tuned2[,1]
+
+write.csv(gbm_h2o_submission_tuned2, 'gbm_h2o_submission_tuned3.csv', row.names = FALSE)
+# submission without misc. parameters: kaggle accuracy = 0.76586, rank = 479
 
 
 
 h2o.shutdown(prompt=FALSE)
+
+
+
+
+
+
+
 
 
 
