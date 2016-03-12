@@ -1,0 +1,194 @@
+results_details.txt
+
+
+######################
+Lasso for our test set in train.csv for 70-30 CV and default lambda
+ Confusion Matrix and Statistics
+
+          Reference
+Prediction   1   2   3   4   5   6   7
+         1 409 150   0   0  13   0  64
+         2 121 349   5   0  74   6   0
+         3   0   9 365  62  12 156   0
+         4   0   0  75 586   0  40   0
+         5  26 110  38   0 514  23   0
+         6   4  22 171  42  36 413   0
+         7  52   6   0   0   0   0 583
+
+Overall Statistics
+                                          
+               Accuracy : 0.7097          
+                 95% CI : (0.6962, 0.7228)
+    No Information Rate : 0.1521          
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.6612          
+ Mcnemar's Test P-Value : NA              
+
+Statistics by Class:
+
+                     Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
+Sensitivity           0.66830  0.54025  0.55810   0.8493   0.7920  0.64734   0.9011
+Specificity           0.94215  0.94704  0.93843   0.9701   0.9493  0.92945   0.9851
+Pos Pred Value        0.64308  0.62883  0.60430   0.8359   0.7229  0.60029   0.9095
+Neg Pred Value        0.94795  0.92540  0.92650   0.9729   0.9647  0.94153   0.9836
+Prevalence            0.13492  0.14242  0.14418   0.1521   0.1431  0.14065   0.1426
+Detection Rate        0.09017  0.07694  0.08047   0.1292   0.1133  0.09105   0.1285
+Detection Prevalence  0.14021  0.12235  0.13316   0.1545   0.1567  0.15168   0.1413
+Balanced Accuracy     0.80523  0.74365  0.74827   0.9097   0.8707  0.78839   0.9431
+
+
+#############
+Ridge 70-30 split with default lambda
+> confusionMatrix(glmmod_best_lambda_ridge[,1], y.test, positive = '1')
+Confusion Matrix and Statistics
+
+          Reference
+Prediction   1   2   3   4   5   6   7
+         1 378 143   0   0  26   2  96
+         2 136 335   4   0  83  18   8
+         3   0   7 350  75  46 143   0
+         4   0   3  91 582   0  55   0
+         5  48 121  23   0 451  47   5
+         6   5  33 186  33  43 373   0
+         7  45   4   0   0   0   0 538
+
+Overall Statistics
+                                         
+               Accuracy : 0.6629         
+                 95% CI : (0.649, 0.6767)
+    No Information Rate : 0.1521         
+    P-Value [Acc > NIR] : < 2.2e-16      
+                                         
+                  Kappa : 0.6067         
+ Mcnemar's Test P-Value : NA             
+
+Statistics by Class:
+
+                     Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
+Sensitivity           0.61765  0.51858  0.53517   0.8435  0.69492  0.58464   0.8315
+Specificity           0.93196  0.93599  0.93019   0.9613  0.93723  0.92304   0.9874
+Pos Pred Value        0.58605  0.57363  0.56361   0.7962  0.64892  0.55423   0.9165
+Neg Pred Value        0.93986  0.92131  0.92235   0.9716  0.94845  0.93140   0.9724
+Prevalence            0.13492  0.14242  0.14418   0.1521  0.14308  0.14065   0.1426
+Detection Rate        0.08333  0.07385  0.07716   0.1283  0.09943  0.08223   0.1186
+Detection Prevalence  0.14220  0.12875  0.13690   0.1612  0.15322  0.14837   0.1294
+Balanced Accuracy     0.77480  0.72728  0.73268   0.9024  0.81607  0.75384   0.9095 
+
+
+
+
+########################################
+Ridge for our test set in train.csv for 85-15 CV and grid for lambda
+> confusionMatrix(glmmod_best_lambda_ridge[,1], y.test, positive = '1')
+Confusion Matrix and Statistics
+
+          Reference
+Prediction   1   2   3   4   5   6   7
+         1 202  76   0   0   3   0  35
+         2  57 174   3   0  46   2   0
+         3   0   5 183  29   8  70   0
+         4   0   0  37 302   0  22   0
+         5   7  64  18   0 239  10   0
+         6   0   7  92  22  17 225   0
+         7  27   3   0   0   0   0 283
+
+Overall Statistics
+                                          
+               Accuracy : 0.709           
+                 95% CI : (0.6898, 0.7276)
+    No Information Rate : 0.1556          
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.6604          
+ Mcnemar's Test P-Value : NA              
+
+Statistics by Class:
+
+                     Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
+Sensitivity           0.68942  0.52888  0.54955   0.8555   0.7636  0.68389   0.8899
+Specificity           0.94228  0.94430  0.94212   0.9692   0.9494  0.92883   0.9846
+Pos Pred Value        0.63924  0.61702  0.62034   0.8366   0.7071  0.61983   0.9042
+Neg Pred Value        0.95338  0.92195  0.92397   0.9733   0.9617  0.94541   0.9821
+Prevalence            0.12919  0.14506  0.14683   0.1556   0.1380  0.14506   0.1402
+Detection Rate        0.08907  0.07672  0.08069   0.1332   0.1054  0.09921   0.1248
+Detection Prevalence  0.13933  0.12434  0.13007   0.1592   0.1490  0.16005   0.1380
+Balanced Accuracy     0.81585  0.73659  0.74583   0.9124   0.8565  0.80636   0.9373
+
+
+
+
+
+########################## 
+lasso for our test set in train.csv for 85-15 CV 
+> confusionMatrix(glmmod_best_lambda_lasso[,1], y.test, positive = '1')
+Confusion Matrix and Statistics
+
+          Reference
+Prediction   1   2   3   4   5   6   7
+         1 203  77   0   0   3   0  35
+         2  57 175   3   0  46   2   0
+         3   0   5 182  28   8  71   0
+         4   0   0  37 304   0  22   0
+         5   7  62  19   0 239  10   0
+         6   0   7  92  21  17 224   0
+         7  26   3   0   0   0   0 283
+
+Overall Statistics
+                                          
+               Accuracy : 0.7099          
+                 95% CI : (0.6907, 0.7285)
+    No Information Rate : 0.1556          
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.6614          
+ Mcnemar's Test P-Value : NA              
+
+Statistics by Class:
+
+                     Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
+Sensitivity           0.69283  0.53191  0.54655   0.8612   0.7636  0.68085   0.8899
+Specificity           0.94177  0.94430  0.94212   0.9692   0.9499  0.92935   0.9851
+Pos Pred Value        0.63836  0.61837  0.61905   0.8375   0.7092  0.62050   0.9071
+Neg Pred Value        0.95385  0.92242  0.92351   0.9743   0.9617  0.94494   0.9821
+Prevalence            0.12919  0.14506  0.14683   0.1556   0.1380  0.14506   0.1402
+Detection Rate        0.08951  0.07716  0.08025   0.1340   0.1054  0.09877   0.1248
+Detection Prevalence  0.14021  0.12478  0.12963   0.1601   0.1486  0.15917   0.1376
+Balanced Accuracy     0.81730  0.73811  0.74433   0.9152   0.8567  0.80510   0.9375
+
+
+###############################################
+> confusionMatrix(glmmod_best_lambda_elastic[,1], y.test, positive = '1')
+Confusion Matrix and Statistics
+
+          Reference
+Prediction   1   2   3   4   5   6   7
+         1 202  75   0   0   3   0  34
+         2  58 175   3   0  47   2   0
+         3   0   5 184  28   8  71   0
+         4   0   0  37 305   0  22   0
+         5   7  64  18   0 238  10   0
+         6   0   7  91  20  17 224   0
+         7  26   3   0   0   0   0 284
+
+Overall Statistics
+                                          
+               Accuracy : 0.7108          
+                 95% CI : (0.6916, 0.7294)
+    No Information Rate : 0.1556          
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.6625          
+ Mcnemar's Test P-Value : NA              
+
+Statistics by Class:
+
+                     Class: 1 Class: 2 Class: 3 Class: 4 Class: 5 Class: 6 Class: 7
+Sensitivity           0.68942  0.53191  0.55255   0.8640   0.7604  0.68085   0.8931
+Specificity           0.94329  0.94327  0.94212   0.9692   0.9494  0.93038   0.9851
+Pos Pred Value        0.64331  0.61404  0.62162   0.8379   0.7062  0.62396   0.9073
+Neg Pred Value        0.95343  0.92234  0.92444   0.9748   0.9612  0.94500   0.9826
+Prevalence            0.12919  0.14506  0.14683   0.1556   0.1380  0.14506   0.1402
+Detection Rate        0.08907  0.07716  0.08113   0.1345   0.1049  0.09877   0.1252
+Detection Prevalence  0.13845  0.12566  0.13051   0.1605   0.1486  0.15829   0.1380
+Balanced Accuracy     0.81636  0.73759  0.74734   0.9166   0.8549  0.80561   0.9391
