@@ -4,7 +4,7 @@ author: "Thomas Kolasa and Aravind Kolumum Raja"
 output: html_document 
 ---
 
-We found the Forest Covertype in the UCI Machine Learning Repository that takes forestry data from the [Roosevelt National Forest](https://tourbuilder.withgoogle.com/tour/ahJzfmd3ZWItdG91cmJ1aWxkZXJyEQsSBFRvdXIYgICAk5uU5AoM) in northern Colorado. The observations are taken from 30m by 30m patches of forest that are classified as one of seven forest types:
+We found the Forest Covertype in the UCI Machine Learning Repository that takes forestry data from the Roosevelt National Forest in northern Colorado ([Click here](https://tourbuilder.withgoogle.com/tour/ahJzfmd3ZWItdG91cmJ1aWxkZXJyEQsSBFRvdXIYgICAk5uU5AoM) for a tour of the area). The observations are taken from 30m by 30m patches of forest that are classified as one of seven forest types:
 
 1. Spruce/Fir
 2. Lodgepole Pine
@@ -14,7 +14,7 @@ We found the Forest Covertype in the UCI Machine Learning Repository that takes 
 6. Douglas-fir
 7. Krummholz
 
-Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative size of the training and test sets makes classification of cover type a challenging problem.
+Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem.
 
 ```{r, echo=FALSE, message=FALSE}
 # data load next 340 lines
@@ -33,6 +33,7 @@ library(tree)
 library(randomForest)
 library(gbm)
 library(NISTunits)
+library(plotly)
 
 forestdata = read.csv('train.csv', header=TRUE)
 # View(forestdata)
@@ -337,22 +338,63 @@ foresttest1$aspect_group=as.factor(foresttest1$aspect_group)
 foresttest1$aspect_group_shift=as.factor(foresttest1$aspect_group_shift)
 foresttest1$aspect_group_class=as.factor(foresttest1$aspect_group_class)
 
-
-
+#create wilderness area names
+forestdata$Wilderness_Area_names = 0
+forestdata$Wilderness_Area_names[forestdata$Wilderness_Area == 1] = "Rawah"
+forestdata$Wilderness_Area_names[forestdata$Wilderness_Area == 2] = "Neota"
+forestdata$Wilderness_Area_names[forestdata$Wilderness_Area == 3] = "Comanche Peak"
+forestdata$Wilderness_Area_names[forestdata$Wilderness_Area == 4] = "Cache la Poudre"
 ```
 
 
-###Data Exploration Graphs
+###Data Exploration
+
+Name                                | Measurement                   |    Description
+------------------------------------|-------------------------------|----------------------------------------------------
+Elevation                           |    meters                     |  Elevation in meters
+Aspect                              |    azimuth                    |  Aspect in degrees azimuth
+Slope                               |    degrees                    |  Slope in degrees
+Horizontal Distance To Hydrology    |    meters                     |  Horz Dist to nearest surface water features
+Vertical Distance To Hydrology      |    meters                     |  Vert Dist to nearest surface water features
+Horizontal Distance To Roadways     |    meters                     |  Horz Dist to nearest roadway
+Hillshade 9am                       |    0 to 255 index             |  Hillshade index at 9am, summer solstice
+Hillshade Noon                      |    0 to 255 index             |  Hillshade index at noon, summer soltice
+Hillshade 3pm                       |    0 to 255 index             |  Hillshade index at 3pm, summer solstice
+Horizontal Distance To Fire Points  |    meters                     |  Horz Dist to nearest wildfire ignition points
+Wilderness Area (4 binary columns)  |    0 (absence) or 1 (presence)|  Wilderness area designation
+Soil Type (40 binary columns)       |    0 (absence) or 1 (presence)|  Soil Type designation
+Cover Type (7 types)                |    1 to 7                     |  Forest Cover Type designation - Dependent Variable
+
+
+Some class seperation is clearly visible in the following plots of elevation.
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-
-
 
 ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
 ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
 ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
 ```
 
-```{r, echo=FALSE, fig.width=16, fig.height=16, dpi=300}
+Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
+
+```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
+
+
+
+ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect Group") + 
+  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+  coord_polar()
+
+ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) + ggtitle("Aspect Group Shift") + 
+  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+  coord_polar()
+
+ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area_names )) + ggtitle("Aspect Group Shift By Wilderness Area") + 
+  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+  coord_polar()
+```
+
+
+```{r, echo=FALSE, fig.width=18, fig.height=18, dpi=300}
 columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
 ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
 
@@ -360,47 +402,20 @@ ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes
 
 
 
-One of the interesting things observed in the dataset was Hillshade information 
+One of the more interesting facets of the dataset was the distribution of Hillshade luminance.
+Hillshade is measured on a scale from 0 to 255 (dark to bright).
 
 
+```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
+plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
 
+```
 
-
-```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-# library(plotly)
-# plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers",color = Cover_Type)
-
+```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
+plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = covername)
 
 ```
 
 
-The Class seperation is clearly seen  the following plot of Elevation 
 
 
-
-```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-
-# plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = Cover_Type)
-# 
-# 
-#  ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
-#   geom_bar() +
-#   coord_polar()
-# 
-# ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) +
-#   geom_bar() +
-#   coord_polar()
-# 
-# ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area )) +
-#   geom_bar() +
-#   coord_polar()
-# 
-# 
-# 
-# ggpairs(data = forestdata, columns = 9:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3))
-# 
-# 
-# 
-# 
-
-```
