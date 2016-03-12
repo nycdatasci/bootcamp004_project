@@ -4,9 +4,7 @@ author: "Thomas Kolasa and Aravind Kolumum Raja"
 output: html_document 
 ---
 
-### The Dataset
-
-We found the Forest Covertype in the UCI Machine Learning Repository that takes forestry data from the [Roosevel National Forest](https://tourbuilder.withgoogle.com/tour/ahJzfmd3ZWItdG91cmJ1aWxkZXJyEQsSBFRvdXIYgICAk5uU5AoM) in northern Colorado. The observations are taken from 30m by 30m patches of forest that are classified as one of seven forest types:
+We found the Forest Covertype in the UCI Machine Learning Repository that takes forestry data from the [Roosevelt National Forest](https://tourbuilder.withgoogle.com/tour/ahJzfmd3ZWItdG91cmJ1aWxkZXJyEQsSBFRvdXIYgICAk5uU5AoM) in northern Colorado. The observations are taken from 30m by 30m patches of forest that are classified as one of seven forest types:
 
 1. Spruce/Fir
 2. Lodgepole Pine
@@ -18,14 +16,27 @@ We found the Forest Covertype in the UCI Machine Learning Repository that takes 
 
 Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative size of the training and test sets makes classification of cover type a challenging problem.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
+# data load next 340 lines
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
+library(dplyr)
 library(GGally)
+#library(clusterSim)
+#library(VGAM)
+library(caret)
+library(glmnet)
+library(tree)
+library(randomForest)
+library(gbm)
+library(NISTunits)
 
 forestdata = read.csv('train.csv', header=TRUE)
+# View(forestdata)
+# summary(forestdata[,2:11])
 
 # adding a new variable for covernames based on cover type
 
@@ -46,8 +57,12 @@ for (i in 12:15) {
 
 #plotting the correlation matrix of the quantitative factors 
 forestcorrelation=cor(forestdata[,2:11])
-# 
+
+#creating mean of hillshade
 forestdata$Hillshade_mean = (forestdata$Hillshade_9am + forestdata$Hillshade_3pm + forestdata$Hillshade_Noon) / 3
+
+
+#creating distance to hydrology as a function of horizontal and vertical 
 forestdata$Euclidean_Distance_To_Hydrology = (forestdata$Horizontal_Distance_To_Hydrology^2 + forestdata$Vertical_Distance_To_Hydrology^2)^.5
 
 forestdata$Aspect[forestdata$Aspect == 360] = 0
@@ -68,7 +83,68 @@ for (i in 16:55) {
   forestdata$Soil_Type[forestdata[,i] == 1] = i-15  
 }
 
-################### converting to factors ########################
+#Create log Elevation 
+forestdata$log_elevation=log(forestdata$Elevation)
+
+#Squared Hillshades 
+forestdata$Hillshade_9am_sq=forestdata$Hillshade_9am^2
+forestdata$Hillshade_noon_sq=forestdata$Hillshade_Noon^2
+forestdata$Hillshade_3pm_sq=forestdata$Hillshade_3pm^2
+
+#Cosine of Slope
+forestdata$cosine_slope=cos(NISTdegTOradian(forestdata$Slope))
+
+#Whether aspect group shift is < 10 or not 
+forestdata$aspect_group_class=as.numeric(forestdata$aspect_group_shift)
+
+for (i in 1:nrow(forestdata)) {
+  if (forestdata$aspect_group_class[i]>10) {
+    forestdata$aspect_group_class[i]=0 
+  } else {
+     forestdata$aspect_group_class[i]=1
+   }
+}
+
+forestdata$aspect_group_class=as.factor(forestdata$aspect_group_class)
+
+# Group families 
+
+soil_family=c(1, 2, 3, 4, 2, 2, 5, 6, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 13, 14, 15, 16, 16, 16,
+  16, 17, 16, 16, 18, 18, 16, 10, 16, 19, 20, 21, 20, 16, 19, 19)
+
+forestdata$soil_family=as.numeric(forestdata$Soil_Type)
+
+for (i in 1:nrow(forestdata)) {
+forestdata$soil_family[i]=soil_family[forestdata$soil_family[i]]
+}
+
+forestdata$soil_family=as.factor(forestdata$soil_family)
+
+rock_type=c('stony', 'stony', 'rubbly', 'rubbly', 'rubbly', 'stony', 'neither', 'neither', 'stony', 'rubbly', 'rubbly', 
+  'stony', 'rubbly', 'neither', 'neither', 'neither', 'neither', 'stony', 'neither', 'neither', 'neither', 
+  'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 
+  'stony', 'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony')
+
+rock_type_factor = c(1,2,3)
+rock_type=rock_type_factor[as.factor(rock_type)]
+
+#3 - stony, 1 -neither 2- rubbly 
+
+forestdata$soil_rock_type=as.numeric(forestdata$Soil_Type)
+
+for (i in 1:nrow(forestdata)) {
+forestdata$soil_rock_type[i]=rock_type[forestdata$soil_rock_type[i]]
+}
+
+forestdata$soil_rock_type=as.factor(forestdata$soil_rock_type)
+#interaction between hillshade noon and 9 am 
+
+forestdata$interaction_9amnoon= forestdata$Hillshade_9am*forestdata$Hillshade_Noon
+forestdata$interaction_noon3pm=forestdata$Hillshade_Noon*forestdata$Hillshade_3pm
+forestdata$interaction_9am3pm= forestdata$Hillshade_9am*forestdata$Hillshade_3pm
+
+
+#################### converting to factors ########################
 
 forestdata$Soil_Type=as.factor(forestdata$Soil_Type)
 forestdata$Wilderness_Area=as.factor(forestdata$Wilderness_Area)
@@ -80,15 +156,251 @@ forestdata$aspect_group_shift=as.factor(forestdata$aspect_group_shift)
 
 forestdata1= forestdata[,-c(22,30)]
 
-
-for(i in 12:53)
-{
+for(i in 12:53) {
   forestdata1[,i]= as.factor(forestdata1[,i])
-  
 }
-forestdata1=forestdata1[,1:54]
+
+temp=forestdata1[,1:54]
+forestdata2=forestdata1
+forestdata1=temp
+
+# replicating the feature  creations with TEST data set 
+
+foresttest = read.csv('test.csv', header = TRUE)
+foresttest$Cover_Type = sample(1:7, nrow(foresttest), replace = TRUE)
+testmodel=foresttest[,-c(22,30)]
+for(i in 12:54) {
+  testmodel[,i] = as.factor(testmodel[,i])
+}
+
+foresttest$Soil_Type = 0
+for (i in 16:55) {
+  foresttest$Soil_Type[foresttest[,i] == 1] = i-15  
+}
+foresttest$Wilderness_Area = 0
+for (i in 12:15) {
+  foresttest$Wilderness_Area[foresttest[,i] == 1] = i-11  
+}
+
+foresttest$Soil_Type = as.factor(foresttest$Soil_Type)
+foresttest$Wilderness_Area = as.factor(foresttest$Wilderness_Area)
+foresttest$Cover_Type = as.factor(foresttest$Cover_Type)
+
+# adding a new variable for covernames based on cover type
+
+foresttest$covername = 'a'
+foresttest$covername[foresttest$Cover_Type==1] = 'Spruce-fir'
+foresttest$covername[foresttest$Cover_Type==2] = 'Lodgepole Pine'
+foresttest$covername[foresttest$Cover_Type==3] = 'Ponderosa Pine'
+foresttest$covername[foresttest$Cover_Type==4] = 'Cottonwood-Willow'
+foresttest$covername[foresttest$Cover_Type==5] = 'Aspen'
+foresttest$covername[foresttest$Cover_Type==6] = 'Douglas-fir'
+foresttest$covername[foresttest$Cover_Type==7] = 'Krummholz'
+
+#creating mean of hillshade
+foresttest$Hillshade_mean = (foresttest$Hillshade_9am + foresttest$Hillshade_3pm + foresttest$Hillshade_Noon) / 3
+
+#creating distance to hydrology as a function of horizontal and vertical 
+foresttest$Euclidean_Distance_To_Hydrology = (foresttest$Horizontal_Distance_To_Hydrology^2 + foresttest$Vertical_Distance_To_Hydrology^2)^.5
+
+foresttest$Aspect[foresttest$Aspect == 360] = 0
+
+rose_diagram_df = foresttest[c('Aspect', 'covername')]
+
+rose_diagram_df['aspect_group'] = cut(rose_diagram_df$Aspect, breaks=c(-1,seq(20,360, by = 20)), labels=FALSE)
+
+foresttest$aspect_group=rose_diagram_df$aspect_group
+foresttest$aspect_group_shift= foresttest$aspect_group+3
+foresttest$aspect_group_shift[foresttest$aspect_group_shift==19]= 1 
+foresttest$aspect_group_shift[foresttest$aspect_group_shift==20]= 2 
+foresttest$aspect_group_shift[foresttest$aspect_group_shift==21]= 3 
+
+
+#Create log Elevation 
+foresttest$log_elevation=log(foresttest$Elevation)
+
+#Squared Hillshades 
+foresttest$Hillshade_9am_sq=foresttest$Hillshade_9am^2
+foresttest$Hillshade_noon_sq=foresttest$Hillshade_Noon^2
+foresttest$Hillshade_3pm_sq=foresttest$Hillshade_3pm^2
+
+#Cosine of Slope
+foresttest$cosine_slope=cos(NISTdegTOradian(foresttest$Slope))
+
+#Whether aspect group shift is < 10 or not 
+foresttest$aspect_group_class=as.numeric(foresttest$aspect_group_shift)
+foresttest$aspect_group_class=0
+
+foresttest$aspect_group_class[foresttest$aspect_group_shift >10]=1
+
+foresttest$aspect_group_class=as.factor(foresttest$aspect_group_class)
+
+# Group families 
+
+soil_family=c(1, 2, 3, 4, 2, 2, 5, 6, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 13, 14, 15, 16, 16, 16,
+              16, 17, 16, 16, 18, 18, 16, 10, 16, 19, 20, 21, 20, 16, 19, 19)
+
+foresttest$soil_family=as.numeric(foresttest$Soil_Type)
+
+foresttest$soil_family=soil_family[foresttest$soil_family]
+
+foresttest$soil_family=as.factor(foresttest$soil_family)
+
+rock_type=c('stony', 'stony', 'rubbly', 'rubbly', 'rubbly', 'stony', 'neither', 'neither', 'stony', 'rubbly', 'rubbly', 
+            'stony', 'rubbly', 'neither', 'neither', 'neither', 'neither', 'stony', 'neither', 'neither', 'neither', 
+            'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 
+            'stony', 'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony')
+
+rock_type_factor = c(1,2,3)
+rock_type=rock_type_factor[as.factor(rock_type)]
+
+#3 - stony, 1 -neither 2- rubbly 
+
+foresttest$soil_rock_type=as.numeric(foresttest$Soil_Type)
+
+foresttest$soil_rock_type=rock_type[foresttest$Soil_Type]
+
+foresttest$soil_rock_type=as.factor(foresttest$soil_rock_type)
+#interaction between hillshade noon and 9 am 
+
+foresttest$interaction_9amnoon= foresttest$Hillshade_9am*foresttest$Hillshade_Noon
+foresttest$interaction_noon3pm=foresttest$Hillshade_Noon*foresttest$Hillshade_3pm
+foresttest$interaction_9am3pm= foresttest$Hillshade_9am*foresttest$Hillshade_3pm
+
+
+xfactors <- model.matrix(forestdata$Cover_Type ~ forestdata$Elevation +
+                           forestdata$Aspect +
+                           forestdata$Slope +
+                           forestdata$Horizontal_Distance_To_Hydrology +
+                           forestdata$Vertical_Distance_To_Hydrology +
+                           forestdata$Horizontal_Distance_To_Roadways +
+                           forestdata$Hillshade_9am +
+                           forestdata$Hillshade_Noon +
+                           forestdata$Hillshade_3pm +
+                           forestdata$Horizontal_Distance_To_Fire_Points +
+                           forestdata$Wilderness_Area +                  #removes the first area
+                           forestdata$Wilderness_Area1 +
+                           forestdata$Horizontal_Distance_To_Fire_Points +
+                           forestdata$Soil_Type +
+                           forestdata$Soil_Type1)[,-1]
+x=as.matrix(xfactors)
+
+set.seed(0)
+train = sample(1:nrow(x), 85*nrow(x)/100)
+test = (-train)
+
+y = forestdata$Cover_Type
+y.test = y[test]
+
+xfactorstest <- model.matrix(foresttest$Cover_Type ~ foresttest$Elevation +
+                               foresttest$Aspect +
+                               foresttest$Slope +
+                               foresttest$Horizontal_Distance_To_Hydrology +
+                               foresttest$Vertical_Distance_To_Hydrology +
+                               foresttest$Horizontal_Distance_To_Roadways +
+                               foresttest$Hillshade_9am +
+                               foresttest$Hillshade_Noon +
+                               foresttest$Hillshade_3pm +
+                               foresttest$Horizontal_Distance_To_Fire_Points +
+                               foresttest$Wilderness_Area +
+                               foresttest$Wilderness_Area1 +
+                               foresttest$Soil_Type +
+                               foresttest$Soil_Type1)[,-1]
+xtest=as.matrix(xfactorstest)
+
+xtest = xtest[, -c(20, 28)]
+
+foresttest1= foresttest[,-c(22,30)]
+
+foresttest1$Soil_Type = 0
+for (i in 12:53) {
+  foresttest1[,i]=as.factor(foresttest1[,i])
+}
+
+foresttest$Soil_Type=as.factor(foresttest$Soil_Type)
+foresttest$Wilderness_Area=as.factor(foresttest$Wilderness_Area)
+
+foresttest$covername=as.factor(foresttest$covername)
+foresttest$Cover_Type=as.factor(foresttest$Cover_Type)
+foresttest$aspect_group=as.factor(foresttest$aspect_group)
+foresttest$aspect_group_shift=as.factor(foresttest$aspect_group_shift)
+foresttest$soil_family=as.factor(foresttest$soil_family)
+foresttest$aspect_group_class=as.factor(foresttest$aspect_group_class)
+
+foresttest1$Soil_Type=as.factor(foresttest1$Soil_Type)
+foresttest1$Wilderness_Area=as.factor(foresttest1$Wilderness_Area)
+
+foresttest1$soil_family=as.factor(foresttest1$soil_family)
+foresttest1$covername=as.factor(foresttest1$covername)
+foresttest1$Cover_Type=as.factor(foresttest1$Cover_Type)
+foresttest1$aspect_group=as.factor(foresttest1$aspect_group)
+foresttest1$aspect_group_shift=as.factor(foresttest1$aspect_group_shift)
+foresttest1$aspect_group_class=as.factor(foresttest1$aspect_group_class)
+
+
+
 ```
 
-```{r, echo=FALSE}
+
+###Data Exploration Graphs
+```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
+
+
+
+ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
+ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+```
+
+```{r, echo=FALSE, fig.width=16, fig.height=16, dpi=300}
+columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
+ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
+
+```
+
+
+
+One of the interesting things observed in the dataset was Hillshade information 
+
+
+
+
+
+```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
+# library(plotly)
+# plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers",color = Cover_Type)
+
+
+```
+
+
+The Class seperation is clearly seen  the following plot of Elevation 
+
+
+
+```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
+
+# plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = Cover_Type)
+# 
+# 
+#  ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
+#   geom_bar() +
+#   coord_polar()
+# 
+# ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) +
+#   geom_bar() +
+#   coord_polar()
+# 
+# ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area )) +
+#   geom_bar() +
+#   coord_polar()
+# 
+# 
+# 
+# ggpairs(data = forestdata, columns = 9:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3))
+# 
+# 
+# 
+# 
 
 ```

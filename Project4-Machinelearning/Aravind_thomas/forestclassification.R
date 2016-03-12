@@ -95,7 +95,7 @@
 # 7 -- Krummholz
 
 
-#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
@@ -438,7 +438,7 @@ ggplot(forestdata, aes(x=covername)) + geom_bar(aes(group=covername, colour=cove
 
 
 # Studying Elevation distribution and densities across Cover type
-ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
+ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('Histogram of Elevation')
 ggplot(forestdata, aes(x=Elevation)) + geom_density()
 ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
 
@@ -756,9 +756,58 @@ write.csv(elastic_submission3, 'elastic_submission3.csv', row.names = FALSE)
 
 
 
+# Support Vector Machines 
+library(e1071)
+library(rgl)
+set.seed(0)
+train.index = sample(1:nrow(forestdata1), 8*nrow(forestdata1)/10)
+forestdata1.train = forestdata1[train.index, ]
+forestdata1.test = forestdata1[-train.index, ]
 
 
-# DECISION TREES
+cv.multi = tune(svm,Cover_Type ~.-Id,data = forestdata1[train.index, ],
+                kernel = "linear",
+                ranges = list(cost = 10^(seq(-1, 1.5, length = 2)),
+                          gamma = 10^(seq(-2, 1, length = 2)), tune.control=3))
+
+#Inspecting the cross-validation output.
+summary(cv.multi)
+
+#Plotting the cross-validation results.
+plot3d(cv.multi$performances$cost,
+       cv.multi$performances$gamma,
+       cv.multi$performances$error,
+       xlab = "Cost",
+       ylab = "Gamma",
+       zlab = "Error",
+       type = "s",
+       size = 1)
+
+#Inspecting the best model.
+best.multi.model = cv.multi$best.model
+summary(best.multi.model)
+
+#Using the best model to predict the test data.
+ypred = predict(best.multi.model, multi[test.index, ])
+table("Predicted Values" = ypred, "True Values" = multi[test.index, "y"])
+
+#Constructing and visualizing the final model.
+svm.best.multi = svm(y ~ .,
+                     data = multi,
+                     kernel = "radial",
+                     cost = best.multi.model$cost,
+                     gamma = best.multi.model$gamma)
+plot(svm.best.multi, multi)
+summary(svm.best.multi)
+svm.best.multi$index
+ypred = predict(svm.best.multi, multi)
+table("Predicted Values" = ypred, "True Values" = multi[, "y"])
+
+
+
+
+
+# Decision trees
 
 foresttrain = sample(1:nrow(forestdata1), 8*nrow(forestdata1)/10)
 forestdata1.train = forestdata1[foresttrain, ]
@@ -992,16 +1041,6 @@ apply(boost.initialpred, 1, which.max)
 nrow(forestdata1.test)
 
 
-# Extra Trees 
-
-library(extraTrees)
-
-et <- extraTrees(x,y, mtry=13,numRandomCuts = 2,nodesize = 3,numThreads = 3)
-yhat <- predict(et, xtest)
-
-# Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
-
-
 
 
 
@@ -1033,7 +1072,7 @@ confusionMatrix(nnet.pred2summary, forestdata1.test.scaled[,53], positive='1')
 # .8194 for maxit=500
 
 # run on all train
-nnet.pred2.all = nnet(forestdata1.scaled[,1:52], class.ind(forestdata1.scaled[,53]), size=25, softmax=TRUE,MaxNWts=2000,maxit=300)
+nnet.pred2.all = nnet(forestdata1.scaled[,1:52], class.ind(forestdata1.scaled[,53]), size=100, softmax=TRUE,MaxNWts=4000,maxit=400)
 nnet.pred2summary.all=predict(nnet.pred2, foresttest.scaled[,1:52], type="class")
 
 nnet.pred2summary.all = as.data.frame(nnet.pred2summary.all)
@@ -1112,4 +1151,853 @@ apply(neuralnet.pred2.test, 1, which.max)
 #Evaluating the model performance on the test set.
 cor(predicted_strength3, concrete_test$strength)
 plot(predicted_strength3, concrete_test$strength)
+
+
+
+# Tuning Neural Networks
+
+
+
+
+
+#-------------------------------- XGBOOST -------------------------------------
+
+library(xgboost)
+library(methods) #?
+library(caret)
+
+# foresttestxgb = data.matrix(foresttest1)
+y = as.matrix(as.numeric(forestdata1[,54]) - 1)
+forestdataxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id, data = forestdata1)
+foresttestxgb = foresttest1
+foresttestxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id, data = testmodel) #as.matrix(foresttestxgb)
+
+param = list("objective" = "multi:softprob",
+              "eval_metric" = "mlogloss",
+              "num_class" = 7+1)
+
+cv.nround = 800
+cv.nfold = 3
+
+bst.cv = xgb.cv(param=param, data = forestdataxgb, label = y,
+                nfold = cv.nfold, nrounds = cv.nround, prediction = T)
+
+min.logloss.idx = which.min(bst.cv$dt[, test.mlogloss.mean]) 
+min.logloss.idx 
+
+pred.cv = matrix(bst.cv$pred, nrow=length(bst.cv$pred)/8, ncol=8)
+pred.cv = max.col(pred.cv, "last")
+
+confusionMatrix(factor(y+1), factor(pred.cv))
+
+
+bst = xgboost(param=param, data = forestdataxgb, label = y,
+                nfold = cv.nfold, nrounds = min.logloss.idx)
+
+pred_xgb1 = predict(bst, foresttestxgb)
+
+pred_xgb1 = matrix(pred_xgb1, nrow=8, ncol=length(pred_xgb1)/8)
+pred_xgb1 = t(pred_xgb1)
+pred_xgb1 = max.col(pred_xgb1, "last")
+
+
+
+pred_xgb1_summary = as.data.frame(pred_xgb1)
+
+xgb_submission1 = foresttest[,c(1,56)]
+xgb_submission1$Cover_Type = pred_xgb1_summary[,1]
+
+write.csv(xgb_submission1, 'xgb_submission2_800.csv', row.names = FALSE)
+# kaggle accuracy = 0.70033, rank = 1258 - nround=50
+
+# kaggle accuracy =0.73438 , rank = 991 - nround 104
+
+
+
+
+
+#Using XG Boost on the complete dataset 
+
+
+y = as.matrix(as.numeric(forestdata2[,54]) - 1)
+forestdataxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id -covername-Wilderness_Area, data = forestdata2[,-c(61,68,69)])
+foresttestxgb = foresttest1
+foresttestxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id-covername-Wilderness_Area, data = foresttest1[,-c(55,68,69)]) #as.matrix(foresttestxgb)
+
+param = list("objective" = "multi:softprob",
+             "eval_metric" = "mlogloss",
+             "num_class" = 7+1)
+
+cv.nround = 200
+cv.nfold = 3
+
+bst.cv = xgb.cv(param=param, data = forestdataxgb, label = y,
+                nfold = cv.nfold, nrounds = cv.nround, prediction = T)
+
+min.logloss.dx = which.min(bst.cv$dt[, test.mlogloss.mean])
+
+min.logloss.dx 
+
+pred.cv = matrix(bst.cv$pred, nrow=length(bst.cv$pred)/8, ncol=8)
+pred.cv = max.col(pred.cv, "last")
+
+confusionMatrix(factor(y+1), factor(pred.cv))
+
+
+
+bst = xgboost(param=param, data = forestdataxgb, label = y,
+              nfold = cv.nfold, nrounds = min.logloss.dx)
+
+pred_xgb1 = predict(bst, foresttestxgb)
+
+pred_xgb1 = matrix(pred_xgb1, nrow=8, ncol=length(pred_xgb1)/8)
+pred_xgb1 = t(pred_xgb1)
+pred_xgb1 = max.col(pred_xgb1, "last")
+
+
+
+pred_xgb1_summary = as.data.frame(pred_xgb1)
+
+xgb_submission1 = foresttest[,c(1,56)]
+xgb_submission1$Cover_Type = pred_xgb1_summary[,1]
+
+write.csv(xgb_submission1, 'xgb_submission2_800_feature.csv', row.names = FALSE)
+
+# Compute feature importance matrix
+library(Ckmeans.1d.dp)
+
+names <- dimnames(forestdataxgb)[[2]]
+
+
+importance_matrix <- xgb.importance(names, model = bst)
+
+
+xgb.plot.importance(importance_matrix[1:20,])
+
+
+
+y = as.matrix(as.numeric(forestdata2[,54]) - 1)
+forestdataxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id -covername-Wilderness_Area, data = forestdata2[,-c(61,68,69)])
+foresttestxgb = foresttest1
+foresttestxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id-covername-Wilderness_Area, data = foresttest1[,-c(55,68,69)]) #as.matrix(foresttestxgb)
+
+
+
+
+#re order the dataset in the order of importance of features run the XGBOOST again
+
+loglossxg= 2:72
+accuracyxg=2:72
+
+for (j in 2:72)
+{
+  reducednames=importance_matrix[1:j,]$Feature
+  forestdataxgb1=forestdataxgb[,reducednames]
+}
+
+
+
+for (j in 2:72)
+{  
+  reducednames=importance_matrix[1:j,]$Feature
+  reducednames
+  forestdataxgb1=forestdataxgb[,reducednames]
+  
+  param = list("objective" = "multi:softprob",
+               "eval_metric" = "mlogloss",
+               "num_class" = 7+1)
+  
+  cv.nround = 150
+  cv.nfold = 3
+  
+  bst.cv = xgb.cv(param=param, data = forestdataxgb1, label = y,
+                  nfold = cv.nfold, nrounds = cv.nround, prediction = T)
+  
+  min.logloss.dx = which.min(bst.cv$dt[, test.mlogloss.mean])
+  
+  loglossxg[j]=min.logloss.dx 
+  
+  pred.cv = matrix(bst.cv$pred, nrow=length(bst.cv$pred)/8, ncol=8)
+  pred.cv = max.col(pred.cv, "last")
+  
+  k=confusionMatrix(factor(y+1), factor(pred.cv),positive='1')
+  accuracyxg[j]=k$overall[1]
+}
+
+
+
+
+
+bst = xgboost(param=param, data = forestdataxgb[,reducednames[1:62]], label = y,
+              nfold = 10, nrounds = 109)
+
+pred_xgb1 = predict(bst, foresttestxgb[,reducednames[1:62]])
+
+pred_xgb1 = matrix(pred_xgb1, nrow=8, ncol=length(pred_xgb1)/8)
+pred_xgb1 = t(pred_xgb1)
+pred_xgb1 = max.col(pred_xgb1, "last")
+
+
+
+pred_xgb1_summary = as.data.frame(pred_xgb1)
+
+xgb_submission1 = foresttest[,c(1,56)]
+xgb_submission1$Cover_Type = pred_xgb1_summary[,1]
+
+write.csv(xgb_submission1, 'xgb_final_submission_62var.csv', row.names = FALSE)
+
+
+
+loglossxg=loglossxg[2:72,]
+loglossxg=as.data.frame(loglossxg)
+
+Variables=2:72
+p1=ggplot(data=accuracyxg,
+       aes(x=Variables, y=accuracyxg$`accuracyxg[2:72]`)) +
+  geom_line(colour="red")+ ggtitle("Xgboost Cross Validation Accuracy - Sequential Variable Addition")+ 
+    xlab("Number of Variables added")+ ylab("Accuracy levels")
+
+p2=ggplot(data=loglossxg,
+       aes(x=Variables, y=loglossxg)) +
+  geom_line(colour="blue")+ ggtitle("Xgboost Cross Validation min logloss round - Sequential Variable Addition")+ 
+  xlab("Number of Variables added")+ ylab("Number of rounds for minimized logloss  ")
+
+ggplotly()
+
+# function found at http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # ncol: Number of columns of plots, nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  if (numPlots==1) {
+    print(plots[[1]])
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+multiplot(p1,p2)
+
+
+
+
+
+
+
+
+# Extra Trees 
+
+options( java.parameters = "-Xmx4g" )
+library(rJava)
+
+library( "RWeka" )
+
+library(extraTrees)
+
+
+et <- extraTrees(x, y, mtry=13, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=50)
+yhat <- predict(et, xtest)
+# Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
+
+
+yhat = as.numeric(yhat)
+yhat = yhat - rep(1, length(yhat))
+yhat = as.data.frame(yhat)
+
+extratrees_submission1 = foresttest[,c(1,56)]
+extratrees_submission1$Cover_Type = yhat[,1]
+
+write.csv(extratrees_submission1, 'extratrees_submission1.csv', row.names = FALSE)
+# kaggle accuracy = 0.79220, rank = 224
+
+
+
+# Tuning parameters
+
+set.seed(1)
+train = sample(1:nrow(x), 8*nrow(x)/10)
+test = (-train)
+
+y = forestdata$Cover_Type
+y.test = y[test]
+
+
+
+
+ntree = seq(50, 300, 10)
+accuracy_et = 1:length(ntree)
+
+for (i in 1:length(ntree))
+{
+  et_tune1 = extraTrees(x[train,], y[train], mtry=13, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=ntree[i])
+  yhat = predict(et_tune1, x[test,])
+  confusion = confusionMatrix(yhat, y.test, positive = '1')
+  accuracy_et[i] = confusion$overall[1]
+  print(i)
+}
+
+plot(ntree, accuracy_et, pch = 16, type = "b",
+     xlab = "Number of Trees",
+     ylab = "accuracy",
+     main = "Extra Trees Accuracy Changing Number of Trees")
+# choose 200 trees
+
+
+mtry_et = 1:30
+accuracy_et2 = 1:30
+
+for (i in 1:length(mtry_et))
+{
+  et_tune2 = extraTrees(x[train,], y[train], mtry=i, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=200)
+  yhat = predict(et_tune2, x[test,])
+  confusion2 = confusionMatrix(yhat, y.test, positive = '1')
+  accuracy_et2[i] = confusion2$overall[1]
+  print(i)
+}
+
+plot(mtry_et, accuracy_et2, pch = 16, type = "b",
+     xlab = "Number of Variables",
+     ylab = "accuracy",
+     main = "Extra Trees Accuracy Changing Number of Variables at Each Split")
+# choose 8-10 variables (n^.5 is the suggested number)
+
+
+
+
+
+
+accuracy_et3 = matrix(ncol = 3, nrow = 100)
+counter=100
+for (i in 11:20)
+{
+  for (j in 1:10)
+  {
+    et_tune3 = extraTrees(x[train,], y[train], mtry=10, numRandomCuts = i, nodesize = j, numThreads = 3, ntree=200)
+    yhat = predict(et_tune3, x[test,])
+    confusion3 = confusionMatrix(yhat, y.test, positive = '1')
+    accu = confusion3$overall[1]
+    accuracy_et3[counter,1] = accu
+    accuracy_et3[counter,2] = i
+    accuracy_et3[counter,3] = j
+    print(counter)
+    counter = counter+1
+  }
+}
+
+
+accuracy_et3=as.data.frame(accuracy_et3)
+
+library(plotly)
+colnames(accuracy_et3)=c("Accuracy","Number of random cuts","Node Size")
+
+plot_ly(accuracy_et3, x =`Number of random cuts` ,y =`Node Size`, z = Accuracy, type = "scatter3d", mode = "markers")
+
+
+plot_ly(accuracy_et3, x = `Number of random cuts` , y = `Accuracy`, 
+        mode = "markers", color=`Node Size`)
+
+
+
+
+
+#based on the plots we decided on the following for the final run without feature engineering 
+# mtry = 10 ,  ntrees = 200  ,  Node size = 2, Number of random cuts = 5
+
+
+et_tuned_final1 <- extraTrees(x, y, mtry=10, numRandomCuts = 5, nodesize = 2, numThreads = 3, ntree=200)
+yhat_tuned <- predict(et_tuned_final1, xtest)
+# Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
+
+
+yhat_tuned = as.data.frame(yhat_tuned)
+
+extratrees_submission1 = foresttest[,c(1,56)]
+extratrees_submission1$Cover_Type = yhat_tuned[,1]
+
+write.csv(extratrees_submission1, 'extratrees_submission_tuned1.csv', row.names = FALSE)
+# kaggle accuracy = 0.79247, rank = 224
+
+
+
+
+
+
+# creating matrices for Feature engineered data
+
+
+xfactors_extra <- model.matrix(Cover_Type ~. - Id - Soil_Type - soil_family -covername - Wilderness_Area , data = forestdata2)[,-1]
+x = as.matrix(xfactors_extra)
+
+set.seed(0)
+train_extra = sample(1:nrow(x), 80*nrow(x)/100)
+test_extra = (-train)
+
+y_extra = forestdata2$Cover_Type
+y_extra.test = y_extra[test]
+
+xtest_extra <- model.matrix(Cover_Type ~. - Id - Soil_Type - soil_family -covername - Wilderness_Area ,data = foresttest)[,-1]
+
+xtest_extra = xtest_extra[,-c(21,29)]
+xtest_extra = as.matrix(xtest_extra)
+
+
+
+
+et2 <- extraTrees(xfactors_extra, y_extra, mtry=13, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=700)
+yhat2 <- predict(et, xtest_extra)
+
+
+yhat2 = as.numeric(yhat)
+yhat2 = yhat - rep(1, length(yhat))
+yhat2 = as.data.frame(yhat)
+
+extratrees_submission2 = foresttest[,c(1,56)]
+extratrees_submission2$Cover_Type = yhat2[,1]
+
+write.csv(extratrees_submission2, 'extratrees_submission2_allfeatures.csv', row.names = FALSE)
+
+
+# Extra trees feature engineering resulted in  0.78739 rank 308 ---mtry=13, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=700
+
+
+
+
+
+
+
+
+
+
+
+#  Deep learning with H20
+
+
+# The following two commands remove any previously installed H2O packages for R.
+if ("package:h2o" %in% search()) { detach("package:h2o", unload=TRUE) }
+if ("h2o" %in% rownames(installed.packages())) { remove.packages("h2o") }
+
+# Next, we download packages that H2O depends on.
+pkgs <- c("methods","statmod","stats","graphics","RCurl","jsonlite","tools","utils")
+for (pkg in pkgs) {
+  if (! (pkg %in% rownames(installed.packages()))) { install.packages(pkg) }
+}
+
+# Now we download, install and initialize the H2O package for R.
+#install.packages("h2o", type="source", repos=(c("http://h2o-release.s3.amazonaws.com/h2o/rel-turan/3/R")))
+library(h2o)
+library(devtools)
+
+
+h2o.init(nthreads=-1, max_mem_size="3G")
+h2o.removeAll() ## clean slate - just in case
+
+# re-load the dataframe in H20 format
+#forest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv"))
+#foresttest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv"))
+forest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv'))
+foresttest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv'))
+
+
+
+# par(mfrow=c(1,1)) # reset canvas
+# plot(h2o.tabulate(forestdata1, "Elevation",                       "Cover_Type"))
+# plot(h2o.tabulate(df, "Horizontal_Distance_To_Roadways", "Cover_Type"))
+# plot(h2o.tabulate(df, "Soil_Type",                       "Cover_Type"))
+# plot(h2o.tabulate(df, "Horizontal_Distance_To_Roadways", "Elevation" ))
+# 
+
+forest_h20 = forest_h20[,-1]
+
+for (i in 11:55)
+{
+  forest_h20[,i]=as.factor(forest_h20[,i])
+}
+  
+for (i in 12:55)
+{
+  foresttest_h20[,i]=as.factor(foresttest_h20[,i])
+}
+
+response <- "Cover_Type"
+predictors <- setdiff(names(forest_h20), response)
+predictors
+
+#initial sampling
+set.seed(0)
+train_h20 = sample(1:nrow(x), 80*nrow(x)/100)
+train_h20=sort(train_h20)
+validation_h20 = (-train_h20)
+validation_h20=sort(validation_h20)
+
+forest_h20_train= forest_h20[train_h20,]
+forest_h20_validation=forest_h20[validation_h20,]
+
+# final sampling
+set.seed(0)
+train_h20_final = sample(1:nrow(x), 95*nrow(x)/100)
+train_h20=sort(train_h20)
+validation_h20 = (-train_h20)
+validation_h20=sort(validation_h20)
+
+forest_h20_train= forest_h20[train_h20,]
+forest_h20_validation=forest_h20[validation_h20,]
+
+
+
+m1 <- h2o.deeplearning(
+  model_id="deep_learning_initial", 
+  training_frame=forest_h20_train, 
+  validation_frame=forest_h20_validation,   ## validation dataset: used for scoring and early stopping
+  x=predictors,
+  y=response,
+  activation="Rectifier",  ## default
+  hidden=c(130,150,70),## default: 2 hidden layers with 200 neurons each, 
+  epochs = 20 ,    
+  variable_importances=T,
+  epsilon =1e-7 ## not enabled by default
+)
+summary(m1)
+
+
+
+
+m2 <- h2o.deeplearning(
+  model_id="dl_model_faster", 
+  training_frame=forest_h20_train, 
+  validation_frame=forest_h20_validation,
+  x=predictors,
+  y=response,
+  hidden=c(64,32,64),                  ## small network, runs faster
+  epochs=100000,                      ## hopefully converges earlier...
+  score_validation_samples=10000,      ## sample the validation dataset (faster)
+  stopping_rounds=2,
+  stopping_metric="misclassification", ## could be "MSE","logloss","r2"
+  stopping_tolerance=0.01,
+  epsilon=1e-7
+)
+summary(m2)
+plot(m2)
+
+
+
+
+m3 <- h2o.deeplearning(
+  model_id="dl_model_tuned", 
+  training_frame=forest_h20_train, 
+  validation_frame=forest_h20_validation, 
+  x=predictors, 
+  y=response, 
+  overwrite_with_best_model=F,    ## Return the final model after 10 epochs, even if not the best
+  hidden=c(128,128,128),          ## more hidden layers -> more complex interactions
+  epochs=10,                      ## to keep it short enough
+  score_validation_samples=10000, ## downsample validation set for faster scoring
+  score_duty_cycle=0.025,         ## don't score more than 2.5% of the wall time
+  adaptive_rate=F,                ## manually tuned learning rate
+  rate=0.01, 
+  rate_annealing=2e-6,            
+  momentum_start=0.2,             ## manually tuned momentum
+  momentum_stable=0.4, 
+  momentum_ramp=1e7, 
+  l1=1e-5,                        ## add some L1/L2 regularization
+  l2=1e-5,
+  max_w2=10                       ## helps stability for Rectifier
+) 
+summary(m3)
+
+
+
+h2o.performance(m3, train=T)       ## sampled training data (from model building)
+h2o.performance(m3, valid=T)       ## sampled validation data (from model building)
+h2o.performance(m3, data=forest_h20_train)    ## full training data
+h2o.performance(m3, data=forest_h20_validation)    ## full validation data
+
+
+head(as.data.frame(h2o.varimp(m1)))
+
+
+
+
+performancem2=h2o.performance(m2, train=T)  
+
+
+#Calculating accuracy:
+pred <- h2o.predict(m2,forest_h20_validation)
+pred
+Accuracy_m2 <- pred$predict == forest_h20_validation$Cover_Type
+mean(Accuracy_m2)
+
+
+
+
+
+
+#hyperparameter tuning
+
+
+hyper_params <- list(
+  hidden=list(c(30),c(50),c(70),c(100),c(130),c(160),c(200),c(250),c(30,60),c(60,90),c(90,120),c(120,150),c(30,60,90),c(60,90,120),c(90,120,160)), 
+  input_dropout_ratio=c(0,0.05),
+  rate=c(0.01,0.02),
+  rate_annealing=c(1e-8,1e-7,1e-6))
+
+hyper_params
+grid <- h2o.grid(
+  "deeplearning",
+  model_id="dl_grid", 
+  training_frame=forest_h20_train,
+  validation_frame=forest_h20_validation, 
+  x=predictors, 
+  y=response,
+  epochs=10,
+  stopping_metric="misclassification",
+  stopping_tolerance=1e-2,        ## stop when logloss does not improve by >=1% for 2 scoring events
+  stopping_rounds=2,
+  score_validation_samples=10000, ## downsample validation set for faster scoring
+  score_duty_cycle=0.025,         ## don't score more than 2.5% of the wall time
+  adaptive_rate=F,                ## manually tuned learning rate
+  momentum_start=0.5,             ## manually tuned momentum
+  momentum_stable=0.9, 
+  momentum_ramp=1e7, 
+  l1=1e-5,
+  l2=1e-5,
+  activation=c("Rectifier"),
+  max_w2=10,                      ## can help improve stability for Rectifier
+  hyper_params=hyper_params
+)
+
+
+
+scores <- cbind(as.data.frame(unlist((lapply(grid@model_ids, function(x) 
+{ h2o.confusionMatrix(h2o.performance(h2o.getModel(x),valid=T))$Error[8] })) )), unlist(grid@model_ids))
+names(scores) <- c("misclassification","model")
+sorted_scores <- scores[order(scores$misclassification),]
+head(sorted_scores)
+best_model <- h2o.getModel(as.character(sorted_scores$model[1]))
+print(best_model@allparameters)
+best_err <- sorted_scores$misclassification[1]
+print(best_err)
+
+
+
+pred_final_deeplearning <- h2o.predict(best_model,foresttest_h20[,-1] )
+deeplearning_pred=as.data.frame(pred_final_deeplearning[,1])
+head(deeplearning_pred)
+
+
+deeplearning_submission1 = foresttest[,c(1,56)]
+deeplearning_submission1$Cover_Type = deeplearning_pred[,1]
+
+write.csv(deeplearning_submission1, 'deep_learing_submission1.csv', row.names = FALSE)
+
+# accuracy = 0.59460, rank = 1418
+
+
+
+
+
+# GBM via H2O -------------------------------------------
+
+gbm1 = h2o.gbm(
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covType1",
+  seed = 7)
+
+summary(gbm1)
+
+# accuracy
+h2o.hit_ratio_table(gbm1,valid = T)[1,2]
+# accuracy = .818783 for default parameters
+
+
+gbm2 = h2o.gbm(
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covType2",
+  seed = 7,
+  ntrees = 250,
+  max_depth = 18,
+  min_rows = 10,
+  learn_rate = .1  )
+
+# accuracy
+h2o.hit_ratio_table(gbm2,valid = T)[1,2]
+# 0.88459
+
+pred_final_gbm_h2o <- h2o.predict(gbm2,foresttest_h20[,-1] )
+pred_final_gbm_h2o=as.data.frame(pred_final_gbm_h2o[,1])
+head(pred_final_gbm_h2o)
+
+
+gbm_h2o_submission1 = foresttest[,c(1,56)]
+gbm_h2o_submission1$Cover_Type = pred_final_gbm_h2o[,1]
+
+write.csv(gbm_h2o_submission1, 'gbm_h2o_submission1.csv', row.names = FALSE)
+
+# kaggle accuracy = 0.76640, rank = 467
+
+
+
+
+gbm3 = h2o.gbm(
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covType3",
+  seed = 7,
+  ntrees = 1000,
+  max_depth = 18,
+  min_rows = 10,
+  learn_rate = .01,
+  sample_rate = 0.7,          ## use a random 70% of the rows to fit each tree
+  col_sample_rate = 0.7,       ## use 70% of the columns to fit each tree
+  stopping_rounds  = 2,
+  stopping_tolerance = 0.01,
+  score_each_iteration = T)
+
+# accuracy
+h2o.hit_ratio_table(gbm3,valid = T)[1,2]
+# 0.8561508
+
+
+# found that ntrees is the same after 40, so we will try 40 and 200
+# found max_depth of 20 is best for ntrees = 100 or 50
+hyper_params_gbm = list(
+  ntrees = c(40, 100, 200),
+  max_depth = 20,
+  min_rows = c(5, 10, 15),
+  learn_rate = c(.01, .1, .3)
+)
+
+grid_gbm = h2o.grid(
+  "gbm",
+  model_id = "gbm_covType3",  
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  seed = 7,
+  sample_rate = 0.7,
+  col_sample_rate = 0.7,
+  stopping_rounds  = 2,
+  stopping_tolerance = 0.01,
+  score_each_iteration = T,
+  #max_depth = 18,
+  #min_rows = 10,
+  #learn_rate = .1,
+  hyper_params = hyper_params_gbm)
+
+
+scores <- cbind(as.data.frame(unlist((lapply(grid_gbm@model_ids, function(x) 
+{ h2o.confusionMatrix(h2o.performance(h2o.getModel(x),valid=T))$Error[8] })) )), unlist(grid_gbm@model_ids))
+names(scores) <- c("misclassification","model")
+sorted_scores <- scores[order(scores$misclassification),]
+sorted_scores
+
+# best result had ntrees=200, max_depth=20, learn_rate=.1, min_rows=10
+# 2nd best result had ntrees=100, max_depth=20, learn_rate=.1, min_rows=10
+# 3rd best result had ntrees=40, max_depth=20, learn_rate=.1, min_rows=10
+
+
+
+gbm_final = h2o.gbm(
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covTypefinal",
+  seed = 7,
+  ntrees = 200,
+  max_depth = 20,
+  min_rows = 10,
+  learn_rate = .1,
+  sample_rate = 0.7,          ## use a random 70% of the rows to fit each tree
+  col_sample_rate = 0.7,       ## use 70% of the columns to fit each tree
+  stopping_rounds  = 2,
+  stopping_tolerance = 0.01,
+  score_each_iteration = T,
+  nfolds = 10)
+
+pred_gbm_h2o_tuned1 <- h2o.predict(gbm_final,foresttest_h20[,-1] )
+pred_gbm_h2o_tuned1 = as.data.frame(pred_gbm_h2o_tuned1[,1])
+head(pred_gbm_h2o_tuned1)
+
+gbm_h2o_submission_tuned1 = foresttest[,c(1,56)]
+gbm_h2o_submission_tuned1$Cover_Type = pred_gbm_h2o_tuned1[,1]
+
+write.csv(gbm_h2o_submission_tuned1, 'gbm_h2o_submission_tuned2.csv', row.names = FALSE)
+# kaggle accuracy = 0.76119 when old was 0.76640, rank = 521
+# submission 2 with cv 80/20 kaggle accuracy = 0.74509, rank = 911
+
+
+
+
+
+gbm_final2 = h2o.gbm(
+  training_frame = forest_h20_train,
+  validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covTypefinal",
+  seed = 7,
+  ntrees = 200,
+  max_depth = 20,
+  min_rows = 10,
+  learn_rate = .1#,
+#   sample_rate = 0.7,          ## use a random 70% of the rows to fit each tree
+#   col_sample_rate = 0.7,       ## use 70% of the columns to fit each tree
+#   stopping_rounds  = 2,
+#   stopping_tolerance = 0.01,
+#   score_each_iteration = T,
+#  nfolds = 10
+)
+
+pred_gbm_h2o_tuned2 <- h2o.predict(gbm_final2,foresttest_h20[,-1] )
+pred_gbm_h2o_tuned2 = as.data.frame(pred_gbm_h2o_tuned2[,1])
+head(pred_gbm_h2o_tuned2)
+
+gbm_h2o_submission_tuned2 = foresttest[,c(1,56)]
+gbm_h2o_submission_tuned2$Cover_Type = pred_gbm_h2o_tuned2[,1]
+
+write.csv(gbm_h2o_submission_tuned2, 'gbm_h2o_submission_tuned3.csv', row.names = FALSE)
+# submission without misc. parameters: kaggle accuracy = 0.76586, rank = 479
+
+
+
+h2o.shutdown(prompt=FALSE)
+
+
+
+
+
+
+
+
+
 
