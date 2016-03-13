@@ -1,6 +1,8 @@
 ---
 title: "Forest Cover Type Classification Project"
 author: "Thomas Kolasa and Aravind Kolumum Raja"
+header-includes:
+   - \usepackage{bbm}
 output: html_document 
 ---
 
@@ -24,14 +26,16 @@ We found the Forest Covertype in the UCI Machine Learning Repository that takes 
 <img src="images/tree_images/krummholz.jpeg", width="470px", height="307px" />
 </center>
 
+The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. The data 
+
 
 Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem.
 
 ```{r, echo=FALSE, message=FALSE}
 # data load next 340 lines
+setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
 library(dplyr)
@@ -388,17 +392,16 @@ ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=co
 Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
 
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-# ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect Group") + 
-#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-#   coord_polar()
-# 
-# ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) + ggtitle("Aspect Group Shift") + 
-#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-#   coord_polar()
-# 
-# ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area_names )) + ggtitle("Aspect Group Shift By Wilderness Area") + 
-#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-#   coord_polar()
+ ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect Group") + 
+  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+  coord_polar()
+
+ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) + ggtitle("Aspect Group Shift") + 
+  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+  coord_polar()
+ ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area_names )) + ggtitle("Aspect Group Shift By Wilderness Area") + 
+  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+  coord_polar()
 ```
 
 
@@ -411,19 +414,59 @@ Another compelling variable is aspect, or the cardinal direction that the slope 
 
 
 One of the more interesting facets of the dataset was the distribution of Hillshade luminance.
-Hillshade is measured on a scale from 0 to 255 (dark to bright).
+Hillshade is measured on a scale from 0 to 255 (dark to bright)
+
+
+Hillshade at time t varies as a factor of $$\cos(slope)\cos (90- Altitude) + \sin (slope)\sin (90-Altitude)\cos(Azimuth-Aspect)$$ 
+
+where Altitude is the angle of the Sun relative to the horizon and Azimuth relates to the direction the Sun is facing:North , South , East or West. Azimuth of 90 degrees corresponds to East.
+
+This equation actually arises from a theorem in Spherical geometry known as "Spherical law of Cosines"
+relating the sides and angles of triangles constructed on spherical surfaces.  
+
+https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg
+
+<center>
+<img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg", width="400px", height="300px" />
+
+</center>
+
+In a unit sphere, lengths a,b,c correspond to the angle subtended by those sides from the center of the sphere. 
+If we know the two sides a,b and the angle between them C, then the cosine of c, is given by 
+
+
+<img src="https://upload.wikimedia.org/math/b/b/3/bb37f9a9bc68d4f6fdf2a35337093c65.png", width="400px", height="300px" />
+
+
+In short, the Illumination of the patch is related to alitude of the sun, slope of the terrain and the relative direction of the sun and the slope. 
+
+$$Hillshade(t_1,t_2,t_3)$$ has has been plotted below in 3 dimensions
 
 
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
-#plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
+plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
 
 ```
+
+
+More importantly, in the context of class seperation , The following plot of Elevation, Slope and Hillshade
+clearly seperates the forest cover types showing that Elevation could be the most significant factor in determining cover type. 
 
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
-#plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = covername)
+plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = covername)
 
 ```
 
 
+The primary reason for the collection of cartographic data pertains to terrain mapping and is ultimately useful for applying topographic correction to satellite images in remote sensing or as background information in scientific studies.
+
+Topographic correction is necessary if,for example  we wish to identify materials on the Earth's surface by deriving empirical spectral signatures, or compare images taken at different times with different Sun and satellite positions and angles. By applying the corrections it is possible to  transform the satellite-derived reflectance into their true reflectivity or radiance in horizontal conditions. 
 
 
+
+References:
+
+https://en.wikipedia.org/wiki/Spherical_law_of_cosines
+https://scientiaplusconscientia.wordpress.com/2014/12/16/hillshading-useful-fun-with-digital-elevation-models/
+https://scientiaplusconscientia.wordpress.com/2014/08/06/working-with-modis-l1b-from-scratch-4-topographic-and-illumination-correction/
+http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Hillshade.htm
