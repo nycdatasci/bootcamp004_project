@@ -86,7 +86,8 @@
 # The third and fourth ELU digits are unique to the mapping unit 
 # and have no special meaning to the climatic or geologic zones.
 # 
-# Forest Cover Type Classes:	1 -- Spruce/Fir
+# Forest Cover Type Classes:
+#1 -- Spruce/Fir
 # 2 -- Lodgepole Pine
 # 3 -- Ponderosa Pine
 # 4 -- Cottonwood/Willow
@@ -427,7 +428,6 @@ foresttest1$aspect_group_class=as.factor(foresttest1$aspect_group_class)
 
 
 
-
 #-------------------------  Exploratory Visuals ------------------------------------------------#
 
 
@@ -460,6 +460,10 @@ ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) +
 ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area )) +
   geom_bar() +
   coord_polar()
+
+
+
+ggplot(forestdata) +geom_point(aes(x=Aspect, y=Elevation,color=covername)) +coord_polar()
 
 
 #The aspect value is higher across once side of the direction of slope,
@@ -767,8 +771,8 @@ forestdata1.test = forestdata1[-train.index, ]
 
 cv.multi = tune(svm,Cover_Type ~.-Id,data = forestdata1[train.index, ],
                 kernel = "linear",
-                ranges = list(cost = 10^(seq(-1, 1.5, length = 2)),
-                          gamma = 10^(seq(-2, 1, length = 2)), tune.control=3))
+                ranges = list(cost = 10^9,
+                          gamma = 10, tune.control=1))
 
 #Inspecting the cross-validation output.
 summary(cv.multi)
@@ -1541,6 +1545,22 @@ write.csv(extratrees_submission1, 'extratrees_submission_tuned1.csv', row.names 
 
 
 
+et_tuned_final1 <- extraTrees(x, y, mtry=14, numRandomCuts = 10, nodesize = 2, numThreads = 3, ntree=200)
+yhat_tuned2 <- predict(et_tuned_final1, xtest)
+
+
+yhat_tuned2 = as.data.frame(yhat_tuned2)
+
+extratrees_submission2 = foresttest[,c(1,56)]
+extratrees_submission2$Cover_Type = yhat_tuned2[,1]
+
+write.csv(extratrees_submission2, 'extratrees_submission_tuned2_mar12.csv', row.names = FALSE)
+
+
+#kaggle accuracy 0.78808 , rank 299
+
+
+
 
 
 # creating matrices for Feature engineered data
@@ -1581,10 +1601,65 @@ write.csv(extratrees_submission2, 'extratrees_submission2_allfeatures.csv', row.
 # Extra trees feature engineering resulted in  0.78739 rank 308 ---mtry=13, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=700
 
 
+#Tuning the Extra trees with feature engineering
+
+
+set.seed(1)
+train = sample(1:nrow(x), 8*nrow(x)/10)
+test = (-train)
+
+
+ntree = seq(50, 300, 10)
+accuracy_et = 1:length(ntree)
+
+for (i in 1:length(ntree))
+{
+  et_tune1 = extraTrees(xfactors_extra[train,], y_extra[train], mtry=13, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=ntree[i])
+  yhat = predict(et_tune1, xfactors_extra[test,])
+  confusion = confusionMatrix(yhat, y_extra.test, positive = '1')
+  accuracy_et[i] = confusion$overall[1]
+  print(i)
+}
+
+plot(ntree, accuracy_et, pch = 16, type = "b",
+     xlab = "Number of Trees",
+     ylab = "accuracy",
+     main = "Extra Trees Accuracy Changing Number of Trees")
+
+
+
+mtry_et = 1:65
+accuracy_et2 = 1:65
+
+for (i in 1:length(mtry_et))
+{
+  et_tune2 = extraTrees(xfactors_extra[train,], y_extra[train], mtry=i, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=150)
+  yhat = predict(et_tune2, xfactors_extra[test,])
+  confusion2 = confusionMatrix(yhat, y_extra.test, positive = '1')
+  accuracy_et2[i] = confusion2$overall[1]
+  print(i)
+}
+
+plot(mtry_et, accuracy_et2, pch = 16, type = "b",
+     xlab = "Number of Variables",
+     ylab = "accuracy",
+     main = "Extra Trees Accuracy Changing Number of Variables at Each Split")
+# choose 55 variables 
 
 
 
 
+et2 <- extraTrees(xfactors_extra, y_extra, mtry=56, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=200)
+yhat2 <- predict(et2, xtest_extra)
+
+yhat2 = as.data.frame(yhat2)
+
+extratrees_submission2 = foresttest[,c(1,56)]
+extratrees_submission2$Cover_Type = yhat2[,1]
+
+write.csv(extratrees_submission2, 'extratrees_submission3_allfeatures_tuned.csv', row.names = FALSE)
+
+# this did not improved our score 0.757000 - rank 613
 
 
 
@@ -1604,7 +1679,7 @@ for (pkg in pkgs) {
 }
 
 # Now we download, install and initialize the H2O package for R.
-#install.packages("h2o", type="source", repos=(c("http://h2o-release.s3.amazonaws.com/h2o/rel-turan/3/R")))
+install.packages("h2o", type="source", repos=(c("http://h2o-release.s3.amazonaws.com/h2o/rel-turan/3/R")))
 library(h2o)
 library(devtools)
 
@@ -1613,10 +1688,10 @@ h2o.init(nthreads=-1, max_mem_size="3G")
 h2o.removeAll() ## clean slate - just in case
 
 # re-load the dataframe in H20 format
-#forest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv"))
-#foresttest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv"))
-forest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv'))
-foresttest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv'))
+forest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv"))
+foresttest_h20 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv"))
+#forest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv'))
+#foresttest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv'))
 
 
 
@@ -1672,10 +1747,11 @@ m1 <- h2o.deeplearning(
   x=predictors,
   y=response,
   activation="Rectifier",  ## default
-  hidden=c(130,150,70),## default: 2 hidden layers with 200 neurons each, 
+  hidden=c(10,50,70,60),## default: 2 hidden layers with 200 neurons each, 
   epochs = 20 ,    
   variable_importances=T,
-  epsilon =1e-7 ## not enabled by default
+  epsilon =1e-7,
+  adaptive_rate =  ## not enabled by default
 )
 summary(m1)
 
@@ -1960,8 +2036,8 @@ write.csv(gbm_h2o_submission_tuned1, 'gbm_h2o_submission_tuned2.csv', row.names 
 
 
 gbm_final2 = h2o.gbm(
-  training_frame = forest_h20_train,
-  validation_frame = forest_h20_validation,
+  training_frame = forest_h20,
+  #validation_frame = forest_h20_validation,
   x=predictors, 
   y=response,
   model_id = "gbm_covTypefinal",
@@ -1969,13 +2045,13 @@ gbm_final2 = h2o.gbm(
   ntrees = 200,
   max_depth = 20,
   min_rows = 10,
-  learn_rate = .1#,
-#   sample_rate = 0.7,          ## use a random 70% of the rows to fit each tree
-#   col_sample_rate = 0.7,       ## use 70% of the columns to fit each tree
+  learn_rate = .1, 
+   sample_rate = 0.6,          ## use a random 70% of the rows to fit each tree
+   col_sample_rate = 0.6,       ## use 70% of the columns to fit each tree
 #   stopping_rounds  = 2,
 #   stopping_tolerance = 0.01,
 #   score_each_iteration = T,
-#  nfolds = 10
+  nfolds = 15
 )
 
 pred_gbm_h2o_tuned2 <- h2o.predict(gbm_final2,foresttest_h20[,-1] )
@@ -1985,19 +2061,76 @@ head(pred_gbm_h2o_tuned2)
 gbm_h2o_submission_tuned2 = foresttest[,c(1,56)]
 gbm_h2o_submission_tuned2$Cover_Type = pred_gbm_h2o_tuned2[,1]
 
-write.csv(gbm_h2o_submission_tuned2, 'gbm_h2o_submission_tuned3.csv', row.names = FALSE)
+write.csv(gbm_h2o_submission_tuned2, 'gbm_h2o_submission_tuned4_15nfold_0.6 sample.csv', row.names = FALSE)
 # submission without misc. parameters: kaggle accuracy = 0.76586, rank = 479
 
+# Score 0.78052 rank 356 for using 15 fold cv
 
+
+pred_gbm_h2o_tuned4 <- h2o.predict(gbm_final2,foresttest_h20[,-c(1,22,30)] )
+pred_gbm_h2o_tuned4 = as.data.frame(pred_gbm_h2o_tuned4[,1])
+head(pred_gbm_h2o_tuned4)
+
+gbm_h2o_submission_tuned4 = foresttest[,c(1,56)]
+gbm_h2o_submission_tuned4$Cover_Type = pred_gbm_h2o_tuned4[,1]
+
+write.csv(gbm_h2o_submission_tuned4, 'gbm_h2o_submission_tuned5_15nfold_0.6 sample_remove7and15.csv', row.names = FALSE)
+
+
+
+
+
+
+
+
+
+gbm_final3 = h2o.gbm(
+  training_frame = forest_h20,
+  #validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_covTypefinal6",
+  seed = 7,
+  ntrees = 200,
+  max_depth = 20,
+  min_rows = 10,
+  learn_rate = .1, 
+  sample_rate = 0.4,          ## use a random 40% of the rows to fit each tree
+  col_sample_rate = 0.3,       ## use 3% of the columns to fit each tree
+  #   stopping_rounds  = 2,
+  #   stopping_tolerance = 0.01,
+  #   score_each_iteration = T,
+  nfolds =9
+)
+
+
+pred_gbm_h2o_tuned6 <- h2o.predict(gbm_final3,foresttest_h20[,-1] )
+pred_gbm_h2o_tuned6 = as.data.frame(pred_gbm_h2o_tuned2[,1])
+head(pred_gbm_h2o_tuned2)
+
+gbm_h2o_submission_tuned6 = foresttest[,c(1,56)]
+gbm_h2o_submission_tuned6$Cover_Type = pred_gbm_h2o_tuned6[,1]
+write.csv(gbm_h2o_submission_tuned6, 'gbm_h2o_submission_tuned6fold_0.3sample.csv', row.names = FALSE)
 
 h2o.shutdown(prompt=FALSE)
 
 
 
 
+# Ensemble1 - basic voting ensemble
 
 
 
+
+
+
+
+
+#Ensemble2
+
+
+library(devtools)
+#install_github("h2oai/h2o-3/h2o-r/ensemble/h2oEnsemble-package")
 
 
 
