@@ -14,6 +14,17 @@ We found the Forest Covertype in the UCI Machine Learning Repository that takes 
 6. Douglas-fir
 7. Krummholz
 
+<center>
+<img src="images/tree_images/Spruce-fir.jpeg", width="400px", height="300px" />
+<img src="images/tree_images/lodgepole_pine.jpeg", width="385px", height="372px" /></br>
+<img src="images/tree_images/ponderosa_pine.jpeg", width="333px", height="379px" />
+<img src="images/tree_images/cottonwood_willow.jpeg", width="450px", height="377px" /></br>
+<img src="images/tree_images/aspen.jpeg", width="587px", height="391px" />
+<img src="images/tree_images/douglas-fir.jpeg", width="200px", height="398px" />
+<img src="images/tree_images/krummholz.jpeg", width="470px", height="307px" />
+</center>
+
+
 Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem.
 
 ```{r, echo=FALSE, message=FALSE}
@@ -377,26 +388,23 @@ ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=co
 Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
 
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-
-
-
-ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect Group") + 
-  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-  coord_polar()
-
-ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) + ggtitle("Aspect Group Shift") + 
-  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-  coord_polar()
-
-ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area_names )) + ggtitle("Aspect Group Shift By Wilderness Area") + 
-  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-  coord_polar()
+# ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect Group") + 
+#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+#   coord_polar()
+# 
+# ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) + ggtitle("Aspect Group Shift") + 
+#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+#   coord_polar()
+# 
+# ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area_names )) + ggtitle("Aspect Group Shift By Wilderness Area") + 
+#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+#   coord_polar()
 ```
 
 
 ```{r, echo=FALSE, fig.width=18, fig.height=18, dpi=300}
-columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
-ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
+#columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
+#ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
 
 ```
 
@@ -407,12 +415,12 @@ Hillshade is measured on a scale from 0 to 255 (dark to bright).
 
 
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
-plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
+#plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
 
 ```
 
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
-plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = covername)
+#plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = covername)
 
 ```
 
