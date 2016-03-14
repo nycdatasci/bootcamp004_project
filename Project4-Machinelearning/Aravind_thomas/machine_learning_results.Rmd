@@ -1,5 +1,5 @@
 ---
-title: "Forest Cover Type Classification Project"
+title: "Forest Cover Type Classification Study"
 author: "Thomas Kolasa and Aravind Kolumum Raja"
 header-includes:
    - \usepackage{bbm}
@@ -27,7 +27,7 @@ We found the Forest Covertype in the UCI Machine Learning Repository that takes 
 <img src="images/tree_images/krummholz.jpeg", width="286px", height="196px" />
 </center>
 
-The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem.
+The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem. We decided to use the machine learning and visualization packages available in R for this project.
 
 ```{r, echo=FALSE, message=FALSE}
 # data load next 340 lines
@@ -452,7 +452,7 @@ Topographic correction is necessary if, for example, we wish to identify materia
 
 ### Logistic Regression
 
-We first investigated multinomial logistic regression. Since classical logistic regression requires that each of the variables are in independent, we made sure to run our logistic regressions with regularization. Using the dataset *x*, the probability of the response class *k* of 1 through 7 is the following:
+We first investigated multinomial logistic regression. Since classical multiple regression in sensitive to high variance of coefficient estimates in cases of correlated predictor variables, we decided to use the *glmnet* package, which executes logistic regressions with regularization. Using the dataset *x*, the probability of the response class *k* of 1 through 7 is the following:
 
 $$\mbox{Pr}(G=k|X=x)=\frac{e^{\beta_{0k}+\beta_k^Tx}}{\sum_{\ell=1}^7e^{\beta_{0\ell}+\beta_\ell^Tx}}$$
 
