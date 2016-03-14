@@ -1,11 +1,12 @@
 ---
-title: "Forest Cover Type Classification Project"
+title: "Forest Cover Type Classification Study"
 author: "Thomas Kolasa and Aravind Kolumum Raja"
 header-includes:
    - \usepackage{bbm}
 output: html_document 
 ---
 
+### Introduction
 We found the Forest Covertype in the UCI Machine Learning Repository that takes forestry data from the Roosevelt National Forest in northern Colorado ([Click here](https://tourbuilder.withgoogle.com/tour/ahJzfmd3ZWItdG91cmJ1aWxkZXJyEQsSBFRvdXIYgICAk5uU5AoM) for a tour of the area). The observations are taken from 30m by 30m patches of forest that are classified as one of seven forest types:
 
 1. Spruce/Fir
@@ -17,25 +18,22 @@ We found the Forest Covertype in the UCI Machine Learning Repository that takes 
 7. Krummholz
 
 <center>
-<img src="images/tree_images/Spruce-fir.jpeg", width="400px", height="300px" />
-<img src="images/tree_images/lodgepole_pine.jpeg", width="385px", height="372px" /></br>
-<img src="images/tree_images/ponderosa_pine.jpeg", width="333px", height="379px" />
-<img src="images/tree_images/cottonwood_willow.jpeg", width="450px", height="377px" /></br>
-<img src="images/tree_images/aspen.jpeg", width="587px", height="391px" />
-<img src="images/tree_images/douglas-fir.jpeg", width="200px", height="398px" />
-<img src="images/tree_images/krummholz.jpeg", width="470px", height="307px" />
+<img src="images/tree_images/Spruce-fir.jpeg", width="240px", height="190px" />
+<img src="images/tree_images/lodgepole_pine.jpeg", width="230px", height="210px" />
+<img src="images/tree_images/ponderosa_pine.jpeg", width="166px", height="180px" />
+<img src="images/tree_images/cottonwood_willow.jpeg", width="225px", height="180px" /></br>
+<img src="images/tree_images/aspen.jpeg", width="293px", height="195px" />
+<img src="images/tree_images/douglas-fir.jpeg", width="100px", height="199px" />
+<img src="images/tree_images/krummholz.jpeg", width="286px", height="196px" />
 </center>
 
-The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. The data 
-
-
-Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem.
+The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem. We decided to use the machine learning and visualization packages available in R for this project.
 
 ```{r, echo=FALSE, message=FALSE}
 # data load next 340 lines
-setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-#setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
 library(dplyr)
@@ -362,7 +360,7 @@ forestdata$Wilderness_Area_names[forestdata$Wilderness_Area == 4] = "Cache la Po
 ```
 
 
-###Data Exploration
+### Data Exploration
 
 Name                                | Measurement                   |    Description
 ------------------------------------|-------------------------------|----------------------------------------------------
@@ -378,95 +376,168 @@ Hillshade 3pm                       |    0 to 255 index             |  Hillshade
 Horizontal Distance To Fire Points  |    meters                     |  Horz Dist to nearest wildfire ignition points
 Wilderness Area (4 binary columns)  |    0 (absence) or 1 (presence)|  Wilderness area designation
 Soil Type (40 binary columns)       |    0 (absence) or 1 (presence)|  Soil Type designation
-Cover Type (7 types)                |    1 to 7                     |  Forest Cover Type designation - Dependent Variable
+Cover Type                          |    Classes 1 to 7             |  Forest Cover Type designation - Response Variable
 
 
 Some class seperation is clearly visible in the following plots of elevation.
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
 
-ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
-ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
-ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+# ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+# ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
+# ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
 ```
 
 Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
 
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
- ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect Group") + 
-  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-  coord_polar()
-
-ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) + ggtitle("Aspect Group Shift") + 
-  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-  coord_polar()
- ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area_names )) + ggtitle("Aspect Group Shift By Wilderness Area") + 
-  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-  coord_polar()
+# ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect Group") + 
+#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+#   coord_polar()
+# 
+# ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) + ggtitle("Aspect Group Shift") + 
+#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+#   coord_polar()
+#  ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area_names )) + ggtitle("Aspect Group Shift By Wilderness Area") + 
+#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+#   coord_polar()
 ```
 
 
 ```{r, echo=FALSE, fig.width=18, fig.height=18, dpi=300}
 #columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
 #ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
-
 ```
 
 
 
-One of the more interesting facets of the dataset was the distribution of Hillshade luminance.
-Hillshade is measured on a scale from 0 to 255 (dark to bright)
+One of the clearer relationships in the dataset was the distribution of Hillshade luminance. Hillshade is measured on a scale from 0 to 255 (dark to bright).
 
+Hillshade at time *t* varies as a factor of:
+$$\cos(slope)\cos (90- Altitude) + \sin (slope)\sin (90-Altitude)\cos(Azimuth-Aspect)$$ 
+where Altitude is the angle of the Sun relative to the horizon and Azimuth relates to the direction the Sun is facing: North, South, East, or West. Azimuth of 90 degrees corresponds to East.
 
-Hillshade at time t varies as a factor of $$\cos(slope)\cos (90- Altitude) + \sin (slope)\sin (90-Altitude)\cos(Azimuth-Aspect)$$ 
+This equation actually arises from a theorem in Spherical geometry known as "Spherical law of Cosines" relating the sides and angles of triangles constructed on spherical surfaces.  
 
-where Altitude is the angle of the Sun relative to the horizon and Azimuth relates to the direction the Sun is facing:North , South , East or West. Azimuth of 90 degrees corresponds to East.
+<center><img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg", width="400px", height="300px" /></center>
 
-This equation actually arises from a theorem in Spherical geometry known as "Spherical law of Cosines"
-relating the sides and angles of triangles constructed on spherical surfaces.  
-
-https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg
-
-<center>
-<img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg", width="400px", height="300px" />
-
-</center>
-
-In a unit sphere, lengths a,b,c correspond to the angle subtended by those sides from the center of the sphere. 
-If we know the two sides a,b and the angle between them C, then the cosine of c, is given by 
-
+In a unit sphere, lengths *a*, *b*, *c* correspond to the angle subtended by those sides from the center of the sphere. 
+If we know the two sides *a*, *b* and the angle between them *C*, then the cosine of *c*, is given by:
 
 <img src="https://upload.wikimedia.org/math/b/b/3/bb37f9a9bc68d4f6fdf2a35337093c65.png", width="400px", height="300px" />
 
-
 In short, the Illumination of the patch is related to alitude of the sun, slope of the terrain and the relative direction of the sun and the slope. 
 
-$$Hillshade(t_1,t_2,t_3)$$ has has been plotted below in 3 dimensions
+$Hillshade(t_1,t_2,t_3)$ has has been plotted below in 3 dimensions:
 
 
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
-plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
-
+#plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
 ```
 
 
-More importantly, in the context of class seperation , The following plot of Elevation, Slope and Hillshade
-clearly seperates the forest cover types showing that Elevation could be the most significant factor in determining cover type. 
+More importantly, in the context of class seperation, The following plot of elevation, slope, and hillshade clearly seperates the forest cover types, demonstrating that elevation could be the most significant factor in determining cover type. 
 
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
-plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers",color = covername)
-
+#plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers", color = covername)
 ```
 
 
 The primary reason for the collection of cartographic data pertains to terrain mapping and is ultimately useful for applying topographic correction to satellite images in remote sensing or as background information in scientific studies.
 
-Topographic correction is necessary if,for example  we wish to identify materials on the Earth's surface by deriving empirical spectral signatures, or compare images taken at different times with different Sun and satellite positions and angles. By applying the corrections it is possible to  transform the satellite-derived reflectance into their true reflectivity or radiance in horizontal conditions. 
+Topographic correction is necessary if, for example, we wish to identify materials on the Earth's surface by deriving empirical spectral signatures, or to compare images taken at different times with different Sun and satellite positions and angles. By applying the corrections, it is possible to  transform the satellite-derived reflectance into their true reflectivity or radiance in horizontal conditions.
 
 
 
-References:
+## Modeling
 
-https://en.wikipedia.org/wiki/Spherical_law_of_cosines
-https://scientiaplusconscientia.wordpress.com/2014/12/16/hillshading-useful-fun-with-digital-elevation-models/
-https://scientiaplusconscientia.wordpress.com/2014/08/06/working-with-modis-l1b-from-scratch-4-topographic-and-illumination-correction/
-http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Hillshade.htm
+### Logistic Regression
+
+We first investigated multinomial logistic regression. Since classical multiple regression in sensitive to high variance of coefficient estimates in cases of correlated predictor variables, we decided to use the *glmnet* package, which executes logistic regressions with regularization. Using the dataset *x*, the probability of the response class *k* of 1 through 7 is the following:
+
+$$\mbox{Pr}(G=k|X=x)=\frac{e^{\beta_{0k}+\beta_k^Tx}}{\sum_{\ell=1}^7e^{\beta_{0\ell}+\beta_\ell^Tx}}$$
+
+We then transfer this into the elastic-net penalized negative log-likelihood function (the first term of the following equation):
+
+$$\ell(\{\beta_{0k},\beta_{k}\}_1^7) = -\left[\frac{1}{N} \sum_{i=1}^N \Big(\sum_{k=1}^7y_{il} (\beta_{0k} + x_i^T \beta_k)- \log \big(\sum_{k=1}^7 e^{\beta_{0k}+x_i^T \beta_k}\big)\Big)\right] +\lambda \left[ (1-\alpha)||\beta||_F^2/2 + \alpha\sum_{j=1}^p||\beta_j||\right]$$
+
+Where *k* is the response class (cover type from 1 to 7) and *N* is the number of observations.
+The second term in the equation represents the regularization term.
+
+The elastic net penalty $\alpha$ varies from 0 to 1. When $\alpha = 0$, the function reduces to Ridge regularization. When $\alpha = 1$, Lasso regularization is used. The Ridge penalty shrinks the coefficients of closely correlated predictors wheras the Lasso tries to pick one and discard others.
+
+
+
+#### Ridge Regularization
+
+We performed 10-fold cross validation on a ridge regularization and on a grid of 100 values of $\lambda$, choosing the minimum $\lambda$ for each model. When we ran the regression with a 70-30 cross validation split on the training set, we got an accuracy on the test set on Kaggle of **0.5570** (rank of 1,489th place). 
+
+When we reran the ridge regression with an 85-15 split on the training data, we got a Kaggle accuracy of **0.5956** (1,414th place). Since the test set is so much larger than our training set, it was beneficial to incorporate a larger proportion of the data for learning within the training data before runnint the model on the larger testing data.
+
+![](images/Ridgeregressiondeviancevslambda.jpeg)
+
+#### Lasso Regularization
+
+A 10-fold cross validated lasso-regularized logistic regression kaggle score was **0.59594**, 1411th place for 70-30 split kaggle score of **0.59526**, 1415th place for 85-15 split kaggle score of **0.59443** if we took the lowest 50 percintile of lambdas and calculated the mode of the predictions.
+
+![](images/lasso_cv_deviance_by_loglambda.jpeg)
+
+#### Elastic-net Regularization
+
+Using both the ridge and lasso regularization terms concurrently produces an elastic-net regularization. We ran this hybrid method with both a 70-30 split and 85-15 split in the training set. When running these models on the testing set, we got accuracies on Kaggle of **0.5959** (1,412th place) and **0.5952** (1,415th place), respectively.
+
+We also tried an elastic-net regression using all 15,120 observations in the training set. It earned an accuracy score on the testing set of **0.5950** (1,417th place).
+
+![](images/elastic netlambdadevianceplot.jpeg)
+
+
+
+### Artificial Neural Networks
+
+#### Single Hidden Layer Using the nnet Package
+
+#### Deep Learning using H2O
+
+
+
+### Random Forest
+
+#### Boosting Using XGBoost
+
+#### Boosting Using H2O's Gradient Boosting Algorithm
+
+#### Extremely Randomized Trees
+
+
+
+
+
+
+
+### Support Vector Machines ?
+
+
+
+
+#### Ensembling
+
+
+
+## Results Summary
+
+Model          | 
+-------------------
+Logistic Regression - 
+Ridge
+Lasso
+Elastic-net
+
+
+
+## References:
+
+- https://en.wikipedia.org/wiki/Spherical_law_of_cosines
+- https://scientiaplusconscientia.wordpress.com/2014/12/16/hillshading-useful-fun-with-digital-elevation-models/
+- https://scientiaplusconscientia.wordpress.com/2014/08/06/working-with-modis-l1b-from-scratch-4-topographic-and-illumination-correction/
+- http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Hillshade.htm
+- https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg
+- https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html

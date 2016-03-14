@@ -1530,6 +1530,7 @@ plot_ly(accuracy_et3, x = `Number of random cuts` , y = `Accuracy`,
 
 
 et_tuned_final1 <- extraTrees(x, y, mtry=10, numRandomCuts = 5, nodesize = 2, numThreads = 3, ntree=200)
+yhat_feed <- predict(et_tuned_final1,x)
 yhat_tuned <- predict(et_tuned_final1, xtest)
 # Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
 
@@ -1544,17 +1545,49 @@ write.csv(extratrees_submission1, 'extratrees_submission_tuned1.csv', row.names 
 
 
 
+# Ensemblin with extratress+gbm h20
+#pred_gbm_h2o_ensemble1_train = as.data.frame(pred_gbm_h2o_ensemble1_train)
+forestdata4=forestdata1
+forestdata4$feed_gbmensemble=pred_gbm_h2o_ensemble1_train[,1]
+xfactors1 <- model.matrix(Cover_Type ~. -Id, data = forestdata4)[,-1]
+x1=as.matrix(xfactors1)
 
-et_tuned_final1 <- extraTrees(x, y, mtry=14, numRandomCuts = 10, nodesize = 2, numThreads = 3, ntree=200)
-yhat_tuned2 <- predict(et_tuned_final1, xtest)
+
+foresttest4=foresttest[,1:55]
+foresttest4$feed_gbmensemble=pred_gbm_h2o_ensemble1[,1]
+
+for (i in 12:55)
+{
+  foresttest4[,i]=as.factor(foresttest4[,i])
+}
+
+foresttest4$Cover_Type = sample(1:7, nrow(foresttest4), replace = TRUE)
+foresttest4$Cover_Type =as.factor(foresttest4$Cover_Type)
+
+set.seed(0)
+train = sample(1:nrow(x), 80*nrow(x)/100)
+test = (-train)
+
+y1 = forestdata$Cover_Type
+y1.test = y1[test]
 
 
-yhat_tuned2 = as.data.frame(yhat_tuned2)
+xfactorstest1 <- model.matrix(Cover_Type ~. -Id,data=foresttest4)[,-1]
+xtest1=as.matrix(xfactorstest1)
 
-extratrees_submission2 = foresttest[,c(1,56)]
-extratrees_submission2$Cover_Type = yhat_tuned2[,1]
+xtest1 = xtest1[, -c(21, 29)]
 
-write.csv(extratrees_submission2, 'extratrees_submission_tuned2_mar12.csv', row.names = FALSE)
+
+
+et_tuned_ensemblefeed <- extraTrees(x1, y1, mtry=14, numRandomCuts = 10, nodesize = 2, numThreads = 3, ntree=200)
+yhat_ensemblefeed <- predict(et_tuned_ensemblefeed, xtest1)
+
+yhat_ensemblefeed = as.data.frame(yhat_ensemblefeed)
+
+extratrees_submissionfinal = foresttest[,c(1,56)]
+extratrees_submissionfinal$Cover_Type = yhat_ensemblefeed[,1]
+
+write.csv(extratrees_submissionfinal, 'extratrees_submission_ensemblegbm.csv', row.names = FALSE)
 
 
 #kaggle accuracy 0.78808 , rank 299
@@ -2112,25 +2145,178 @@ gbm_h2o_submission_tuned6 = foresttest[,c(1,56)]
 gbm_h2o_submission_tuned6$Cover_Type = pred_gbm_h2o_tuned6[,1]
 write.csv(gbm_h2o_submission_tuned6, 'gbm_h2o_submission_tuned6fold_0.3sample.csv', row.names = FALSE)
 
+
+
+# Ensemble1 - basic voting ensemble
+
+#resulted only in 0.76 accuracy based on RF, GBM, Extratrees and XGboost
+
+
+
+
+
+
+#Ensemble2 - Feeding Extratrees to H20 XGB
+
+yhat_feed=as.data.frame(yhat_feed)
+yhat_feed[,1]=as.factor(yhat_feed[,1])
+
+foresttest_h20$feed_extra=as.numeric(yhat_feed[,1])
+
+library(devtools)
+#install_github("h2oai/h2o-3/h2o-r/ensemble/h2oEnsemble-package")
+
+forestdata3=forestdata1
+forestdata3$feed_extra=yhat_feed[,1]
+write.csv(forestdata3,"ensemblefeed.csv")
+
+forest_h201 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/ensemblefeed.csv"))
+
+#forest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv'))
+#foresttest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv'))
+
+
+
+# par(mfrow=c(1,1)) # reset canvas
+# plot(h2o.tabulate(forestdata1, "Elevation",                       "Cover_Type"))
+# plot(h2o.tabulate(df, "Horizontal_Distance_To_Roadways", "Cover_Type"))
+# plot(h2o.tabulate(df, "Soil_Type",                       "Cover_Type"))
+# plot(h2o.tabulate(df, "Horizontal_Distance_To_Roadways", "Elevation" ))
+# 
+
+forest_h201 = forest_h201[,-c(1,2)]
+
+for (i in 11:54)
+{
+  forest_h201[,i]=as.factor(forest_h201[,i])
+}
+
+foresttesth1=foresttest[,1:56]
+foresttesth1$feed_extra=yhat_tuned[,1]
+
+write.csv(foresttesth1,"ensemblefeedtest.csv")
+
+foresttest_h201 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/ensemblefeedtest.csv"))
+
+
+
+foresttest_h201 = foresttest_h201[,-c(1,2,57)]
+
+
+for (i in 12:55)
+{
+  foresttest_h201[,i]=as.factor(foresttest_h201[,i])
+}
+
+response <- "Cover_Type"
+predictors <- setdiff(names(forest_h201), response)
+predictors
+
+
+
+
+gbm_final_ensemble = h2o.gbm(
+  training_frame = forest_h201,
+  #validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_ensemble1",
+  seed = 7,
+  ntrees = 200,
+  max_depth = 20,
+  min_rows = 10,
+  learn_rate = .1, 
+  sample_rate = 0.6,          ## use a random 70% of the rows to fit each tree
+  col_sample_rate = 0.6,       ## use 70% of the columns to fit each tree
+  #   stopping_rounds  = 2,
+  #   stopping_tolerance = 0.01,
+  #   score_each_iteration = T,
+  nfolds = 15
+)
+
+
+
+pred_gbm_h2o_ensemble1 <- h2o.predict(gbm_final_ensemble,foresttest_h201)
+
+pred_gbm_h2o_ensemble1 = as.data.frame(pred_gbm_h2o_ensemble1)
+head(pred_gbm_h2o_ensemble1)
+
+ensemble_h2o_submission_1 = foresttest[,c(1,56)]
+ensemble_h2o_submission_1$Cover_Type = pred_gbm_h2o_ensemble1[,1]
+write.csv(ensemble_h2o_submission_1, 'ensemble_feedextratrees_to_gbm1.csv', row.names = FALSE)
+
+#best GBM accuracy 0.79182 - still lower than Extratrees . 
+
+
+pred_gbm_h2o_ensemble1_train <- h2o.predict(gbm_final_ensemble,forest_h201)
+pred_gbm_h2o_ensemble1_train = as.data.frame(pred_gbm_h2o_ensemble1_train)
+
+
+
 h2o.shutdown(prompt=FALSE)
 
 
 
 
-# Ensemble1 - basic voting ensemble
+#Using XG Boost on the Ensemble above
+
+library(xgboost)
+param = list("objective" = "multi:softprob",
+             "eval_metric" = "mlogloss",
+             "num_class" = 8)
+
+cv.nround = 200
+cv.nfold = 10
+
+bst.cv = xgb.cv(param=param, data = x1, label = y1,
+                nfold = cv.nfold, nrounds = cv.nround, prediction = T)
+
+min.logloss.dx = which.min(bst.cv$dt[, test.mlogloss.mean])
+
+min.logloss.dx 
+
+pred.cv = matrix(bst.cv$pred, nrow=length(bst.cv$pred)/8, ncol=8)
+pred.cv = max.col(pred.cv, "last")
+
+pred.cv=pred.cv-rep(1,15120)
+
+confusionMatrix(factor(y1), factor(pred.cv))
+
+
+
+bst = xgboost(param=param, data = x1, label = y1,
+              nfold = cv.nfold, nrounds = min.logloss.dx)
 
 
 
 
+pred_xgb1 = predict(bst, xtest1)
+
+pred_xgb1 = matrix(pred_xgb1, nrow=8, ncol=length(pred_xgb1)/8)
+pred_xgb1 = t(pred_xgb1)
+pred_xgb1 = max.col(pred_xgb1, "last")
 
 
+pred_xgb1_summary = as.data.frame(pred_xgb1)
+pred_xgb1_summary[,1]=pred_xgb1_summary[,1]- rep(1,nrow(pred_xgb1_summary))
+
+xgb_submission1 = foresttest[,c(1,56)]
+xgb_submission1$Cover_Type = pred_xgb1_summary[,1]
+
+write.csv(xgb_submission1, 'extratrees_to_GBM_to_xgb_ensemble.csv', row.names = FALSE)
+
+# Compute feature importance matrix
+library(Ckmeans.1d.dp)
+
+names <- dimnames(x1)[[2]]
 
 
-#Ensemble2
+importance_matrix <- xgb.importance(names[1:10], model = bst)
 
 
-library(devtools)
-#install_github("h2oai/h2o-3/h2o-r/ensemble/h2oEnsemble-package")
+xgb.plot.importance(importance_matrix[1:20,])
+
+
 
 
 
