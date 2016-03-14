@@ -473,20 +473,29 @@ We performed 10-fold cross validation on a ridge regularization and on a grid of
 
 When we reran the ridge regression with an 85-15 split on the training data, we got a Kaggle accuracy of **0.5956** (1,414th place). Since the test set is so much larger than our training set, it was beneficial to incorporate a larger proportion of the data for learning within the training data before runnint the model on the larger testing data.
 
+![](images/Ridgeregressiondeviancevslambda.jpeg)
 
 #### Lasso Regularization
 
-A 10-fold cross validated lasso-regularized logistic regression kaggle score = **0.59594**, 1411th place for 70-30 split kaggle score of **0.59526**, 1415th place for 85-15 split kaggle score of **0.59443** if we took the lowest 50 percintile of lambdas and calculated the mode of the predictions.
+A 10-fold cross validated lasso-regularized logistic regression kaggle score was **0.59594**, 1411th place for 70-30 split kaggle score of **0.59526**, 1415th place for 85-15 split kaggle score of **0.59443** if we took the lowest 50 percintile of lambdas and calculated the mode of the predictions.
+
+![](images/lasso_cv_deviance_by_loglambda.jpeg)
 
 #### Elastic-net Regularization
 
-Using both the ridge and lasso regularization terms concurrently produces an elastic-net regression. We ran this hybrid method with both a 70-30 split and 85-15 split in the training set. When running these models on the testing set, we got accuracies on Kaggle of **0.5959** (1,412th place) and **0.5952** (1,415th place), respectively.
+Using both the ridge and lasso regularization terms concurrently produces an elastic-net regularization. We ran this hybrid method with both a 70-30 split and 85-15 split in the training set. When running these models on the testing set, we got accuracies on Kaggle of **0.5959** (1,412th place) and **0.5952** (1,415th place), respectively.
 
-We also tried an elastic-net regression using all 15,120 observations in the training set. However, since this did not use cross validation, it likely overfitted slightly, earning an accuracy score on the testing set of **0.5950** (1,417th place).
+We also tried an elastic-net regression using all 15,120 observations in the training set. It earned an accuracy score on the testing set of **0.5950** (1,417th place).
+
+![](images/elastic netlambdadevianceplot.jpeg)
 
 
 
+### Artificial Neural Networks
 
+#### Single Hidden Layer Using the nnet Package
+
+#### Deep Learning using H2O
 
 
 
@@ -500,11 +509,7 @@ We also tried an elastic-net regression using all 15,120 observations in the tra
 
 
 
-### Artificial Neural Networks
 
-#### Single Hidden Layer Using the nnet Package
-
-#### Deep Learning using H2O
 
 
 
@@ -530,8 +535,9 @@ Elastic-net
 
 ## References:
 
-https://en.wikipedia.org/wiki/Spherical_law_of_cosines
-https://scientiaplusconscientia.wordpress.com/2014/12/16/hillshading-useful-fun-with-digital-elevation-models/
-https://scientiaplusconscientia.wordpress.com/2014/08/06/working-with-modis-l1b-from-scratch-4-topographic-and-illumination-correction/
-http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Hillshade.htm
-https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg
+- https://en.wikipedia.org/wiki/Spherical_law_of_cosines
+- https://scientiaplusconscientia.wordpress.com/2014/12/16/hillshading-useful-fun-with-digital-elevation-models/
+- https://scientiaplusconscientia.wordpress.com/2014/08/06/working-with-modis-l1b-from-scratch-4-topographic-and-illumination-correction/
+- http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Hillshade.htm
+- https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg
+- https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html
