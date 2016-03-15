@@ -1865,10 +1865,10 @@ mean(Accuracy_m2)
 
 
 hyper_params <- list(
-  hidden=list(c(30),c(50),c(70),c(100),c(130),c(160),c(200),c(250),c(30,60),c(60,90),c(90,120),c(120,150),c(30,60,90),c(60,90,120),c(90,120,160)), 
-  input_dropout_ratio=c(0,0.05),
-  rate=c(0.01,0.02),
-  rate_annealing=c(1e-8,1e-7,1e-6))
+  hidden=list(c(120,150),c(500,800)), 
+  input_dropout_ratio=c(0,0.01,0.05,0.2),
+  rate=c(0.01,0.02,0.2),
+  rate_annealing=c(1e-9,1e-8,1e-7,1e-6,1e-5))
 
 hyper_params
 grid <- h2o.grid(
@@ -1917,13 +1917,229 @@ head(deeplearning_pred)
 deeplearning_submission1 = foresttest[,c(1,56)]
 deeplearning_submission1$Cover_Type = deeplearning_pred[,1]
 
-write.csv(deeplearning_submission1, 'deep_learing_submission_mar14.csv', row.names = FALSE)
+write.csv(deeplearning_submission1, 'deep_learing_submission_mar15.csv', row.names = FALSE)
 
 # accuracy = 0.60186, - 1400 with  54-120-150-7  layer 
-
-
-
-
+# Accuracy improved to 67.4% with a more complex 
+# 
+# $model_id
+# [1] "Grid_DeepLearning_RTMP_sid_a102_92_model_R_1458015959542_1_model_112"
+# 
+# $training_frame
+# [1] "RTMP_sid_a102_92"
+# 
+# $validation_frame
+# [1] "RTMP_sid_a102_93"
+# 
+# $nfolds
+# [1] 0
+# 
+# $keep_cross_validation_predictions
+# [1] FALSE
+# 
+# $fold_assignment
+# [1] "AUTO"
+# 
+# $ignore_const_cols
+# [1] TRUE
+# 
+# $score_each_iteration
+# [1] FALSE
+# 
+# $balance_classes
+# [1] FALSE
+# 
+# $max_after_balance_size
+# [1] 5
+# 
+# $max_confusion_matrix_size
+# [1] 20
+# 
+# $max_hit_ratio_k
+# [1] 0
+# 
+# $overwrite_with_best_model
+# [1] TRUE
+# 
+# $use_all_factor_levels
+# [1] TRUE
+# 
+# $standardize
+# [1] TRUE
+# 
+# $activation
+# [1] "Rectifier"
+# 
+# $hidden
+# [1] 500 800
+# 
+# $epochs
+# [1] 10
+# 
+# $train_samples_per_iteration
+# [1] -2
+# 
+# $target_ratio_comm_to_comp
+# [1] 0.05
+# 
+# $seed
+# [1] 4.030434e+18
+# 
+# $adaptive_rate
+# [1] FALSE
+# 
+# $rho
+# [1] 0.99
+# 
+# $epsilon
+# [1] 1e-08
+# 
+# $rate
+# [1] 0.02
+# 
+# $rate_annealing
+# [1] 1e-05
+# 
+# $rate_decay
+# [1] 1
+# 
+# $momentum_start
+# [1] 0.5
+# 
+# $momentum_ramp
+# [1] 1e+07
+# 
+# $momentum_stable
+# [1] 0.9
+# 
+# $nesterov_accelerated_gradient
+# [1] TRUE
+# 
+# $input_dropout_ratio
+# [1] 0
+# 
+# $l1
+# [1] 1e-05
+# 
+# $l2
+# [1] 1e-05
+# 
+# $max_w2
+# [1] 10
+# 
+# $initial_weight_distribution
+# [1] "UniformAdaptive"
+# 
+# $initial_weight_scale
+# [1] 1
+# 
+# $loss
+# [1] "Automatic"
+# 
+# $distribution
+# [1] "AUTO"
+# 
+# $quantile_alpha
+# [1] 0.5
+# 
+# $tweedie_power
+# [1] 1.5
+# 
+# $score_interval
+# [1] 5
+# 
+# $score_training_samples
+# [1] 10000
+# 
+# $score_validation_samples
+# [1] 10000
+# 
+# $score_duty_cycle
+# [1] 0.025
+# 
+# $classification_stop
+# [1] 0
+# 
+# $regression_stop
+# [1] 1e-06
+# 
+# $stopping_rounds
+# [1] 2
+# 
+# $stopping_metric
+# [1] "misclassification"
+# 
+# $stopping_tolerance
+# [1] 0.01
+# 
+# $max_runtime_secs
+# [1] 0
+# 
+# $score_validation_sampling
+# [1] "Uniform"
+# 
+# $diagnostics
+# [1] TRUE
+# 
+# $fast_mode
+# [1] TRUE
+# 
+# $force_load_balance
+# [1] TRUE
+# 
+# $variable_importances
+# [1] FALSE
+# 
+# $replicate_training_data
+# [1] TRUE
+# 
+# $single_node_mode
+# [1] FALSE
+# 
+# $shuffle_training_data
+# [1] FALSE
+# 
+# $missing_values_handling
+# [1] "MeanImputation"
+# 
+# $quiet_mode
+# [1] FALSE
+# 
+# $autoencoder
+# [1] FALSE
+# 
+# $sparse
+# [1] FALSE
+# 
+# $col_major
+# [1] FALSE
+# 
+# $average_activation
+# [1] 0
+# 
+# $sparsity_beta
+# [1] 0
+# 
+# $max_categorical_features
+# [1] 2147483647
+# 
+# $reproducible
+# [1] FALSE
+# 
+# $export_weights_and_biases
+# [1] FALSE
+# 
+# $mini_batch_size
+# [1] 1
+# 
+# $elastic_averaging
+# [1] FALSE
+# 
+# $elastic_averaging_moving_rate
+# [1] 0.9
+# 
+# $elastic_averaging_regularization
+# [1] 0.001
 
 # GBM via H2O -------------------------------------------
 

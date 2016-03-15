@@ -538,7 +538,8 @@ Some features of H2o include
 -  Anomaly detection to identify outliers 
 
 
-We ran a basic model with the default parameters , out validation results were poor and we decided to follow the approach 
+We ran a basic model with the default parameters , out validation results were poor and we decided to follow these steps
+
 
 
 
@@ -611,3 +612,6 @@ Elastic-net
 - http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Hillshade.htm
 - https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg
 - https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html
+- http://h2o-release.s3.amazonaws.com/h2o/rel-turan/3/docs-website/h2o-docs/booklets/DeepLearning_Vignette.pdf
+
+
