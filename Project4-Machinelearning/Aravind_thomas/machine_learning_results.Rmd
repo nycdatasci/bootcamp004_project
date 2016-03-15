@@ -381,9 +381,9 @@ Cover Type                          |    Classes 1 to 7             |  Forest Co
 
 Some class seperation is clearly visible in the following plots of elevation.
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=.8, bins = 50) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
-ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
-ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+# ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=.8, bins = 50) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+# ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
+# ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
 ```
 
 Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
@@ -523,15 +523,29 @@ For adding multiple hidden layers, we used H2O. H2O is an R package that runs pa
 
 
 ### Random Forest
+![](images/randomforestchangingvariables.png)
+![](images/randomforestchangingvariables.png)
+![](images/randomforestfeatureaccuracy2.jpeg)
+![](images/randomforestfeatureengineering tune.png)
+![](imagesrf_featureengineering20importance.jpeg)
+![](images/rf.tuned17bestmodelimportance.jpeg)
+![](images/Tuning randmo cuts and node size Extra trees.jpeg)
 
 #### Boosting Using XGBoost
+![](images/xgboost cross validation acc seq variable and logloss.jpeg)
+![](images/Xgboost cross validation accuracy - sequential variable addition.jpeg)
+![](images/xgboost final graph cross validation.jpeg)
+![](images/xgboost_allfeatures800_feature importance_top10.jpeg)
+![](images/xgboost_allfeatures800_feature importance_top20.jpeg)
+![](images/top20plottodecidetopruneXGBOOSTfeature.jpeg)
 
 #### Boosting Using H2O's Gradient Boosting Algorithm
 
 #### Extremely Randomized Trees
-
-
-
+![](images/extratrees_mtry_accuracy.png)
+![](images/extratrees_ntree_accuracy.png)
+![](images/extratreesaccuracychangingnooftreesfeatureengineerd.jpeg)
+![](images/extratreesfeatureengineeringtuningnoofvariables.jpeg)
 
 
 
@@ -554,6 +568,9 @@ Ridge
 Lasso
 Elastic-net
 
+
+
+## Conclusion
 
 
 ## References:
