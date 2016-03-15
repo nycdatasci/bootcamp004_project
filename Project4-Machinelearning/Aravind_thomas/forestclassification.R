@@ -1753,7 +1753,7 @@ predictors
 
 #initial sampling
 set.seed(0)
-train_h20 = sample(1:nrow(x), 80*nrow(x)/100)
+train_h20 = sample(1:nrow(forest_h20), 80*nrow(forest_h20)/100)
 train_h20=sort(train_h20)
 validation_h20 = (-train_h20)
 validation_h20=sort(validation_h20)
@@ -1917,9 +1917,9 @@ head(deeplearning_pred)
 deeplearning_submission1 = foresttest[,c(1,56)]
 deeplearning_submission1$Cover_Type = deeplearning_pred[,1]
 
-write.csv(deeplearning_submission1, 'deep_learing_submission1.csv', row.names = FALSE)
+write.csv(deeplearning_submission1, 'deep_learing_submission_mar14.csv', row.names = FALSE)
 
-# accuracy = 0.59460, rank = 1418
+# accuracy = 0.60186, - 1400 with  54-120-150-7  layer 
 
 
 
