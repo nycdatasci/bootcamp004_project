@@ -381,33 +381,44 @@ Cover Type                          |    Classes 1 to 7             |  Forest Co
 
 Some class seperation is clearly visible in the following plots of elevation.
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-
-# ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
-# ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
-# ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=.8, bins = 50) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
+ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
 ```
 
 Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
 
+Across Wilderness areas, there seems to be some class seperation . Cottonwood Willow covers are found only in Cache la Poudre areas and Neota area comprises of only Spruce-fir,Krummholz and LodgePole-Pine covers. 
+
+<center>
+```{r, echo=FALSE, message=FALSE}
+# ggplot(forestdata, aes(x=Wilderness_Area, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Wilderness Area') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank()) +
+#   scale_x_discrete(breaks = 1:4, labels=c("Rawah","Neota","Camanche Peak","Cache la Poudre"))
+```
+
+```{r, echo=FALSE, out.width="1100px",height="600px", message=FALSE}
+# ggplot(forestdata, aes(x=Soil_Type, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Soil Type') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank(), legend.position='bottom') +
+#   scale_x_discrete(breaks = 1:40)
+```
+
+
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-# ggplot(rose_diagram_df, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect Group") + 
+# ggplot(forestdata, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect by Cover Type") + 
 #   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
 #   coord_polar()
 # 
-# ggplot(forestdata, aes(x=aspect_group_shift, fill=covername )) + ggtitle("Aspect Group Shift") + 
-#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-#   coord_polar()
-#  ggplot(forestdata, aes(x=aspect_group_shift, fill=Wilderness_Area_names )) + ggtitle("Aspect Group Shift By Wilderness Area") + 
+#  ggplot(forestdata, aes(x=aspect_group, fill=Wilderness_Area_names )) + ggtitle("Aspect by Wilderness Area") + 
 #   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
 #   coord_polar()
 ```
 
 
 ```{r, echo=FALSE, fig.width=18, fig.height=18, dpi=300}
-#columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
-#ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
-```
+# columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
+# ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
 
+```
+</center>
 
 
 One of the clearer relationships in the dataset was the distribution of Hillshade luminance. Hillshade is measured on a scale from 0 to 255 (dark to bright).
@@ -419,7 +430,7 @@ where Altitude is the angle of the Sun relative to the horizon and Azimuth relat
 This equation actually arises from a theorem in Spherical geometry known as "Spherical law of Cosines" relating the sides and angles of triangles constructed on spherical surfaces.  
 
 <center><img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg", width="400px", height="300px" /></center>
-
+<br>
 In a unit sphere, lengths *a*, *b*, *c* correspond to the angle subtended by those sides from the center of the sphere. 
 If we know the two sides *a*, *b* and the angle between them *C*, then the cosine of *c*, is given by:
 
@@ -449,6 +460,8 @@ Topographic correction is necessary if, for example, we wish to identify materia
 
 
 ## Modeling
+<center>![](images/study flow diagram.jpg)</center>
+
 
 ### Logistic Regression
 
@@ -469,7 +482,7 @@ The elastic net penalty $\alpha$ varies from 0 to 1. When $\alpha = 0$, the func
 
 #### Ridge Regularization
 
-We performed 10-fold cross validation on a ridge regularization and on a grid of 100 values of $\lambda$, choosing the minimum $\lambda$ for each model. When we ran the regression with a 70-30 cross validation split on the training set, we got an accuracy on the test set on Kaggle of **0.5570** (rank of 1,489th place). 
+We performed 10-fold cross validation on a ridge regularization and on a grid of 100 values of $\lambda$, choosing the minimum $\lambda$ for each model. When we ran the regression with a 70-30 cross validation split on the training set, we got an accuracy on the test set on Kaggle of **0.5570**. 
 
 When we reran the ridge regression with an 85-15 split on the training data, we got a Kaggle accuracy of **0.5956** (1,414th place). Since the test set is so much larger than our training set, it was beneficial to incorporate a larger proportion of the data for learning within the training data before runnint the model on the larger testing data.
 
@@ -477,26 +490,36 @@ When we reran the ridge regression with an 85-15 split on the training data, we 
 
 #### Lasso Regularization
 
-A 10-fold cross validated lasso-regularized logistic regression kaggle score was **0.59594**, 1411th place for 70-30 split kaggle score of **0.59526**, 1415th place for 85-15 split kaggle score of **0.59443** if we took the lowest 50 percintile of lambdas and calculated the mode of the predictions.
+A 10-fold cross validated lasso-regularized logistic regression kaggle score was **0.59594** for 70-30 split kaggle score of **0.59526**, for 85-15 split kaggle score of **0.59443** if we took the lowest 50 percintile of lambdas and calculated the mode of the predictions.
 
 ![](images/lasso_cv_deviance_by_loglambda.jpeg)
 
 #### Elastic-net Regularization
 
-Using both the ridge and lasso regularization terms concurrently produces an elastic-net regularization. We ran this hybrid method with both a 70-30 split and 85-15 split in the training set. When running these models on the testing set, we got accuracies on Kaggle of **0.5959** (1,412th place) and **0.5952** (1,415th place), respectively.
+Using both the ridge and lasso regularization terms concurrently produces an elastic-net regularization. We ran this hybrid method with both a 70-30 split and 85-15 split in the training set. When running these models on the testing set, we got accuracies on Kaggle of **0.5959** and **0.5952**, respectively.
 
-We also tried an elastic-net regression using all 15,120 observations in the training set. It earned an accuracy score on the testing set of **0.5950** (1,417th place).
+We also tried an elastic-net regression using all 15,120 observations in the training set. It earned an accuracy score on the testing set of **0.5950**.
 
 ![](images/elastic netlambdadevianceplot.jpeg)
 
 
 
 ### Artificial Neural Networks
+An artificial neural network is a combination of simple processing elements that convert input information into response output. 
+
+The complexity of these models makes the relationships between nodes highly variable and difficult to interpret, giving neural networks the reputation of "black box" models. 
+
+We first modeled the data in a feed-forward neural network with a single layer of nodes. Later, we created deep learning models where we added more layers of hidden nodes.
 
 #### Single Hidden Layer Using the nnet Package
+The Nnet R library allows the construction of feed-forward single-layer nerual networks. After scaling our variables, we experimented to see the optimal number of nodes for our hidden layer.
+
+<center>![](images/nnet_accuracy_by_node_size.png)</center>
+
+We ran 25 node neural nets on our training data achieving **0.5087** accuracy for 300 maximum iterations [per node?????] and **0.5149** accuracy for 500 maximum iterations.
 
 #### Deep Learning using H2O
-
+For adding multiple hidden layers, we used H2O. H2O is an R package that runs parallel-distributed machine learning algorithms to improve computational speed. 
 
 
 ### Random Forest
@@ -524,7 +547,7 @@ We also tried an elastic-net regression using all 15,120 observations in the tra
 
 ## Results Summary
 
-Model          | 
+Model
 -------------------
 Logistic Regression - 
 Ridge
