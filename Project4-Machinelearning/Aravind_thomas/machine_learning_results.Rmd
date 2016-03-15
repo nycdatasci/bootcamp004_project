@@ -530,7 +530,7 @@ We finally chose a 54-100-7  node neural nets on our training data achieving **0
 
 For adding multiple hidden layers, we used the deeplearning function using H2O package. H2O is an R package that runs parallel-distributed machine learning algorithms to improve computational speed. Later we also used H2o's Gradient Boosting Machine (GBM) algorithm to acheive our second best accuracy rate. 
 
-Some features of H2o include
+Some features of H2O include
 -  In-memory compression techniques to handle large datasets
 -  Automatic standardization 
 -  Randomized Grid Search
@@ -554,19 +554,16 @@ We ran a basic model with the default parameters , out validation results were p
 
 
 ### Random Forest
-![](images/randomforestchangingvariables.png)
-![](images/randomforestchangingvariables.png)
-![](images/randomforestfeatureaccuracy2.jpeg)
+
+<img src="images/randomforestchangingvariables.png" height="1200px" width="800px" />
+<img src="images/randomforestfeatureaccuracy2.jpeg" height="1200px" width="800px" />
 ![](images/randomforestfeatureengineering tune.png)
 ![](images/rf_featureengineering20importance.jpeg)
 ![](images/rf.tuned17bestmodelimportance.jpeg)
 ![](images/Tuning randmo cuts and node size Extra trees.jpeg)
 
 #### Boosting Using XGBoost
-![](images/xgboost cross validation acc seq variable and logloss.jpeg)
-![](images/Xgboost cross validation accuracy - sequential variable addition.jpeg)
-![](images/xgboost final graph cross validation.jpeg)
-![](images/xgboost_allfeatures800_feature importance_top10.jpeg)
+![](images/xgboost_cv_final_graph.jpeg)
 ![](images/xgboost_allfeatures800_feature importance_top20.jpeg)
 ![](images/top20plottodecidetopruneXGBOOSTfeature.jpeg)
 
@@ -602,6 +599,11 @@ Elastic-net
 
 
 ## Conclusion
+
+"The general characteristics of this class of problems is that some minority classes are distributed in small regions that are surrounded 
+and overlapped with majority classes."
+"When there is a minority class that is distributed in small isolated regions of featurespace, the BP learning mechanism seems to have great trouble
+”finding” the regions"
 
 
 ## References:
