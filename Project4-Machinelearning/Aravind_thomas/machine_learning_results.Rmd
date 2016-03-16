@@ -25,16 +25,16 @@ We found the Forest Covertype in the UCI Machine Learning Repository that takes 
   <img src="images/tree_images/aspen.jpeg", width="293px", height="195px" />
   <img src="images/tree_images/douglas-fir.jpeg", width="100px", height="199px" />
   <img src="images/tree_images/krummholz.jpeg", width="286px", height="196px" />
-  </center>
+</center>
   
   
-  The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem. We decided to use the machine learning and visualization packages available in R for this project.
+The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem. We decided to use the machine learning and visualization packages available in R for this project.
 
 ```{r, echo=FALSE, message=FALSE}
 # data load next 340 lines
 #setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-#setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
 library(dplyr)
@@ -384,9 +384,9 @@ Cover Type                          |    Classes 1 to 7             |  Forest Co
 
 Some class seperation is clearly visible in the following plots of elevation.
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-# ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=.8, bins = 50) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
-# ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
-# ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=.8, bins = 50) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
+ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
 ```
 
 Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
@@ -394,57 +394,56 @@ Another compelling variable is aspect, or the cardinal direction that the slope 
 Across Wilderness areas, there seems to be some class seperation . Cottonwood Willow covers are found only in Cache la Poudre areas and Neota area comprises of only Spruce-fir,Krummholz and LodgePole-Pine covers. 
 
 <center>
-  ```{r, echo=FALSE, message=FALSE}
-# ggplot(forestdata, aes(x=Wilderness_Area, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Wilderness Area') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank()) +
-#   scale_x_discrete(breaks = 1:4, labels=c("Rawah","Neota","Camanche Peak","Cache la Poudre"))
+```{r, echo=FALSE, message=FALSE}
+ggplot(forestdata, aes(x=Wilderness_Area, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Wilderness Area') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank()) +
+scale_x_discrete(breaks = 1:4, labels=c("Rawah","Neota","Camanche Peak","Cache la Poudre"))
 ```
 
 ```{r, echo=FALSE, out.width="1100px",height="600px", message=FALSE}
-# ggplot(forestdata, aes(x=Soil_Type, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Soil Type') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank(), legend.position='bottom') +
-#   scale_x_discrete(breaks = 1:40)
+ggplot(forestdata, aes(x=Soil_Type, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Soil Type') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank(), legend.position='bottom') +
+scale_x_discrete(breaks = 1:40)
 ```
 
 
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-# ggplot(forestdata, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect by Cover Type") + 
-#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-#   coord_polar()
-# 
-#  ggplot(forestdata, aes(x=aspect_group, fill=Wilderness_Area_names )) + ggtitle("Aspect by Wilderness Area") + 
-#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-#   coord_polar()
+ggplot(forestdata, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect by Cover Type") + 
+  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+  coord_polar()
+
+ggplot(forestdata, aes(x=aspect_group, fill=Wilderness_Area_names )) + ggtitle("Aspect by Wilderness Area") + 
+  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+  coord_polar()
 ```
 
 
 ```{r, echo=FALSE, fig.width=18, fig.height=18, dpi=300}
-# columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
-# ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
-
+columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
+ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
 ```
 </center>
   
   
-  One of the clearer relationships in the dataset was the distribution of Hillshade luminance. Hillshade is measured on a scale from 0 to 255 (dark to bright).
+One of the clearer relationships in the dataset was the distribution of Hillshade luminance. Hillshade is measured on a scale from 0 to 255 (dark to bright).
 
 Hillshade at time *t* varies as a factor of:
   $$\cos(slope)\cos (90- Altitude) + \sin (slope)\sin (90-Altitude)\cos(Azimuth-Aspect)$$ 
-  where Altitude is the angle of the Sun relative to the horizon and Azimuth relates to the direction the Sun is facing: North, South, East, or West. Azimuth of 90 degrees corresponds to East.
+where Altitude is the angle of the Sun relative to the horizon and Azimuth relates to the direction the Sun is facing: North, South, East, or West. Azimuth of 90 degrees corresponds to East.
 
 This equation actually arises from a theorem in Spherical geometry known as "Spherical law of Cosines" relating the sides and angles of triangles constructed on spherical surfaces.  
 
 <center><img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg", width="400px", height="300px" /></center>
-  <br>
-  In a unit sphere, lengths *a*, *b*, *c* correspond to the angle subtended by those sides from the center of the sphere. 
+<br>
+In a unit sphere, lengths *a*, *b*, *c* correspond to the angle subtended by those sides from the center of the sphere. 
 If we know the two sides *a*, *b* and the angle between them *C*, then the cosine of *c*, is given by:
   
-  <img src="https://upload.wikimedia.org/math/b/b/3/bb37f9a9bc68d4f6fdf2a35337093c65.png", width="400px", height="300px" />
+<img src="https://upload.wikimedia.org/math/b/b/3/bb37f9a9bc68d4f6fdf2a35337093c65.png", width="400px", height="300px" />
   
-  In short, the Illumination of the patch is related to alitude of the sun, slope of the terrain and the relative direction of the sun and the slope. 
+In short, the Illumination of the patch is related to alitude of the sun, slope of the terrain and the relative direction of the sun and the slope. 
 
 $Hillshade(t_1,t_2,t_3)$ has has been plotted below in 3 dimensions. Click/drag on the plot to explore:
   
   
-  ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
+```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
 #plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
 ```
 
@@ -542,7 +541,7 @@ Some features of H2o include
 
 When we first ran a basic model, our validation results were poor and we decided to experiment with varying the default parameters using a grid search. We tried variations of one to three hidden layers with between 30 to 200 nodes each. We also varied the input dropout ratio, the fraction of training features to omit for improving generalizability. The next parameter was the rate, or how much the network adjusts over time. Finally, we tuned the rate annealing parameter that reduces the liklihood that the learning rate chooses local minima while optimizing. H2o allows for "hyper-parameter" tuning in the following format:
   
-  ```{r, eval=FALSE}
+```{r, eval=FALSE}
 hyper_params <- list(
   hidden=list(c(30),c(50),c(70),c(100),c(130),c(160),c(200),c(250),c(30,60),c(60,90),c(90,120),c(120,150),c(30,60,90),c(60,90,120),c(90,120,160)), 
   input_dropout_ratio=c(0,0.05),
@@ -570,41 +569,41 @@ After returning to the model, we decided to experiment with a wider range of the
 
   <span style="color:MidnightBlue"><i>"Based on some experiments with the Forest Cover Type Data Set, we conjectured a class of problems that are extremely difficult for FFBP NNs but relatively simple for DTs. The features of such problems are that some minority classes are surrounded and overlapped by some majority classes. We generated synthetic data sets with the above description. In our experiments on the synthetic data sets, we varied the size and the number of the islands for the minority class. We also varied the ratio of the minority class and the majority class for each island. We tried a plain feed forward back propagation NN, a Rprop NN, and a cascade correlation NN. With all of these experiments, the DT performed better than each kind of FFBP NN"</i></span>
   
-  Based on these findings, we decided to move on from neural networks in favor of tree-based methods.
-  
-  
-  
-  ## Tree Based Methods
-  <center><img src="images/table_tree_based_methods.png" /></center>
-  
-  ### Random Forest
-  
-  Random Forest 
-  Our initial submission of the Random forest algorithm without tuning any parameters improved our score to 68.%
-  
-  
-  <center><img src="images/randomforestchangingvariables.png" height="1200px" width="800px" /></center>
-  <center>![](images/rf_featureengineering20importance.jpeg)</center>
-  <center>![](images/rf.tuned17bestmodelimportance.jpeg)</center>
-  
-  
-  #### Boosting Using XGBoost
-  <center>![](images/xgboost_cv_final_graph.jpeg)<center>
-  <center>![](images/xgboost_allfeatures800_feature importance_top20.jpeg)</center>
-  <center>![](images/top20plottodecidetopruneXGBOOSTfeature.jpeg)</center>
-  
-  #### Boosting Using H2o's Gradient Boosting Algorithm
-  
-  #### Extremely Randomized Trees
-  <center>![](images/Tuning randmo cuts and node size Extra trees.jpeg)</center>
-  <center>![](images/extratrees_mtry_accuracy.png)</center>
-  <center>![](images/extratrees_ntree_accuracy.png)</center>
-  <center>![](images/extratreesaccuracychangingnooftreesfeatureengineerd.jpeg)</center>
-  <center>![](images/extratreesfeatureengineeringtuningnoofvariables.jpeg)</center>
-  
-  
-  
-  
+Based on these findings, we decided to move on from neural networks in favor of tree-based methods.
+
+
+
+## Tree Based Methods
+<center><img src="images/table_tree_based_methods.png" /></center>
+
+### Random Forest
+
+Random Forest 
+Our initial submission of the Random forest algorithm without tuning any parameters improved our score to 68.%
+
+
+<center><img src="images/randomforestchangingvariables.png" height="1200px" width="800px" /></center>
+<center>![](images/rf_featureengineering20importance.jpeg)</center>
+<center>![](images/rf.tuned17bestmodelimportance.jpeg)</center>
+
+
+#### Boosting Using XGBoost
+<center>![](images/xgboost_cv_final_graph.jpeg)<center>
+<center>![](images/xgboost_allfeatures800_feature importance_top20.jpeg)</center>
+<center>![](images/top20plottodecidetopruneXGBOOSTfeature.jpeg)</center>
+
+#### Boosting Using H2o's Gradient Boosting Algorithm
+
+#### Extremely Randomized Trees
+<center>![](images/Tuning randmo cuts and node size Extra trees.jpeg)</center>
+<center>![](images/extratrees_mtry_accuracy.png)</center>
+<center>![](images/extratrees_ntree_accuracy.png)</center>
+<center>![](images/extratreesaccuracychangingnooftreesfeatureengineerd.jpeg)</center>
+<center>![](images/extratreesfeatureengineeringtuningnoofvariables.jpeg)</center>
+ 
+ 
+ 
+ 
 ### Support Vector Machines ?
   
   
@@ -660,7 +659,8 @@ extratrees_submission_ensemblegbm.csv | No?  | ...  | 0.78808 | ???
 ensemble1 | ? | basic voting of RF, GBM, ExtraTrees and XGBoost | 0.76 | ?
 ensemble2 | ? | Feeding ExtraTrees to H2o XGB | 0.79182 | ?
 ensemble3 | ? | Feeding ExtraTrees to H2o XGB then to XGB again | 0.79182 | ?
- 
+
+
 
 Learning and improvements 
 -	One of the important learnings from the Project was effective utilization of Github for workflow management and coordinating as a team.  
