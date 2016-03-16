@@ -528,17 +528,28 @@ We finally chose a 54-100-7  node neural nets on our training data achieving **0
 
 #### Deep Learning using H2o
 
-For adding multiple hidden layers, we used the deeplearning function using H2O package. H2O is an R package that runs parallel-distributed machine learning algorithms to improve computational speed. Later we also used H2o's Gradient Boosting Machine (GBM) algorithm to acheive our second best accuracy rate. 
+For adding multiple hidden layers, we used the deeplearning function using the H2o package. H2o is an R package that runs parallel-distributed machine learning algorithms to improve computational speed. Later, we also used H2o's Gradient Boosting Machine (GBM) algorithm to acheive our second best accuracy rate. 
 
-Some features of H2O include
+Some features of H2o include
 -  In-memory compression techniques to handle large datasets
 -  Automatic standardization 
 -  Randomized Grid Search
 -  Fast algorithms deployed in Java
 -  Anomaly detection to identify outliers 
 
+When we first ran a basic model, our validation results were poor and we decided to experiment with varying the default parameters using a grid search. We tried variations of one to three hidden layers with between 30 to 200 nodes each. We also varied the input dropout ratio, the fraction of training features to omit for improving generalizability. The next parameter was the rate, or how much the network adjusts over time. Finally, we tuned the rate annealing parameter that reduces the liklihood that the learning rate chooses local minima while optimizing. H2o allows for "hyper-parameter" tuning in the following format:
 
-We ran a basic model with the default parameters , out validation results were poor and we decided to follow these steps
+```{r, eval=FALSE}
+hyper_params <- list(
+   hidden=list(c(30),c(50),c(70),c(100),c(130),c(160),c(200),c(250),c(30,60),c(60,90),c(90,120),c(120,150),c(30,60,90),c(60,90,120),c(90,120,160)), 
+   input_dropout_ratio=c(0,0.05),
+   rate=c(0.01,0.02),
+   rate_annealing=c(1e-8,1e-7,1e-6))
+```
+
+From our first tuning run, the neural network had an accuracy of **0.60186** with a 54-120-150-7 network.
+
+After returning to the model, we decided to experiment with a wider range of the tuning parameters. Our best model was a 54-500-800-7 network with a learning rate of 0.02, rate annealing of 1e-05, input dropout ratio of 0, and an accuracy of **0.674**.
 
 
 
@@ -546,34 +557,44 @@ We ran a basic model with the default parameters , out validation results were p
 
 
 
+**Notable studies from the past:**
+
+The earliest use of the dataset was in a doctoral dissertation. Jock Blackard and Denis Dean at Colorado State University used Linear Discriminant Analysis to obtain a 58% accuracy and Artificial Neural network to achieve 70% accuracy.  The paper concludes by saying that ANN does have its drawbacks, it is still more viable than traditional methods, by which we think he refers to logistic regression, LDA and Support Vector Classifiers. 
+</br>
+In 2007, Jain & Minz (Journal  of Indian Agricultural Statistics) applied Rough Set Theory as an alternative to Machine learning approaches to achieve equally good but using lesser attributes (only 29) to achieve 78% accuracy for the forest cover dataset. This is especially relevant in real world classification applications in remote sensing involving large datasets. 
+</br>
+In 2004,  in “Systems, Man and Cybernetics”  an  IEEE International Conference Journal publication, Xiaomei Liu, Kevin W. Bowyer of the University of Notre Dame use the forest cover dataset to conjecture something interesting. In their own words:
+</br>
+  *“Based on some experiments with the Forest Cover Type Data Set, we conjectured a class of problems that are extremely difficult for FFBP NNs but relatively simple for DTs. The features of such problems are that some minority classes are surrounded and overlapped by some majority classes. We generated synthetic data sets with the above description. In our experiments on the synthetic data sets, we varied the size and the number of the islands for the minority class. We also varied the ratio of the minority class and the majority class for each island. We tried a plain feed forward back propagation NN, a Rprop NN, and a cascade correlation NN. With all of these experiments, the DT performed better than each kind of FFBP NN”*
+</br>
+Based on these findings, we decided to move on from neural networks in favor of tree-based methods.
 
 
 
 
-
-
+## Tree Based Methods
+<center><img src="images/table_tree_based_methods.png" /></center>
 
 ### Random Forest
 
-<img src="images/randomforestchangingvariables.png" height="1200px" width="800px" />
-<img src="images/randomforestfeatureaccuracy2.jpeg" height="1200px" width="800px" />
-![](images/randomforestfeatureengineering tune.png)
-![](images/rf_featureengineering20importance.jpeg)
-![](images/rf.tuned17bestmodelimportance.jpeg)
-![](images/Tuning randmo cuts and node size Extra trees.jpeg)
+<center><img src="images/randomforestchangingvariables.png" height="1200px" width="800px" /></center>
+<center>![](images/rf_featureengineering20importance.jpeg)</center>
+<center>![](images/rf.tuned17bestmodelimportance.jpeg)</center>
+
 
 #### Boosting Using XGBoost
-![](images/xgboost_cv_final_graph.jpeg)
-![](images/xgboost_allfeatures800_feature importance_top20.jpeg)
-![](images/top20plottodecidetopruneXGBOOSTfeature.jpeg)
+<center>![](images/xgboost_cv_final_graph.jpeg)<center>
+<center>![](images/xgboost_allfeatures800_feature importance_top20.jpeg)</center>
+<center>![](images/top20plottodecidetopruneXGBOOSTfeature.jpeg)</center>
 
-#### Boosting Using H2O's Gradient Boosting Algorithm
+#### Boosting Using H2o's Gradient Boosting Algorithm
 
 #### Extremely Randomized Trees
-![](images/extratrees_mtry_accuracy.png)
-![](images/extratrees_ntree_accuracy.png)
-![](images/extratreesaccuracychangingnooftreesfeatureengineerd.jpeg)
-![](images/extratreesfeatureengineeringtuningnoofvariables.jpeg)
+<center>![](images/Tuning randmo cuts and node size Extra trees.jpeg)</center>
+<center>![](images/extratrees_mtry_accuracy.png)</center>
+<center>![](images/extratrees_ntree_accuracy.png)</center>
+<center>![](images/extratreesaccuracychangingnooftreesfeatureengineerd.jpeg)</center>
+<center>![](images/extratreesfeatureengineeringtuningnoofvariables.jpeg)</center>
 
 
 
@@ -606,6 +627,15 @@ and overlapped with majority classes."
 ”finding” the regions"
 
 
+
+
+
+
+
+
+
+
+
 ## References:
 
 - https://en.wikipedia.org/wiki/Spherical_law_of_cosines
@@ -614,6 +644,11 @@ and overlapped with majority classes."
 - http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Hillshade.htm
 - https://upload.wikimedia.org/wikipedia/commons/3/38/Law-of-haversines.svg
 - https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html
-- http://h2o-release.s3.amazonaws.com/h2o/rel-turan/3/docs-website/h2o-docs/booklets/DeepLearning_Vignette.pdf
+- http://H2o-release.s3.amazonaws.com/H2o/rel-turan/3/docs-website/H2o-docs/booklets/DeepLearning_Vignette.pdf
 
+
+http://www.isas.org.in/jsp/volume/vol62/Apr-08/Apr-08-9.pdf
+https://www.researchgate.net/publication/222499246_Comparative_Accuracies_of_Artificial_Neural_Networks_and_Discriminant_Analysis_in_Predicting_Forest_Cover_Types_from_Cartographic_Variables
+
+http://www.csee.usf.edu/~hall/papers/smc04nn.pdf
 
