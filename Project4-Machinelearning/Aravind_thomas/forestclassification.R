@@ -96,7 +96,7 @@
 # 7 -- Krummholz
 
 
-setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 #setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
@@ -1233,7 +1233,7 @@ param = list("objective" = "multi:softprob",
              "num_class" = 7+1)
 
 cv.nround = 200
-cv.nfold = 3
+cv.nfold = 10
 
 bst.cv = xgb.cv(param=param, data = forestdataxgb, label = y,
                 nfold = cv.nfold, nrounds = cv.nround, prediction = T)
@@ -1295,23 +1295,21 @@ accuracyxg=2:72
 
 for (j in 2:72)
 {
-  reducednames=importance_matrix[1:j,]$Feature
-  forestdataxgb1=forestdataxgb[,reducednames]
+  reducednames = importance_matrix[1:j,]$Feature
+  forestdataxgb1 = forestdataxgb[,reducednames]
 }
-
-
 
 for (j in 2:72)
 {  
-  reducednames=importance_matrix[1:j,]$Feature
+  reducednames = importance_matrix[1:j,]$Feature
   reducednames
-  forestdataxgb1=forestdataxgb[,reducednames]
+  forestdataxgb1 = forestdataxgb[,reducednames]
   
   param = list("objective" = "multi:softprob",
                "eval_metric" = "mlogloss",
                "num_class" = 7+1)
   
-  cv.nround = 150
+  cv.nround = 130
   cv.nfold = 3
   
   bst.cv = xgb.cv(param=param, data = forestdataxgb1, label = y,
@@ -1356,17 +1354,19 @@ loglossxg=loglossxg[2:72,]
 loglossxg=as.data.frame(loglossxg)
 
 Variables=2:72
+accuracyxg = as.data.frame(accuracyxg)
+accuracyxg=accuracyxg[-1,]
 p1=ggplot(data=accuracyxg,
-       aes(x=Variables, y=accuracyxg$`accuracyxg[2:72]`)) +
+       aes(x=Variables,y=accuracyxg)) +
   geom_line(colour="red")+ ggtitle("Xgboost Cross Validation Accuracy - Sequential Variable Addition")+ 
-    xlab("Number of Variables added")+ ylab("Accuracy levels")
+    xlab("Num. of Variables added")+ ylab("Accuracy levels") + theme(text = element_text(size=18))
 
 p2=ggplot(data=loglossxg,
        aes(x=Variables, y=loglossxg)) +
   geom_line(colour="blue")+ ggtitle("Xgboost Cross Validation min logloss round - Sequential Variable Addition")+ 
-  xlab("Number of Variables added")+ ylab("Number of rounds for minimized logloss  ")
+  xlab("Num. of Variables added")+ ylab("Num. of rounds for minimized logloss") + theme(text = element_text(size=18))
 
-ggplotly()
+#ggplot()
 
 # function found at http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
