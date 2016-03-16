@@ -32,8 +32,8 @@ The actual forest cover type for a given observation (30 x 30 meter cell) was de
 ```{r, echo=FALSE, message=FALSE}
 # data load next 340 lines
 #setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
 library(dplyr)
