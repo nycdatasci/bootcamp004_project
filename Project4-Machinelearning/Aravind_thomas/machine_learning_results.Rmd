@@ -33,8 +33,8 @@ The actual forest cover type for a given observation (30 x 30 meter cell) was de
 ```{r, echo=FALSE, message=FALSE}
 # data load next 340 lines
 #setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
 library(dplyr)
@@ -581,8 +581,9 @@ Based on these findings, we decided to move on from neural networks in favor of 
 Random Forest 
 Our initial submission of the Random forest algorithm without tuning any parameters improved our score to 68.%
 
+The tuning was performed by varying the number of variables randomly sampled as candidates at each split. 
 
-<center><img src="images/randomforestchangingvariables.png" height="1200px" width="800px" /></center>
+<center><img src="images/randomforesttuning.jpeg" height="1200px" width="800px" /></center>
 <center>![](images/rf_featureengineering20importance.jpeg)</center>
 <center>![](images/rf.tuned17bestmodelimportance.jpeg)</center>
 
