@@ -14,6 +14,19 @@ shinyUI(
     conditionalPanel(condition="input.conditionedPanels==1",
                      helpText("Where were these samples collected?")
     ),
+    conditionalPanel(condition="input.conditionedPanels==3",
+                     helpText("Chemical Analysis"),
+                     fileInput('chemFile', 'Choose file to upload',
+                               accept = c(
+                                 'text/csv',
+                                 'text/comma-separated-values',
+                                 'text/tab-separated-values',
+                                 'text/plain',
+                                 '.csv',
+                                 '.tsv'
+                               )
+                     ) 
+    ),
     conditionalPanel(condition="input.conditionedPanels==4",
          fileInput('file1', 'Choose file to upload',
                    accept = c(
@@ -82,8 +95,10 @@ shinyUI(
                            brush = NULL, clickId = NULL, hoverId = NULL, inline = TRUE),
                dataTableOutput("rawMole")
       ),#End of tabPael 
+      ##########################################################################33
       tabPanel("Phyto chemical analysis", value=3,
-               helpText("Where were these samples collected?")
+               helpText("Where were these samples collected?"),
+               textOutput("chemGLM")
       ),#End of tabPael 
       tabPanel("Molecular Analysis", value=4,
                fluidRow(

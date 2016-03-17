@@ -74,3 +74,13 @@ svm.mmc.linear$index
 ypred = predict(svm.mmc.linear, linearly.separable[test.index, ])
 predicTable01 <<- table("Predicted Values" = ypred, "True Values" = linearly.separable[test.index, "PopuNY"])
 print(predicTable01)
+
+client.index = all.samples[1:(num.all*0.15)]
+#for (k in 1: length(client.index)) {
+  ypred = predict(svm.mmc.linear, linearly.separable[client.index,])
+  #predicTable01 <<- table("Predicted Values" = ypred, "True Values" = linearly.separable[client.index[k], "PopuNY"])
+  #print(predicTable01,"asdfasdfasdf")
+  print(ypred)
+#}
+  
+client.file <- linearly.separable[client.index,]

@@ -1,33 +1,37 @@
-oriCul <- read.csv("/media/ubun10/64GB/NYC/project04/oriCul.csv", stringsAsFactors=FALSE)
+oriCul <- read.csv("./data/oriCul.csv", stringsAsFactors=FALSE)
 oriCul$Year <- NULL 
 
 oriCul$culMethod[oriCul$culMethod == "O"] <- 0
 oriCul$culMethod[oriCul$culMethod == "B"] <- 1
-#oriCul$culMethod <- as.integer(oriCul$culMethod)
-
-# ##///////////////////////////////////////////////////////////////
-reduOriCul <- oriCul[, c("culMethod","Rb1", "Rc", "Rd", "popu", "Dwg" )]
-reduOriCul$culMethod <- as.factor(reduOriCul$culMethod)
-# ##///////////////////////////////////////////////////////////////
- oriCul <- reduOriCul
-# #QQQQQQQQQQQQQq
-library(MASS)
-oriCul$culMethod <- as.factor(oriCul$culMethod)
-fit <- qda(culMethod ~ ., data=oriCul,
-           na.action="na.omit", CV=TRUE)
-fit # show results
-plot(fit)
-
-library(klaR)
-partimat(culMethod ~.,data=oriCul,method="qda")
 oriCul$culMethod <- as.integer(oriCul$culMethod)
-# #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-summary(oriCul) #Looking at the five number summary information.
-sapply(oriCul, sd) #Looking at the individual standard deviations.
-sapply(oriCul, class) #Looking at the variable classes.
 
-plot(oriCul, col = oriCul$culMethod + 2)
-oriCul[, "popu"] <- as.factor(oriCul[, "popu"])
+# # ##///////////////////////////////////////////////////////////////
+# reduOriCul <- oriCul[, c("culMethod","Rb1", "Rc", "Rd", "popu", "Dwg" )]
+# reduOriCul$culMethod <- as.factor(reduOriCul$culMethod)
+# # ##///////////////////////////////////////////////////////////////
+#  oriCul <- reduOriCul
+# # #QQQQQQQQQQQQQq
+# library(MASS)
+# oriCul$culMethod <- as.factor(oriCul$culMethod)
+# fit <- qda(culMethod ~ ., data=oriCul,
+#            na.action="na.omit", CV=TRUE)
+# fit # show results
+# plot(fit)
+# 
+# library(klaR)
+# partimat(culMethod ~.,data=oriCul,method="qda")
+#oriCul$culMethod <- as.integer(oriCul$culMethod)
+# oriCul$culMethod <- oriCul$culMethod - 1
+# # #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+# summary(oriCul) #Looking at the five number summary information.
+# sapply(oriCul, sd) #Looking at the individual standard deviations.
+# sapply(oriCul, class) #Looking at the variable classes.
+# 
+# plot(oriCul, col = oriCul$culMethod + 2)
+# oriCul[, "popu"] <- as.factor(oriCul[, "popu"])
+# 
+# 
+
 
 #Fitting the logistic regression with all variables; the family parameter
 #specifies the error distribution and link function to be used. For logistic
@@ -50,6 +54,8 @@ library(car)
 influencePlot(logit.overall) #Can still inspect the influence plot.
 
 summary(logit.overall) #Investigating the overall fit of the model.
+
+summ <- summary(logit.overall)
 ##################################################
 #reduOriCul <- oriCul[, c("culMethod","Rb1", "Rc", "Rd", "Dwg", "popu")]
 ##################################################

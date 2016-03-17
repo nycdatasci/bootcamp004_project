@@ -3,6 +3,7 @@ library(htmltools)
 library(leaflet)
 library(ggplot2)
 library(DT)
+library(car)
 
 shinyServer(function(input, output) {
   #Reading Variable
@@ -262,8 +263,35 @@ shinyServer(function(input, output) {
     }
     dataDiffFrame
   })
-  
-  output$hitRate <- renderText({
+
+  output$chemGLM <- renderPrint({
+    
+    inFile <- input$chemFile
+    
+    if (is.null(inFile))
+      return(NULL)
+    
+    oriCul <- read.csv(inFile$datapath, header = TRUE,
+                        sep = ',', quote = '"',  stringsAsFactors=FALSE)
+    oriCul$Year <- NULL 
+    
+    oriCul$culMethod[oriCul$culMethod == "O"] <- 0
+    oriCul$culMethod[oriCul$culMethod == "B"] <- 1
+    print(oriCul)
+    oriCul$culMethod <- as.integer(oriCul$culMethod)
+    
+    logit.overall <- glm(culMethod ~ .,
+                        family = "binomial",
+                        data = oriCul)
+    
+    #influencePlot(logit.overall) #Can still inspect the influence plot.
+    
+    #summary(logit.overall) #Investigating the overall fit of the model.
+    summ <- summary(logit.overall)
+    summ
+  })
+#########################Side Panel Start
+   output$hitRate <- renderText({
     start <- input$randomSet
     cost <- input$svmCost
     wakeup <- input$bestWholeVec
