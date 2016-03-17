@@ -383,42 +383,49 @@ Cover Type                          |    Classes 1 to 7             |  Forest Co
 
 
 Some class seperation is clearly visible in the following plots of elevation.
+<center>
+<img src="images/ggplot_elevation_histogram.jpeg", width="1200px", height="800px" />
+<img src="images/ggplot_elevation_density_type.jpeg", width="1200px", height="800px" />
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=.8, bins = 50) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
-ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
-ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)')
+# ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, fill=covername), alpha=.8, bins = 50) + ggtitle('Elevation Histogram') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)') + theme(text = element_text(size=16))
+# ggplot(forestdata, aes(x=Elevation)) + geom_density() + ggtitle('Elevation Density Plot') + xlab('Elevation (m)')
+#ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, fill=covername), alpha=0.3) + ggtitle('Elevation Density Plots by Cover Type') + scale_fill_discrete(name='Forest Cover Type') + theme(legend.position = "bottom") + xlab('Elevation (m)') + theme(text = element_text(size=16))
 ```
+</center>
 
 Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
 
 Across Wilderness areas, there seems to be some class seperation . Cottonwood Willow covers are found only in Cache la Poudre areas and Neota area comprises of only Spruce-fir,Krummholz and LodgePole-Pine covers. 
 
 <center>
+<img src="images/ggplot_wilderness_area.jpeg", width="1200px", height="800px" />
 ```{r, echo=FALSE, message=FALSE}
-ggplot(forestdata, aes(x=Wilderness_Area, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Wilderness Area') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank()) +
-scale_x_discrete(breaks = 1:4, labels=c("Rawah","Neota","Camanche Peak","Cache la Poudre"))
+#ggplot(forestdata, aes(x=Wilderness_Area, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Wilderness Area') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank()) +
+#scale_x_discrete(breaks = 1:4, labels=c("Rawah","Neota","Camanche Peak","Cache la Poudre")) + theme(text = element_text(size=16))
 ```
 
+<img src="images/ggplot_soil_type.jpeg", width="1200px", height="800px" />
 ```{r, echo=FALSE, out.width="1100px",height="600px", message=FALSE}
-ggplot(forestdata, aes(x=Soil_Type, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Soil Type') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank(), legend.position='bottom') +
-scale_x_discrete(breaks = 1:40)
+#ggplot(forestdata, aes(x=Soil_Type, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Soil Type') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank(), legend.position='bottom') +
+#scale_x_discrete(breaks = 1:40) + theme(text = element_text(size=16))
 ```
 
-
+<img src="images/ggplot_aspect.jpeg", width="1200px", height="800px" />
+<img src="images/ggplot_aspect_wilderness_area.jpeg", width="1200px", height="800px" />
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
-ggplot(forestdata, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect by Cover Type") + 
-  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-  coord_polar()
-
-ggplot(forestdata, aes(x=aspect_group, fill=Wilderness_Area_names )) + ggtitle("Aspect by Wilderness Area") + 
-  geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
-  coord_polar()
+# ggplot(forestdata, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect by Cover Type") + 
+#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+#   coord_polar() + theme(text = element_text(size=16))
+# 
+# ggplot(forestdata, aes(x=aspect_group, fill=Wilderness_Area_names )) + ggtitle("Aspect by Wilderness Area") + 
+#   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
+#   coord_polar() + theme(text = element_text(size=16))
 ```
 
-
+<img src="images/ggplot_corr_plot.jpeg", width="2000px", height="2000px" />
 ```{r, echo=FALSE, fig.width=18, fig.height=18, dpi=300}
-columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
-ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
+#columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
+#ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes(colour = Cover_Type, alpha = .3), columnLabels = columnlables)
 ```
 </center>
   
@@ -426,7 +433,7 @@ ggpairs(data = forestdata, columns = 2:11, title = "Correlations", mapping = aes
 One of the clearer relationships in the dataset was the distribution of Hillshade luminance. Hillshade is measured on a scale from 0 to 255 (dark to bright).
 
 Hillshade at time *t* varies as a factor of:
-  $$\cos(slope)\cos (90- Altitude) + \sin (slope)\sin (90-Altitude)\cos(Azimuth-Aspect)$$ 
+$$\cos(slope)\cos (90- Altitude) + \sin (slope)\sin (90-Altitude)\cos(Azimuth-Aspect)$$ 
 where Altitude is the angle of the Sun relative to the horizon and Azimuth relates to the direction the Sun is facing: North, South, East, or West. Azimuth of 90 degrees corresponds to East.
 
 This equation actually arises from a theorem in Spherical geometry known as "Spherical law of Cosines" relating the sides and angles of triangles constructed on spherical surfaces.  
@@ -435,9 +442,11 @@ This equation actually arises from a theorem in Spherical geometry known as "Sph
 <br>
 In a unit sphere, lengths *a*, *b*, *c* correspond to the angle subtended by those sides from the center of the sphere. 
 If we know the two sides *a*, *b* and the angle between them *C*, then the cosine of *c*, is given by:
-  
+
+<center>  
 <img src="https://upload.wikimedia.org/math/b/b/3/bb37f9a9bc68d4f6fdf2a35337093c65.png", width="400px", height="300px" />
-  
+</center>
+
 In short, the Illumination of the patch is related to alitude of the sun, slope of the terrain and the relative direction of the sun and the slope. 
 
 $Hillshade(t_1,t_2,t_3)$ has has been plotted below in 3 dimensions. Click/drag on the plot to explore:
@@ -592,7 +601,7 @@ After returning to the model, we decided to experiment with a wider range of the
 
 - In 2004,  in Systems, Man and Cybernetics an  IEEE International Conference publication, Xiaomei Liu, Kevin W. Bowyer of the University of Notre Dame use the forest cover dataset to conjecture something interesting. In their own words:
 
-  <span style="color:MidnightBlue"><i>"Based on some experiments with the Forest Cover Type Data Set, we        conjectured a class of problems that are extremely difficult for FFBP NNs but relatively simple for DTs. The features of such problems are that some minority classes are surrounded and overlapped by some majority classes. We generated synthetic data sets with the above description. In our experiments on the synthetic data sets, we varied the size and the number of the islands for the minority class. We also varied the ratio of the minority class and the majority class for each island. We tried a plain feed forward back propagation NN, a Rprop NN, and a cascade correlation NN. With all of these experiments, the DT performed better than each kind of FFBP NN"</i></span>
+<span style="color:MidnightBlue"><i>"Based on some experiments with the Forest Cover Type Data Set, we        conjectured a class of problems that are extremely difficult for FFBP NNs but relatively simple for DTs. The features of such problems are that some minority classes are surrounded and overlapped by some majority classes. We generated synthetic data sets with the above description. In our experiments on the synthetic data sets, we varied the size and the number of the islands for the minority class. We also varied the ratio of the minority class and the majority class for each island. We tried a plain feed forward back propagation NN, a Rprop NN, and a cascade correlation NN. With all of these experiments, the DT performed better than each kind of FFBP NN"</i></span>
   
 Based on these findings, we decided to move on from neural networks in favor of tree-based methods.
 
@@ -645,33 +654,94 @@ using all our variables
 Our accuracy was **72.66** lower than the one acheived using the original dataset. 
 
 
+#### Gradient Boosting
 #### Boosting Using H2o's Gradient Boosting Algorithm
 
+- After some initial tuining an accuracy of **76.64%**
+- Grid search tuning with ntrees,
+```{r, eval=FALSE}
+  hyper_params_gbm = list(
+  ntrees = c(40, 100, 200),
+  max_depth = 20,
+  min_rows = c(5, 10, 15),
+  learn_rate = c(.01, .1, .3)
+```
+
+max_depth is the maximum depth (length of the longest path from node to leaf of a Tree)
+min_rows  is the minimum no of rows to assign to terminal nodes 
+
+- hyperparameter tuning gives an impvroment to **78.052**
+- Using a second set of feature engineered variables leads to a further improvement of **79.01%** 
 
 
 
 
 
 #### Extremely Randomized Trees
+
+As mentioned earlier, the Extratrees algorithm includes another level of randomness to the mix by choosing cutpoints for each split in random  while using the whole of the in-sample data to build the tree. The feature also allows us to choose the number of cutpoints. 
+ 
+ 
+A simple implementation of ExtraTrees in R , with 13 features tried at each node, 2 random cuts led 
+an accuracy of **79.22%**, our second best result.
+
+The procedure for tuning the model was to first estimate an optimal number of trees , 
+and then estimate the number of features considered for each split , and finally 
+simultaneously estimate both number of cuts and node size to get the final model . 
+
+The model selected with the parameters mtry = 10 ,  ntrees = 200  ,  Node size = 2, Number of random cuts = 5
+resulted in an improvement to our earlier model with an accuracy of **79.25%** 
+
 <center>![](images/Tuning randmo cuts and node size Extra trees.jpeg)</center>
-<center>![](images/extratrees_mtry_accuracy.png)</center>
-<center>![](images/extratrees_ntree_accuracy.png)</center>
+<center><img src='images/extratrees_mtry_accuracy.png', width='400px', height='400px' /><img src='images/extratrees_ntree_accuracy_resize.png', width='400px', height='400px' /></center>
 <center>![](images/extratreesaccuracychangingnooftreesfeatureengineerd.jpeg)</center>
 <center>![](images/extratreesfeatureengineeringtuningnoofvariables.jpeg)</center>
  
  
  
  
-### Support Vector Machines ?
-  
-  
-  
-  
+ 
+ 
 #### Ensembling
-  
+- For the first ensemble we used a majority of the best models from XGBOOST,GBM H2o,Extratrees and Randomforest
+  but our final accuracy was around **76%**
+- We fed our model outputs of ExtraTrees into GBM and that led to a score of **79.182%** , the best we could do     with ensembling
 
 
 ## Results Summary
+
+### Performance, Benchmarks and Accuracy 
+ 
+- Our final Kaggle rank was 224, achieving a top 13% ranking. This was satisfactory considering the time     constraint on the project.
+ 
+- Dong Ying of Technische Universität Darmstadt & Shivanshu Agrawal et all at Indian Institute of Technology, Kanpur  achieved similar scores for their models in 2015 but were able to improve their ExtraTrees accuracy to 82% through better feature selection and engineering for Extratrees. 
+ 
+- Our GBM model performed better than both the projects cited above largely due to H2o's improved algorithm.
+
+
+
+
+
+
+Learning and improvements 
+- One of the important learnings from the Project was effective utilization of Github for workflow management and coordinating as a team.  
+- The tuning of Neural networks can be more cumbersome and time consuming especially when it involves deep   learning.  This must be taken into account and techniques such as Adaptive learning rate and Randomized  hyper-parameter tuning must be utilized. 
+-	If one is implementing techniques like multistage ensemble, it is better to store model parameters, fitted and predicted values of the best models beforehand for each method including the probability values for each prediction to save time. 
+- It is important to consider all aspects of the data and if/whether the classification problem can be solved effectively by means of just Machine learning algorithms or if other type of algorithms work better. 
+- Learning to use LateX for publishing was very useful .
+- The key drivers to success in a competition like Kaggle are creative feature engineering, effective model tuning, optimal ensembling, computational resources and time 
+
+
+Conclusion:
+The forest cover dataset is an extremely rich dataset for anyone who wishes to implement multi-class classification algorithms across a wide range of methods and will continue to be a benchmark for classifying algorithms for sometime.  
+
+
+
+  
+
+
+## Appendix
+
 
 Classifier                        | Feature Engineering  | Parameters               | Accuracy | Rank
 ----------------------------------|-----|-------------------------------------------|----------|-------------------------------------------------
@@ -720,30 +790,6 @@ ensemble3 | ? | Feeding ExtraTrees to H2o XGB then to XGB again | 0.79182 | ?
 
 
 
-Learning and improvements 
-- One of the important learnings from the Project was effective utilization of Github for workflow management and coordinating as a team.  
-- The tuning of Neural networks can be more cumbersome and time consuming especially when it involves deep   learning.  This must be taken into account and techniques such as Adaptive learning rate and Randomized  hyper-parameter tuning must be utilized. 
--	If one is implementing techniques like multistage ensemble, it is better to store model parameters, fitted and predicted values of the best models beforehand for each method including the probability values for each prediction to save time. 
-- It is important to consider all aspects of the data and if/whether the classification problem can be solved effectively by means of just Machine learning algorithms or if other type of algorithms work better. 
-- Learning to use LateX for publishing was very useful .
-- The key drivers to success in a competition like Kaggle are creative feature engineering, effective model tuning, optimal ensembling, computational resources and time 
-
-
-Conclusion:
-The forest cover dataset is an extremely rich dataset for anyone who wishes to implement multi-class classification algorithms across a wide range of methods and will continue to be a benchmark for classifying algorithms for sometime.  
-
-
-
-  
-
-
-
-
-
-
-
-
-
 
 
 ## References:
@@ -761,3 +807,5 @@ The forest cover dataset is an extremely rich dataset for anyone who wishes to i
 - https://www.researchgate.net/publication/222499246_Comparative_Accuracies_of_Artificial_Neural_Networks_and_Discriminant_Analysis_in_Predicting_Forest_Cover_Types_from_Cartographic_Variables
 - http://www.csee.usf.edu/~hall/papers/smc04nn.pdf
 
+- http://www.ke.tu-darmstadt.de/lehre/arbeiten/studien/2015/Dong_Ying.pdf
+- http://home.iitk.ac.in/~shefalig/g8p5.pdf
