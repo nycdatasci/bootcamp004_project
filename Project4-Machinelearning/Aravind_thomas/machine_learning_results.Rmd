@@ -3,11 +3,13 @@ title: "Forest Cover Type Classification Study"
 author: "Thomas Kolasa and Aravind Kolumum Raja"
 header-includes:
 - \usepackage{bbm}
-output: html_document 
+output: 
+  html_document: 
+    fig_width: 12
 ---
   
 ### Introduction
-We found the Forest Covertype in the UCI Machine Learning Repository that takes forestry data from the Roosevelt National Forest in northern Colorado ([Click here](https://tourbuilder.withgoogle.com/tour/ahJzfmd3ZWItdG91cmJ1aWxkZXJyEQsSBFRvdXIYgICAk5uU5AoM) for a tour of the area). The observations are taken from 30m by 30m patches of forest that are classified as one of seven forest types:
+We found the Forest Cover type dataset in the UCI Machine Learning Repository that takes forestry data from four wilderness areas in Roosevelt National Forest in northern Colorado ([Click here](https://tourbuilder.withgoogle.com/tour/ahJzfmd3ZWItdG91cmJ1aWxkZXJyEQsSBFRvdXIYgICAk5uU5AoM) for a tour of the area). The observations are taken from 30m by 30m patches of forest that are classified as one of seven cover types:
   
 1. Spruce/Fir
 2. Lodgepole Pine
@@ -28,7 +30,7 @@ We found the Forest Covertype in the UCI Machine Learning Repository that takes 
 </center></br>
   
   
-The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem. We decided to use the machine learning and visualization packages available in R for this project.
+The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the train and test sets makes classification of cover type a challenging problem. We decided to use the machine learning and visualization packages available in R for this project.
 
 ```{r, echo=FALSE, message=FALSE}
 # data load next 340 lines
@@ -381,7 +383,8 @@ Cover Type                          |    Classes 1 to 7             |  Forest Co
 
 
 
-
+The Kaggle training data was not a simple random sample of the entire dataset, but a stratified sample of the seven forest classes. The class distribution of the training data was equally distributed among the seven classes. 
+</br>
 Some class seperation is clearly visible in the following plots of elevation.
 <center>
 <img src="images/ggplot_elevation_histogram.jpeg", width="1200px", height="800px" />
@@ -393,9 +396,7 @@ Some class seperation is clearly visible in the following plots of elevation.
 ```
 </center>
 
-Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
-
-Across Wilderness areas, there seems to be some class seperation . Cottonwood Willow covers are found only in Cache la Poudre areas and Neota area comprises of only Spruce-fir,Krummholz and LodgePole-Pine covers. 
+Across Wilderness areas, there seems to be some class seperation. Cottonwood Willow covers are found only in Cache la Poudre areas and Neota areas comprises of only Spruce-fir, Krummholz, and LodgePole-Pine covers. 
 
 <center>
 <img src="images/ggplot_wilderness_area.jpeg", width="1200px", height="800px" />
@@ -409,7 +410,9 @@ Across Wilderness areas, there seems to be some class seperation . Cottonwood Wi
 #ggplot(forestdata, aes(x=Soil_Type, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Soil Type') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank(), legend.position='bottom') +
 #scale_x_discrete(breaks = 1:40) + theme(text = element_text(size=16))
 ```
-
+</center>
+Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
+<center>
 <img src="images/ggplot_aspect.jpeg", width="1200px", height="800px" />
 <img src="images/ggplot_aspect_wilderness_area.jpeg", width="1200px", height="800px" />
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
@@ -421,7 +424,9 @@ Across Wilderness areas, there seems to be some class seperation . Cottonwood Wi
 #   geom_bar() + theme(legend.title=element_blank(), axis.title.x=element_blank(), axis.text.x=element_blank()) +
 #   coord_polar() + theme(text = element_text(size=16))
 ```
-
+</center>
+Let us look at the correlation plots of the ten quantitative variables.
+<center>
 <img src="images/ggplot_corr_plot.jpeg", width="2000px", height="2000px" />
 ```{r, echo=FALSE, fig.width=18, fig.height=18, dpi=300}
 #columnlables <- c('Elevation', 'Aspect', 'Slope', 'Water Dist', 'Water Dist Vert', 'Road Dist', 'Hillshade 9AM', 'Hillshade Noon', 'Hillshade 3PM', 'Fire Point Dist')
@@ -429,7 +434,7 @@ Across Wilderness areas, there seems to be some class seperation . Cottonwood Wi
 ```
 </center>
   
-  
+
 One of the clearer relationships in the dataset was the distribution of Hillshade luminance. Hillshade is measured on a scale from 0 to 255 (dark to bright).
 
 Hillshade at time *t* varies as a factor of:
@@ -449,7 +454,9 @@ If we know the two sides *a*, *b* and the angle between them *C*, then the cosin
 
 In short, the Illumination of the patch is related to alitude of the sun, slope of the terrain and the relative direction of the sun and the slope. 
 
-$Hillshade(t_1,t_2,t_3)$ has has been plotted below in 3 dimensions. Click/drag on the plot to explore:
+$Hillshade(t_{9AM},t_{Noon},t_{3PM})$ has has been plotted below in 3 dimensions. 
+
+<center>Click/drag on the plot to explore:</center>
   
   
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
@@ -457,14 +464,14 @@ plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, ty
 ```
 
 
-More importantly, in the context of class seperation, The following plot of elevation, slope, and hillshade clearly seperates the forest cover types, demonstrating that elevation could be the most significant factor in determining cover type. 
+More importantly, in the context of class seperation, The following plot of elevation, slope, and hillshade clearly separates the forest cover types, demonstrating that elevation could be the most significant factor in determining cover type. 
 
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
 plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers", color = covername)
 ```
 
 
-The primary reason for the collection of cartographic data pertains to terrain mapping and is ultimately useful for applying topographic correction to satellite images in remote sensing or as background information in scientific studies.
+The primary reason for the collection of cartographic data pertains to terrain mapping. It is ultimately useful for applying topographic correction to satellite images in remote sensing or as background information in scientific studies.
 
 Topographic correction is necessary if, for example, we wish to identify materials on the Earth's surface by deriving empirical spectral signatures, or to compare images taken at different times with different Sun and satellite positions and angles. By applying the corrections, it is possible to  transform the satellite-derived reflectance into their true reflectivity or radiance in horizontal conditions.
 
@@ -477,6 +484,7 @@ Topographic correction is necessary if, for example, we wish to identify materia
 
 
 ## Feature Engineering
+Some of the features ultimately incorporated into our analysis are shown below.
 
 New Feature | Description
 ------------|----------------
@@ -495,6 +503,7 @@ interaction_9amnoon | Product of hillshades at 9AM and Noon
 interaction_noon3pm | Product of hillshades at Noon and 3PM
 interaction_9am3pm | Product of hillshades at 9AM and 3PM
 
+We also looked at linear combinations of many of the higher correlated variables. This proved to be useful for improving the accuracy of one of our models.
 
 
 
@@ -534,39 +543,37 @@ A 10-fold cross validated lasso-regularized logistic regression kaggle score was
 
 Using both the ridge and lasso regularization terms concurrently produces an elastic-net regularization. We ran this hybrid method with both a 70-30 split and 85-15 split in the training set. When running these models on the testing set, we got accuracies on Kaggle of **59.59%** and **59.52%**, respectively.
 
-We also tried an elastic-net regression using all 15,120 observations in the training set with an Alpha parameter of 0.5. It earned an accuracy score on the testing set of **59.50%**.
+We also tried an elastic-net regression using all 15,120 observations in the training set with an $\alpha$ parameter of 0.5. It earned an accuracy score on the testing set of **59.50%**.
 
 ![](images/elastic netlambdadevianceplot.jpeg)
 
-In summary , we were able to attain a best accuracy of  **59.59%** suing lasso/Elastic net and regularization does not have huge impact on model accuracy on this dataset.  
+In summary, we were able to attain a best accuracy of **59.59%** using lasso/elastic net and regularization. Whatever value $\alpha$ takes does not have huge impact on model accuracy on this dataset.  
 
 ### Artificial Neural Networks
 
-
 We first modeled the data in a feed-forward neural network with a single layer of nodes. Later, we created deep learning models where we added more layers of hidden nodes.
-
-
 
 #### Single Hidden Layer Using the nnet Package
 
-The nnet R library allows the construction of feed-forward single-layer nerual networks. After scaling our variables, and a basic run we decided to tune the nnet function based on the following parameters 
+The nnet R library allows the construction of feed-forward single-layer nerual networks. After scaling our variables and running a basic model, we decided to tune the nnet function based on the following parameters 
 - Number of nodes 
 - Number of iterations 
 - Maximum number of weights (since this depends on the number of nodes)
 
-we experimented to see the optimal number of nodes for our hidden layer by checking our accuracy levels over various number of nodes. 
+We experimented to see the optimal number of nodes for our hidden layer by checking our accuracy levels over various number of nodes. 
 
 <center>![](images/nnet_accuracy_by_node_size.png)</center>
 
 
-We finally chose a 54-100-7  node neural nets on our training data achieving **0.52113** accuracy for 300 maximum iterations  and **0.52432** accuracy for 500 maximum iterations.
+We finally chose a 54-100-7  node neural nets on our training data achieving **52.11%** accuracy for 300 maximum iterations  and **52.43%** accuracy for 500 maximum iterations.
 
 
 #### Deep Learning using H2o
 
 For adding multiple hidden layers, we used the deeplearning function using the H2o package. H2o is an R package that runs parallel-distributed machine learning algorithms to improve computational speed. Later, we also used H2o's Gradient Boosting Machine (GBM) algorithm to acheive our second best accuracy rate. 
 
-Some features of H2o include
+Some features of H2o include:
+
 -  In-memory compression techniques to handle large datasets
 -  Automatic standardization 
 -  Randomized Grid Search
@@ -583,9 +590,9 @@ hyper_params <- list(
   rate_annealing=c(1e-8,1e-7,1e-6))
 ```
 
-From our first tuning run, the neural network had an accuracy of **0.60186** with a 54-120-150-7 network.
+From our first tuning run, the neural network had an accuracy of **60.19%** with a 54-120-150-7 network.
 
-After returning to the model, we decided to experiment with a wider range of the tuning parameters. Our best model was a 54-500-800-7 network with a learning rate of 0.02, rate annealing of 1e-05, input dropout ratio of 0, and an accuracy of **0.674**.
+After returning to the model, we decided to experiment with a wider range of the tuning parameters. Our best model was a 54-500-800-7 network with a learning rate of 0.02, rate annealing of 1e-05, input dropout ratio of 0, and an accuracy of **67.4%**.
 
 
 
@@ -595,13 +602,13 @@ After returning to the model, we decided to experiment with a wider range of the
 
 ## Notable studies from the past:
 
-- The earliest use of the dataset was in a doctoral dissertation. Jock Blackard and Denis Dean at Colorado State University used Linear Discriminant Analysis to obtain a 58% accuracy and Artificial Neural network to achieve 70% accuracy.  The paper concludes by saying that ANN does have its drawbacks, it is still more viable than traditional methods, by which we think he refers to logistic regression, LDA and Support Vector Classifiers.
+The earliest use of the dataset was in a doctoral dissertation. Jock Blackard and Denis Dean at Colorado State University used Linear Discriminant Analysis to obtain a 58% accuracy and Artificial Neural network to achieve 70% accuracy.  The paper concludes by saying that ANN does have its drawbacks, it is still more viable than traditional methods, by which we think he refers to logistic regression, LDA and Support Vector Classifiers.
 
-- In 2007, Jain & Minz (Journal  of Indian Agricultural Statistics) applied Rough Set Theory as an alternative to Machine learning approaches to achieve equally good but using lesser attributes (only 29) to achieve 78% accuracy for the forest cover dataset. This is especially relevant in real world classification applications in remote sensing involving large datasets. 
+In 2007, Jain & Minz (Journal  of Indian Agricultural Statistics) applied Rough Set Theory as an alternative to Machine learning approaches to achieve equally good but using lesser attributes (only 29) to achieve 78% accuracy for the forest cover dataset. This is especially relevant in real world classification applications in remote sensing involving large datasets. 
 
-- In 2004,  in Systems, Man and Cybernetics an  IEEE International Conference publication, Xiaomei Liu, Kevin W. Bowyer of the University of Notre Dame use the forest cover dataset to conjecture something interesting. In their own words:
+In 2004,  in Systems, Man and Cybernetics an  IEEE International Conference publication, Xiaomei Liu, Kevin W. Bowyer of the University of Notre Dame use the forest cover dataset to conjecture something interesting. In their own words:
 
-<span style="color:MidnightBlue"><i>"Based on some experiments with the Forest Cover Type Data Set, we        conjectured a class of problems that are extremely difficult for FFBP NNs but relatively simple for DTs. The features of such problems are that some minority classes are surrounded and overlapped by some majority classes. We generated synthetic data sets with the above description. In our experiments on the synthetic data sets, we varied the size and the number of the islands for the minority class. We also varied the ratio of the minority class and the majority class for each island. We tried a plain feed forward back propagation NN, a Rprop NN, and a cascade correlation NN. With all of these experiments, the DT performed better than each kind of FFBP NN"</i></span>
+- <span style="color:MidnightBlue"><i>"Based on some experiments with the Forest Cover Type Data Set, we conjectured a class of problems that are extremely difficult for FFBP NNs but relatively simple for DTs. The features of such problems are that some minority classes are surrounded and overlapped by some majority classes. We generated synthetic data sets with the above description. In our experiments on the synthetic data sets, we varied the size and the number of the islands for the minority class. We also varied the ratio of the minority class and the majority class for each island. We tried a plain feed forward back propagation NN, a Rprop NN, and a cascade correlation NN. With all of these experiments, the DT performed better than each kind of FFBP NN"</i></span>$^{1}$
   
 Based on these findings, we decided to move on from neural networks in favor of tree-based methods.
 
@@ -611,8 +618,7 @@ Based on these findings, we decided to move on from neural networks in favor of 
 
 ### Random Forest
 
-Random Forest 
-Our initial submission of the Random forest algorithm without tuning any parameters improved our score to 68.%
+Our initial submission of the Random forest algorithm without tuning any parameters improved our score to 68%.
 
 The tuning was performed by varying the number of variables randomly sampled as candidates at each split. 
 
@@ -622,12 +628,12 @@ The tuning was performed by varying the number of variables randomly sampled as 
 Elevation clearly shows up as the most significant variable both in terms of mean decrease in Accuracy
 as well as contributing to reduction in node impurity. 
 
-After tuning the number of trees , we arrived an accuracy of  **75.17%**,our first benchmark. 
+After tuning the number of trees, we arrived an accuracy of  **75.17%**, our first benchmark. 
 
 
 <center>![](images/rf_featureengineering20importance.jpeg)</center>
 
-After tuning the feature-engineered dataset we were only able to acheive around **71.93$%**
+After tuning the feature-engineered dataset we were only able to acheive around **71.93%** accuracy.
 
 
 
@@ -636,9 +642,9 @@ After tuning the feature-engineered dataset we were only able to acheive around 
 The following steps were followed while implementing the XGBoost algorithm 
 - An untuned algorithm performed slightly better than the untuned Random Forest with **70%** accuracy
 - The tuning metric we used was the multinomial logloss  
-$$multinomial log loss = -\frac{1}{N}\sum_{i=1}^N\sum_{j=1}^My_{i,j}\log(p_{i,j})$$
+$$multinomial\ logloss = -\frac{1}{N}\sum_{i=1}^N\sum_{j=1}^My_{i,j}\log(p_{i,j})$$
 
-where N is the number of observations, M is the number of class labels, loglog is the natural logarithm, $y_{i,y}$ is 1 if observation i is in class j and 0 otherwise, and $p_{i,j}$ is the predicted probability that observation i is in class j.
+where *N* is the number of observations, *M* is the number of class labels, loglog is the natural logarithm, $y_{i,y}$ is 1 if observation *i* is in class *j* and 0 otherwise, and $p_{i,j}$ is the predicted probability that observation *i* is in class *j*.
 
 - After running a 3-fold crossvalidation with 800 rounds, we estimated the logloss minimization occured on around 104 
 - Our new model used the above parameters and improved the accuracy to **73.44%**
@@ -651,27 +657,26 @@ using all our variables
 
 <center>![](images/xgboost_cv_final_graph.jpeg)<center>
 
-Our accuracy was **72.66** lower than the one acheived using the original dataset. 
+Our accuracy was **72.66%**, lower than the one acheived using the original dataset. 
 
 
 #### Gradient Boosting
-#### Boosting Using H2o's Gradient Boosting Algorithm
 
-- After some initial tuining an accuracy of **76.64%**
-- Grid search tuning with ntrees,
+- After some initial tuning of H2o's Gradient Boosting Algorithm, an accuracy of **76.64%** was reached
+- The Grid search tuning looked as follows:
 ```{r, eval=FALSE}
   hyper_params_gbm = list(
   ntrees = c(40, 100, 200),
   max_depth = 20,
   min_rows = c(5, 10, 15),
-  learn_rate = c(.01, .1, .3)
+  learn_rate = c(.01, .1, .3))
 ```
 
-max_depth is the maximum depth (length of the longest path from node to leaf of a Tree)
-min_rows  is the minimum no of rows to assign to terminal nodes 
+*max_depth* is the maximum depth (length of the longest path from node to leaf of a Tree)
+*min_rows* is the minimum number of rows to assign to terminal nodes 
 
-- hyperparameter tuning gives an impvroment to **78.052**
-- Using a second set of feature engineered variables leads to a further improvement of **79.01%** 
+- Hyperparameter tuning gives an impvroment to **78.05%**.
+- Using a second set of feature engineered variables leads to a further improvement of **79.01%**.
 
 
 
@@ -679,7 +684,7 @@ min_rows  is the minimum no of rows to assign to terminal nodes
 
 #### Extremely Randomized Trees
 
-As mentioned earlier, the Extratrees algorithm includes another level of randomness to the mix by choosing cutpoints for each split in random  while using the whole of the in-sample data to build the tree. The feature also allows us to choose the number of cutpoints. 
+As mentioned earlier, the Extratrees algorithm includes another level of randomness to the mix by choosing cutpoints for each split in random while using the whole of the in-sample data to build the tree. The feature also allows us to choose the number of cutpoints. 
  
  
 A simple implementation of ExtraTrees in R , with 13 features tried at each node, 2 random cuts led 
@@ -692,29 +697,23 @@ simultaneously estimate both number of cuts and node size to get the final model
 The model selected with the parameters mtry = 10 ,  ntrees = 200  ,  Node size = 2, Number of random cuts = 5
 resulted in an improvement to our earlier model with an accuracy of **79.25%** 
 
-<center>![](images/Tuning randmo cuts and node size Extra trees.jpeg)</center>
-<center><img src='images/extratrees_mtry_accuracy.png', width='400px', height='400px' /><img src='images/extratrees_ntree_accuracy_resize.png', width='400px', height='400px' /></center>
 <center>![](images/extratreesaccuracychangingnooftreesfeatureengineerd.jpeg)</center>
 <center>![](images/extratreesfeatureengineeringtuningnoofvariables.jpeg)</center>
+<center>![](images/Tuning randmo cuts and node size Extra trees.jpeg)</center>
  
+
  
- 
- 
- 
- 
-#### Ensembling
-- For the first ensemble we used a majority of the best models from XGBOOST,GBM H2o,Extratrees and Randomforest
-  but our final accuracy was around **76%**
-- We fed our model outputs of ExtraTrees into GBM and that led to a score of **79.182%** , the best we could do     with ensembling
+## Ensembling
+- For the first ensemble we used a majority of the best models from XGBOOST, GBM H2o, Extratrees, and Randomforest. Our final accuracy was around **76%**, less than the Extratrees standalone.
+- We fed our model outputs of ExtraTrees into GBM and that led to a score of **79.182%**, the best we could do with ensembling.
 
 
-## Results Summary
 
-### Performance, Benchmarks and Accuracy 
+## Performance, Benchmarks and Accuracy 
  
 - Our final Kaggle rank was 224, achieving a top 13% ranking. This was satisfactory considering the time     constraint on the project.
  
-- Dong Ying of Technische Universität Darmstadt & Shivanshu Agrawal et all at Indian Institute of Technology, Kanpur  achieved similar scores for their models in 2015 but were able to improve their ExtraTrees accuracy to 82% through better feature selection and engineering for Extratrees. 
+- Dong Ying of Technische Universität Darmstadt & Shivanshu Agrawal et all at Indian Institute of Technology, Kanpur  achieved similar scores for their models in 2015, but were able to improve their ExtraTrees accuracy to 82% through better feature selection and engineering. 
  
 - Our GBM model performed better than both the projects cited above largely due to H2o's improved algorithm.
 
@@ -723,17 +722,19 @@ resulted in an improvement to our earlier model with an accuracy of **79.25%**
 
 
 
-Learning and improvements 
-- One of the important learnings from the Project was effective utilization of Github for workflow management and coordinating as a team.  
-- The tuning of Neural networks can be more cumbersome and time consuming especially when it involves deep   learning.  This must be taken into account and techniques such as Adaptive learning rate and Randomized  hyper-parameter tuning must be utilized. 
--	If one is implementing techniques like multistage ensemble, it is better to store model parameters, fitted and predicted values of the best models beforehand for each method including the probability values for each prediction to save time. 
-- It is important to consider all aspects of the data and if/whether the classification problem can be solved effectively by means of just Machine learning algorithms or if other type of algorithms work better. 
-- Learning to use LateX for publishing was very useful .
-- The key drivers to success in a competition like Kaggle are creative feature engineering, effective model tuning, optimal ensembling, computational resources and time 
+## Learning and Improvements
+
+- The tuning of Neural networks can be more cumbersome and time consuming especially when it involves deep learning.  This must be taken into account and techniques such as Adaptive learning rate and Randomized hyper-parameter tuning must be utilized. 
+-	To save time when one is implementing techniques like multistage ensembles, it is important better to store model parameters, fitted values, and predicted values of the best models beforehand for each method including the probability values for each prediction. 
+- It is important to consider all aspects of the data and if/whether the classification problem can be solved effectively by solely machine learning approaches  or alternative algorithms. 
+- One of the important learnings from the Project was effective utilization of Github for workflow management and coordinating as a team.
+- Learning to use LateX for publishing was very useful.
+- The key drivers to success in a competition like on Kaggle are creative feature engineering, effective model tuning, optimal ensembling, computational resources, and time.
 
 
-Conclusion:
-The forest cover dataset is an extremely rich dataset for anyone who wishes to implement multi-class classification algorithms across a wide range of methods and will continue to be a benchmark for classifying algorithms for sometime.  
+## Conclusion
+
+The forest cover dataset is an extremely rich dataset for anyone who wishes to implement multi-class classification algorithms across a wide range of methods. It will continue to be a benchmark for classifying algorithms for some time.  
 
 
 
@@ -747,7 +748,7 @@ Classifier                        | Feature Engineering  | Parameters           
 ----------------------------------|-----|-------------------------------------------|----------|-------------------------------------------------
 Logistic Regression - Ridge       | No  | 70-30 split                               | 0.55696  | 1,489 
 Logistic Regression - Ridge       | No  | 85-15 split                               | 0.59550  | 1,414
-Logistic Regression - Lasso       | No  | 70-30 split best lambda                   | 0.59594  | 1,411
+Logistic Regression - Lasso       | No  | 70-30 split best lambda                   | **0.59594**  | **1,411**
 Logistic Regression - Lasso       | No  | 85-15 split best lambda                   | 0.59526  | 1,415
 Logistic Regression - Lasso       | No  | 85-15 split,lowest 50 percintile of lambdas and calculated the mode of the predictions | 0.59443 | 1,418
 Logistic Regression - Elastic-net | No  | 70-30 split                               | 0.59588  | 1,412
@@ -756,7 +757,7 @@ Logistic Regression - Elastic-net | No  | using whole training set              
 Random Forest                     | No  | 80-20 split                               | 0.68932  | 1,286
 Random Forest                     | No  | using whole training set                  | 0.70748  | 1,210
 Random Forest                     | No  | ntree=500, mtry=13                        | 0.75168  |   792
-Random Forest                     | No  | ntree=500, mtry=17                        | 0.754    |   672
+Random Forest                     | No  | ntree=500, mtry=17                        | **0.754**|   672
 Random Forest                     | Yes | ntree=500, mtry=13                        | 0.69115  | 1,282
 Random Forest                     | Yes | ntree=500, mtry=20                        | 0.71929  | 1,221
 Random Forest                     | Yes | ntree=500, mtry=30                        | 0.71831  | 
@@ -767,26 +768,25 @@ Neural Network                    | No  | nnet package, 80% training set, maxit=
 Neural Network - Deep Learning    | No  | H2o package,                              | 0.5946   |
 Neural Network - Deep Learning    | No  | H2o package, 54-100-120-7                 | 0.60186  |
 Neural Network - Deep Learning    | No  | H2o package, 54-120-150-7                 | 0.60186  |
-Neural Network - Deep Learning    | No  | H2o package, 54-500-800-7, rate=0.02, rate-annealing=1e-05, rate-decay=1 | .67428 |
+Neural Network - Deep Learning    | No  | H2o package, 54-500-800-7, rate=0.02, rate-annealing=1e-05, rate-decay=1 |**0.67428**|
 XGBoost                           | No  | nround=50                                 | 0.70033  | 1,258
 XGBoost                           | No  | nround=104                                | 0.73438  | 991
-XGBoost                           | Yes | after 800 run                             | 0.72949  | 
+XGBoost                           | Yes | after 800 run                             | **0.72949**  | 
 XGBoost    | Yes | cv run by sequentially choosing the 62 variables based on importance and chose the optimal set of parameters | 0.72656 | 
 GBM - H2o                         | No  | ntrees=250, max_depth=18, min_rows=10, learn_rate=.1 | 0.76640  | 467
 GBM - H2o                         | No  | ntrees=200, max_depth=20, min_rows=10, learn_rate=.1 | 0.76119 | 521
 GBM - H2o                         | No  | ntrees=200, max_depth=20, min_rows=10, learn_rate=.1, cv 80/20 | 0.74509 | 911
 GBM - H2o                         | No  | w/o stopping_rounds=2, stopping_tolerance=0.01, score_each_iteration=T, 10-fold | 0.76586 | 479
 GBM - H2o                         | No  | w/o stopping_rounds=2, stopping_tolerance=0.01, score_each_iteration=T, 15-fold | 0.78052 | 356
-GBM - H2o                         | No  | after reducing row sampling rate=0.4, column sampling rate=0.3 (roughly sqrt(n)/n), 9-fold | 0.78052 | 
+GBM - H2o                         | No  | after reducing row sampling rate=0.4, column sampling rate=0.3 (roughly sqrt(n)/n), 9-fold | **0.78052** | 
 ExtraTrees                        | No  | mtry=13, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=50  | 0.79220 | 224
-ExtraTrees                        | No  | mtry=10, numRandomCuts = 5, nodesize = 2, numThreads = 3, ntree=200 | 0.79247 | 224
+ExtraTrees                        | No  | mtry=10, numRandomCuts = 5, nodesize = 2, numThreads = 3, ntree=200 | **0.79247** | 224
 ExtraTrees                        | Yes | mtry=13, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=700 | 0.78739 | 308
 ExtraTrees                        | Yes | tuned: mtry=56, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=200 | 0.757000 | 613
 **Ensembles**                     |     |                                            |        | 
-extratrees_submission_ensemblegbm.csv | No?  | ...  | 0.78808 | ???
-ensemble1 | ? | basic voting of RF, GBM, ExtraTrees and XGBoost | 0.76 | ?
-ensemble2 | ? | Feeding ExtraTrees to H2o XGB | 0.79182 | ?
-ensemble3 | ? | Feeding ExtraTrees to H2o XGB then to XGB again | 0.79182 | ?
+ensemble1 | No | basic voting of RF, GBM, ExtraTrees and XGBoost | 0.76 | 
+ensemble2 | No | Feeding ExtraTrees to H2o XGB | 0.79182 | 
+ensemble3 | No | Feeding ExtraTrees to H2o GBM then to XGB | 0.79182 | 
 
 
 
