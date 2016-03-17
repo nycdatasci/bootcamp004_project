@@ -25,7 +25,7 @@ We found the Forest Covertype in the UCI Machine Learning Repository that takes 
   <img src="images/tree_images/aspen.jpeg", width="293px", height="195px" />
   <img src="images/tree_images/douglas-fir.jpeg", width="100px", height="199px" />
   <img src="images/tree_images/krummholz.jpeg", width="286px", height="196px" />
-</center>
+</center></br>
   
   
 The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the training and test sets makes classification of cover type a challenging problem. We decided to use the machine learning and visualization packages available in R for this project.
@@ -33,8 +33,8 @@ The actual forest cover type for a given observation (30 x 30 meter cell) was de
 ```{r, echo=FALSE, message=FALSE}
 # data load next 340 lines
 #setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
-#setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+#setwd('C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
+setwd('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas')
 
 library(ggplot2)
 library(dplyr)
@@ -444,14 +444,14 @@ $Hillshade(t_1,t_2,t_3)$ has has been plotted below in 3 dimensions. Click/drag 
   
   
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
-#plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
+plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
 ```
 
 
 More importantly, in the context of class seperation, The following plot of elevation, slope, and hillshade clearly seperates the forest cover types, demonstrating that elevation could be the most significant factor in determining cover type. 
 
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
-#plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers", color = covername)
+plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers", color = covername)
 ```
 
 
@@ -598,7 +598,7 @@ Based on these findings, we decided to move on from neural networks in favor of 
 
 
 ## Tree Based Methods
-<center><img src="images/table_tree_based_methods.png" /></center>
+<center><img src="images/table_tree_based_methods.jpeg" /></center>
 
 ### Random Forest
 
