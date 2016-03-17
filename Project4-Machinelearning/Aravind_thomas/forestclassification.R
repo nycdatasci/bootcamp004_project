@@ -178,8 +178,8 @@ for (i in 1:nrow(forestdata)) {
   if (forestdata$aspect_group_class[i]>10) {
     forestdata$aspect_group_class[i]=0 
   } else {
-     forestdata$aspect_group_class[i]=1
-   }
+    forestdata$aspect_group_class[i]=1
+  }
 }
 
 forestdata$aspect_group_class=as.factor(forestdata$aspect_group_class)
@@ -187,20 +187,20 @@ forestdata$aspect_group_class=as.factor(forestdata$aspect_group_class)
 # Group families 
 
 soil_family=c(1, 2, 3, 4, 2, 2, 5, 6, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 13, 14, 15, 16, 16, 16,
-  16, 17, 16, 16, 18, 18, 16, 10, 16, 19, 20, 21, 20, 16, 19, 19)
+              16, 17, 16, 16, 18, 18, 16, 10, 16, 19, 20, 21, 20, 16, 19, 19)
 
 forestdata$soil_family=as.numeric(forestdata$Soil_Type)
 
 for (i in 1:nrow(forestdata)) {
-forestdata$soil_family[i]=soil_family[forestdata$soil_family[i]]
+  forestdata$soil_family[i]=soil_family[forestdata$soil_family[i]]
 }
 
 forestdata$soil_family=as.factor(forestdata$soil_family)
 
 rock_type=c('stony', 'stony', 'rubbly', 'rubbly', 'rubbly', 'stony', 'neither', 'neither', 'stony', 'rubbly', 'rubbly', 
-  'stony', 'rubbly', 'neither', 'neither', 'neither', 'neither', 'stony', 'neither', 'neither', 'neither', 
-  'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 
-  'stony', 'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony')
+            'stony', 'rubbly', 'neither', 'neither', 'neither', 'neither', 'stony', 'neither', 'neither', 'neither', 
+            'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 'stony', 
+            'stony', 'stony', 'neither', 'stony', 'stony', 'stony', 'stony', 'stony')
 
 rock_type_factor = c(1,2,3)
 rock_type=rock_type_factor[as.factor(rock_type)]
@@ -210,7 +210,7 @@ rock_type=rock_type_factor[as.factor(rock_type)]
 forestdata$soil_rock_type=as.numeric(forestdata$Soil_Type)
 
 for (i in 1:nrow(forestdata)) {
-forestdata$soil_rock_type[i]=rock_type[forestdata$soil_rock_type[i]]
+  forestdata$soil_rock_type[i]=rock_type[forestdata$soil_rock_type[i]]
 }
 
 forestdata$soil_rock_type=as.factor(forestdata$soil_rock_type)
@@ -441,6 +441,10 @@ ggplot(forestdata, aes(x=covername)) + geom_bar(aes(group=covername, colour=cove
 ggplot(forestdata, aes(x=Elevation)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('Histogram of Elevation')
 ggplot(forestdata, aes(x=Elevation)) + geom_density()
 ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=covername, colour=covername, fill=covername), alpha=0.3)
+
+
+ggplot(forestdata, aes(x=Elevation)) + geom_density(aes(group=Wilderness_Area, colour=Wilderness_Area, fill=Wilderness_Area), alpha=0.3)
+ggplot(foresttest, aes(x=Elevation)) + geom_density(aes(group=Wilderness_Area, colour=Wilderness_Area, fill=Wilderness_Area), alpha=0.3)
 
 # Studying Aspect across cover type
 ggplot(forestdata, aes(x=Aspect)) + geom_histogram(aes(group=covername, colour=covername, fill=covername), alpha=0.3)+ggtitle('T')
@@ -772,7 +776,7 @@ forestdata1.test = forestdata1[-train.index, ]
 cv.multi = tune(svm,Cover_Type ~.-Id,data = forestdata1[train.index, ],
                 kernel = "linear",
                 ranges = list(cost = 10^9,
-                          gamma = 10, tune.control=1))
+                              gamma = 10, tune.control=1))
 
 #Inspecting the cross-validation output.
 summary(cv.multi)
@@ -1026,9 +1030,9 @@ write.csv(featurerandomforest30, 'rf_featureengineering30.csv', row.names = FALS
 # Boosting
 
 boost.forestdata1 = gbm( Cover_Type~ . -Id, data = forestdata1.train,
-                   distribution = "multinomial",
-                   n.trees = 1000,
-                   interaction.depth = 3)
+                         distribution = "multinomial",
+                         n.trees = 1000,
+                         interaction.depth = 3)
 
 boostsummary = summary(boost.forestdata1)
 boostsummary[boostsummary$rel.inf > 0,]
@@ -1120,8 +1124,8 @@ colnames(forestdata1.train.scaled.nnet)[60] = 'Cover_Type1'
 # Add Cover_Type1 column
 for (i in 1:dim(forestdata1.train.scaled.nnet)[1]) {
   if (sum(forestdata1.train.scaled.nnet[i,54:59]) == 0) {
-      forestdata1.train.scaled.nnet[i,60] = 1
-    }
+    forestdata1.train.scaled.nnet[i,60] = 1
+  }
 }
 
 forestdata1.test.scaled.nnet = cbind(forestdata1.test.scaled.nnet, rep(0, dim(forestdata1.test.scaled.nnet)[1]))
@@ -1177,8 +1181,8 @@ foresttestxgb = foresttest1
 foresttestxgb = sparse.model.matrix(Cover_Type ~ .-1 -Id, data = testmodel) #as.matrix(foresttestxgb)
 
 param = list("objective" = "multi:softprob",
-              "eval_metric" = "mlogloss",
-              "num_class" = 7+1)
+             "eval_metric" = "mlogloss",
+             "num_class" = 7+1)
 
 cv.nround = 800
 cv.nfold = 3
@@ -1196,7 +1200,7 @@ confusionMatrix(factor(y+1), factor(pred.cv))
 
 
 bst = xgboost(param=param, data = forestdataxgb, label = y,
-                nfold = cv.nfold, nrounds = min.logloss.idx)
+              nfold = cv.nfold, nrounds = min.logloss.idx)
 
 pred_xgb1 = predict(bst, foresttestxgb)
 
@@ -1357,12 +1361,12 @@ Variables=2:72
 accuracyxg = as.data.frame(accuracyxg)
 accuracyxg=accuracyxg[-1,]
 p1=ggplot(data=accuracyxg,
-       aes(x=Variables,y=accuracyxg)) +
+          aes(x=Variables,y=accuracyxg)) +
   geom_line(colour="red")+ ggtitle("Xgboost Cross Validation Accuracy - Sequential Variable Addition")+ 
-    xlab("Num. of Variables added")+ ylab("Accuracy levels") + theme(text = element_text(size=18))
+  xlab("Num. of Variables added")+ ylab("Accuracy levels") + theme(text = element_text(size=18))
 
 p2=ggplot(data=loglossxg,
-       aes(x=Variables, y=loglossxg)) +
+          aes(x=Variables, y=loglossxg)) +
   geom_line(colour="blue")+ ggtitle("Xgboost Cross Validation min logloss round - Sequential Variable Addition")+ 
   xlab("Num. of Variables added")+ ylab("Num. of rounds for minimized logloss") + theme(text = element_text(size=18))
 
@@ -1741,7 +1745,7 @@ for (i in 11:55)
 {
   forest_h20[,i]=as.factor(forest_h20[,i])
 }
-  
+
 for (i in 12:55)
 {
   foresttest_h20[,i]=as.factor(foresttest_h20[,i])
@@ -2141,6 +2145,60 @@ write.csv(deeplearning_submission1, 'deep_learing_submission_mar15.csv', row.nam
 # $elastic_averaging_regularization
 # [1] 0.001
 
+
+
+m4 <- h2o.deeplearning(
+  model_id="dl_model_tuned", 
+  training_frame=forest_h20[train,], 
+  validation_frame=forest_h20[test,], 
+  x=predictors, 
+  y=response, 
+  overwrite_with_best_model=F,    ## Return the final model after 10 epochs, even if not the best
+  hidden=c(500,800),          ## more hidden layers -> more complex interactions
+  epochs=2000,                      ## to keep it short enough
+  score_validation_samples=10000, ## downsample validation set for faster scoring
+  score_duty_cycle=0.025,         ## don't score more than 2.5% of the wall time
+  adaptive_rate=F,                ## manually tuned learning rate
+  rate=0.002, 
+  rate_annealing=2e-6,            
+  momentum_start=0.5,             ## manually tuned momentum
+  momentum_stable=0.4, 
+  momentum_ramp=1e7, 
+  l1=1e-5,                        ## add some L1/L2 regularization
+  l2=1e-5,
+  max_w2=10
+  
+) 
+summary(m4)
+
+
+
+
+pred_gbm_h2o_ensemble1 <- h2o.predict(m4,foresttest_h201)
+
+pred_gbm_h2o_ensemble1 = as.data.frame(pred_gbm_h2o_ensemble1)
+head(pred_gbm_h2o_ensemble1)
+
+ensemble_h2o_submission_1 = foresttest[,c(1,56)]
+ensemble_h2o_submission_1$Cover_Type = pred_gbm_h2o_ensemble1[,1]
+write.csv(ensemble_h2o_submission_1, 'ensemble_extratrees_to_neuralnet.csv', row.names = FALSE)
+
+write.csv(forestdata2,'featureengineeredtrain.csv')
+write.csv(foresttest1,'featureengineeredtest.csv')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # GBM via H2O -------------------------------------------
 
 gbm1 = h2o.gbm(
@@ -2295,11 +2353,11 @@ gbm_final2 = h2o.gbm(
   max_depth = 20,
   min_rows = 10,
   learn_rate = .1, 
-   sample_rate = 0.6,          ## use a random 70% of the rows to fit each tree
-   col_sample_rate = 0.6,       ## use 70% of the columns to fit each tree
-#   stopping_rounds  = 2,
-#   stopping_tolerance = 0.01,
-#   score_each_iteration = T,
+  sample_rate = 0.6,          ## use a random 70% of the rows to fit each tree
+  col_sample_rate = 0.6,       ## use 70% of the columns to fit each tree
+  #   stopping_rounds  = 2,
+  #   stopping_tolerance = 0.01,
+  #   score_each_iteration = T,
   nfolds = 15
 )
 
@@ -2531,6 +2589,150 @@ importance_matrix <- xgb.importance(names[1:10], model = bst)
 
 
 xgb.plot.importance(importance_matrix[1:20,])
+
+
+
+
+forestdata5=forestdata1
+foresttest5=foresttest1[,1:55]
+
+forestdata5$elevfire=forestdata5$Elevation+forestdata$Horizontal_Distance_To_Fire_Points
+forestdata5$elevroad=forestdata5$Elevation+forestdata$Horizontal_Distance_To_Roadways
+forestdata5$elevhydro=forestdata5$Elevation+forestdata5$Horizontal_Distance_To_Hydrology
+
+
+forestdata5$sumhydofire=forestdata5$Horizontal_Distance_To_Hydrology+forestdata$Horizontal_Distance_To_Fire_Points
+forestdata5$sumhydroroad=forestdata5$Horizontal_Distance_To_Hydrology+forestdata$Horizontal_Distance_To_Roadways
+forestdata5$fireroad=forestdata5$Horizontal_Distance_To_Fire_Points+forestdata5$Horizontal_Distance_To_Roadways
+forestdata5$euclidean=forestdata2$Euclidean_Distance_To_Hydrology
+forestdata5$int1=forestdata2$interaction_9am3pm
+forestdata5$int2=forestdata2$interaction_noon3pm
+forestdata5$int3=forestdata2$interaction_9amnoon
+forestdata5$elevfire=forestdata5$Elevation+forestdata$Horizontal_Distance_To_Fire_Points
+forestdata5$elevroad=forestdata5$Elevation+forestdata$Horizontal_Distance_To_Roadways
+forestdata5$elevhydro=forestdata5$Elevation+forestdata5$Horizontal_Distance_To_Hydrology
+
+
+foresttest5$sumhydofire=foresttest5$Horizontal_Distance_To_Hydrology+foresttest$Horizontal_Distance_To_Fire_Points
+foresttest5$sumhydroroad=foresttest5$Horizontal_Distance_To_Hydrology+foresttest$Horizontal_Distance_To_Roadways
+foresttest5$fireroad=foresttest5$Horizontal_Distance_To_Fire_Points+foresttest5$Horizontal_Distance_To_Roadways
+foresttest5$euclidean=as.numeric(foresttest1$Euclidean_Distance_To_Hydrology)
+foresttest5$int1=foresttest1$interaction_9am3pm
+foresttest5$int2=foresttest1$interaction_noon3pm
+foresttest5$int3=foresttest1$interaction_9amnoon
+foresttest5$elevfire=foresttest5$Elevation+foresttest$Horizontal_Distance_To_Fire_Points
+foresttest5$elevroad=foresttest5$Elevation+foresttest$Horizontal_Distance_To_Roadways
+foresttest5$elevhydro=foresttest5$Elevation+foresttest5$Horizontal_Distance_To_Hydrology
+
+
+
+foresttest5=foresttest5[,-55]
+
+
+
+write.csv(forestdata5,'featureengineeredtrain.csv')
+
+write.csv(foresttest5,'featureengineeredtest1.csv')
+
+
+
+forest_h201 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/featureengineeredtrain.csv"))
+
+#forest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/train.csv'))
+#foresttest_h20 <- h2o.importFile(path = normalizePath('/Users/tkolasa/dev/nycdatascience/projects/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/test.csv'))
+
+
+
+# par(mfrow=c(1,1)) # reset canvas
+# plot(h2o.tabulate(forestdata1, "Elevation",                       "Cover_Type"))
+# plot(h2o.tabulate(df, "Horizontal_Distance_To_Roadways", "Cover_Type"))
+# plot(h2o.tabulate(df, "Soil_Type",                       "Cover_Type"))
+# plot(h2o.tabulate(df, "Horizontal_Distance_To_Roadways", "Elevation" ))
+# 
+
+forest_h201 = forest_h201[,-c(1,2)]
+
+for (i in 11:53)
+{
+  forest_h201[,i]=as.factor(forest_h201[,i])
+}
+
+
+foresttest_h201 <- h2o.importFile(path = normalizePath("C://Users/Aravind/Documents/GitHub/bootcamp004_project/Project4-Machinelearning/Aravind_thomas/featureengineeredtest1.csv"))
+
+
+
+foresttest_h201 = foresttest_h201[,-c(1,2)]
+
+foresttest_h201 = foresttest_h201[,-c(21,29)]
+
+
+for (i in 11:52)
+{
+  foresttest_h201[,i]=as.factor(foresttest_h201[,i])
+}
+
+response <- "Cover_Type"
+predictors <- setdiff(names(forest_h201), response)
+predictors
+
+
+
+
+gbm_final_ensemble = h2o.gbm(
+  training_frame = forest_h201,
+  #validation_frame = forest_h20_validation,
+  x=predictors, 
+  y=response,
+  model_id = "gbm_ensemble1",
+  seed = 7,
+  ntrees = 220,
+  max_depth = 20,
+  min_rows = 10,
+  learn_rate = .1, 
+  sample_rate = 0.6,          ## use a random 70% of the rows to fit each tree
+  col_sample_rate = 0.6,       ## use 70% of the columns to fit each tree
+  #   stopping_rounds  = 2,
+  #   stopping_tolerance = 0.01,
+  #   score_each_iteration = T,
+  nfolds = 5
+)
+
+
+
+
+pred_gbm_h2o_ensemble1 <- h2o.predict(gbm_final_ensemble,foresttest_h201)
+
+pred_gbm_h2o_ensemble1 = as.data.frame(pred_gbm_h2o_ensemble1)
+head(pred_gbm_h2o_ensemble1)
+
+ensemble_h2o_submission_1 = foresttest[,c(1,56)]
+ensemble_h2o_submission_1$Cover_Type = pred_gbm_h2o_ensemble1[,1]
+write.csv(ensemble_h2o_submission_1, 'newfeatureengineeringgbm2.csv', row.names = FALSE)
+
+
+kk=as.data.frame(foresttest_h201)
+kk$Cover_Type=foresttest1$Cover_Type
+kktrain=as.data.frame(forest_h201)
+
+x1 = model.matrix(Cover_Type ~ . -int1-int2-int3, data = forestdata5)[,-1]
+x2= model.matrix(Cover_Type~ .-int1- int2-int3, data =foresttest5)[,-1]
+
+x=as.matrix(x1)
+y=forestdata5$Cover_Type
+xtest=as.matrix(x2)
+
+et <- extraTrees(x, y, mtry=15, numRandomCuts = 5, nodesize = 2, numThreads = 3, ntree=500)
+yhat <- predict(et,xtest)
+# Error in .jarray(m) : java.lang.OutOfMemoryError: Java heap space! not working
+
+
+yhat = as.data.frame(yhat)
+
+extratrees_submission1 = foresttest[,c(1,56)]
+extratrees_submission1$Cover_Type = yhat[,1]
+
+write.csv(extratrees_submission1, 'extratrees_2ndfeatureengineering.csv', row.names = FALSE)
 
 
 
