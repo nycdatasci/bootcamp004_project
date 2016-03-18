@@ -30,7 +30,7 @@ We found the Forest Cover type dataset in the UCI Machine Learning Repository th
 </center></br>
   
   
-The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the train and test sets makes classification of cover type a challenging problem. We decided to use the machine learning and visualization packages available in R for this project.
+The actual forest cover type for a given observation was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data. Kaggle hosted the dataset in a competition with a training set of 15,120 observations and a test set of 565,892 observations. The relative sizes of the train and test sets makes classification of cover type a challenging problem. We decided to use the machine learning and visualization packages available in R for this project.
 
 ```{r, echo=FALSE, message=FALSE}
 # data load next 340 lines
@@ -396,7 +396,7 @@ Some class seperation is clearly visible in the following plots of elevation.
 ```
 </center>
 
-Across Wilderness areas, there seems to be some class seperation. Cottonwood Willow covers are found only in Cache la Poudre areas and Neota areas comprises of only Spruce-fir, Krummholz, and LodgePole-Pine covers. 
+Across Wilderness areas, there seems to be some class seperation. Cottonwood Willow covers are found only in Cache la Poudre areas and Neota areas comprises of only Spruce-fir, Krummholz, and Lodgepole Pine covers. 
 
 <center>
 <img src="images/ggplot_wilderness_area.jpeg", width="1200px", height="800px" />
@@ -405,15 +405,17 @@ Across Wilderness areas, there seems to be some class seperation. Cottonwood Wil
 #scale_x_discrete(breaks = 1:4, labels=c("Rawah","Neota","Camanche Peak","Cache la Poudre")) + theme(text = element_text(size=16))
 ```
 
+Within the training data, the presence of certain soil types reduces the probability of observing certain cover types. Soil type 7 and 15 had no observations in the training data, even though they were present in the test set. For the purposes of modeling, we had to ignore these features.
 <img src="images/ggplot_soil_type.jpeg", width="1200px", height="800px" />
 ```{r, echo=FALSE, out.width="1100px",height="600px", message=FALSE}
 #ggplot(forestdata, aes(x=Soil_Type, fill=covername)) + geom_bar(aes(y=(..count..)/sum(..count..))) + ggtitle('Proportion of Observations by Soil Type') + ylab('Proportion') + xlab(NULL) + theme(legend.title=element_blank(), legend.position='bottom') +
 #scale_x_discrete(breaks = 1:40) + theme(text = element_text(size=16))
 ```
 </center>
-Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there are more Douglas-Fir trees for observations with northern aspects (near 0º) than southern aspects (near 180º).
+Another compelling variable is aspect, or the cardinal direction that the slope has the steepest gradient downwards. For example, in the rose diagram below, there is a greater prevalence of cottonwood/willow trees on patches where the slope faces an easterly direction.
 <center>
 <img src="images/ggplot_aspect.jpeg", width="1200px", height="800px" />
+When we look at the aspect by wilderness area, we find aspect to be equally distributed among the four wilderness areas.
 <img src="images/ggplot_aspect_wilderness_area.jpeg", width="1200px", height="800px" />
 ```{r, echo=FALSE,fig.width=8,fig.height=4.5,dpi=300,out.width="1200px",height="800px",message=FALSE}
 # ggplot(forestdata, aes(x=aspect_group, fill=covername) ) + ggtitle("Aspect by Cover Type") + 
@@ -460,14 +462,14 @@ $Hillshade(t_{9AM},t_{Noon},t_{3PM})$ has has been plotted below in 3 dimensions
   
   
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
-plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
+#plot_ly(forestdata, x = Hillshade_9am, y = Hillshade_Noon, z = Hillshade_3pm, type = "scatter3d", mode = "markers", color = covername)
 ```
 
 
 More importantly, in the context of class seperation, The following plot of elevation, slope, and hillshade clearly separates the forest cover types, demonstrating that elevation could be the most significant factor in determining cover type. 
 
 ```{r, echo=F, message=F, dpi=300, out.width='1000px',out.height='1000px'}
-plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers", color = covername)
+#plot_ly(forestdata, x =Elevation, y = Slope, z = Hillshade_9am, type = "scatter3d", mode = "markers", color = covername)
 ```
 
 
@@ -760,34 +762,32 @@ Random Forest                     | No  | ntree=500, mtry=13                    
 **Random Forest**                 | **No**  | **ntree=500, mtry=17**                | **0.754**| **672**
 Random Forest                     | Yes | ntree=500, mtry=13                        | 0.69115  | 1,282
 Random Forest                     | Yes | ntree=500, mtry=20                        | 0.71929  | 1,221
-Random Forest                     | Yes | ntree=500, mtry=30                        | 0.71831  | 
-Neural Network                    | No  | nnet pack, whole train, maxit=300         | 0.50867  | 
-Neural Network                    | No  | nnet package, whole train set, maxit=500  | 0.51487  | 
-Neural Network                    | No  | nnet package, 80% training set, maxit=300 | 0.52113  | 
-Neural Network                    | No  | nnet package, 80% training set, maxit=500 | 0.52432  | 
-Neural Network - Deep Learning    | No  | H2o package,                              | 0.5946   |
-Neural Network - Deep Learning    | No  | H2o package, 54-100-120-7                 | 0.60186  |
-Neural Network - Deep Learning    | No  | H2o package, 54-120-150-7                 | 0.60186  |
-**Neural Network - Deep Learning**| **No**| **H2o package, 54-500-800-7, rate=0.02, rate-annealing=1e-05, rate-decay=1** |**0.67428**|
+Random Forest                     | Yes | ntree=500, mtry=30                        | 0.71831  | 1,133
+Neural Network                    | No  | nnet pack, whole train, maxit=300         | 0.50867  | 1,554
+Neural Network                    | No  | nnet package, whole train set, maxit=500  | 0.51487  | 1,549
+Neural Network                    | No  | nnet package, 80% training set, maxit=300 | 0.52113  | 1,545
+Neural Network                    | No  | nnet package, 80% training set, maxit=500 | 0.52432  | 1,541
+Neural Network - Deep Learning    | No  | H2o package,                              | 0.5946   | 1,418
+Neural Network - Deep Learning    | No  | H2o package, 54-100-120-7                 | 0.60186  | 1,403
+Neural Network - Deep Learning    | No  | H2o package, 54-120-150-7                 | 0.60186  | 1,403
+**Neural Network - Deep Learning**| **No**| **H2o package, 54-500-800-7, rate=0.02, rate-annealing=1e-05, rate-decay=1** |**0.67428**| 1,325
 XGBoost                           | No  | nround=50                                 | 0.70033  | 1,258
-XGBoost                           | No  | nround=104                                | 0.73438  | 991
-**XGBoost**                       |**Yes**| **after 800 run**                       | **0.72949**  | 
-XGBoost    | Yes | cv run by sequentially choosing the 62 variables based on importance and chose the optimal set of parameters | 0.72656 | 
-GBM - H2o                         | No  | ntrees=250, max_depth=18, min_rows=10, learn_rate=.1 | 0.76640  | 467
+**XGBoost**                       | **No** | **nround=104**                            | **0.73438**  | **991**
+XGBoost                           | Yes | after 800 run                       | 0.72949 | 1,040
+XGBoost    | Yes | cv run by sequentially choosing the 62 variables based on importance and chose the optimal set of parameters | 0.72656 | 1,070
+GBM - H2o                         | No  | ntrees=250, max_depth=18, min_rows=10, learn_rate=.1 | 0.76640 | 467
 GBM - H2o                         | No  | ntrees=200, max_depth=20, min_rows=10, learn_rate=.1 | 0.76119 | 521
 GBM - H2o                         | No  | ntrees=200, max_depth=20, min_rows=10, learn_rate=.1, cv 80/20 | 0.74509 | 911
 GBM - H2o                         | No  | w/o stopping_rounds=2, stopping_tolerance=0.01, score_each_iteration=T, 10-fold | 0.76586 | 479
 GBM - H2o                         | No  | w/o stopping_rounds=2, stopping_tolerance=0.01, score_each_iteration=T, 15-fold | 0.78052 | 356
-**GBM - H2o**                     | **No**| **after reducing row sampling rate=0.4, column sampling rate=0.3 (roughly sqrt(n)/n), 9-fold** | **0.78052** | 
+**GBM - H2o**                 | **No**| **after reducing row sampling rate=0.4, column sampling rate=0.3 (roughly sqrt(n)/n), 9-fold** | **0.72656** | 1,070
 ExtraTrees                        | No  | mtry=13, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=50  | 0.79220 | 224
 **ExtraTrees**                    | **No**| **mtry=10, numRandomCuts = 5, nodesize = 2, numThreads = 3, ntree=200** | **0.79247** | **224**
 ExtraTrees                        | Yes | mtry=13, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=700 | 0.78739 | 308
 ExtraTrees                        | Yes | tuned: mtry=56, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=200 | 0.757000 | 613
-**Ensembles**                     |     |                                            |        | 
-ensemble1 | No | basic voting of RF, GBM, ExtraTrees and XGBoost | 0.76 | 
-**ensemble2** | **No** | **Feeding ExtraTrees to H2o XGB** | **0.79182** | 
-**ensemble3** | **No** | **Feeding ExtraTrees to H2o GBM then to XGB** | **0.79182** | 
-
+Ensemble I | No | basic voting of RF, GBM, ExtraTrees and XGBoost | 0.76787 | 448
+**Ensemble II** | **No** | **Feeding ExtraTrees to H2o XGB** | **0.79182** | **230**
+**Ensemble III** | **No** | **Feeding ExtraTrees to H2o GBM then to XGB** | **0.79182** | **230**
 
 
 
@@ -796,7 +796,6 @@ ensemble1 | No | basic voting of RF, GBM, ExtraTrees and XGBoost | 0.76 |
 
 ## References:
 
-- https://en.wikipedia.org/wiki/Spherical_law_of_cosines
 - https://scientiaplusconscientia.wordpress.com/2014/12/16/hillshading-useful-fun-with-digital-elevation-models/
 - https://scientiaplusconscientia.wordpress.com/2014/08/06/working-with-modis-l1b-from-scratch-4-topographic-and-illumination-correction/
 - http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Hillshade.htm
