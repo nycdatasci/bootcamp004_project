@@ -365,7 +365,7 @@ forestdata$Wilderness_Area_names[forestdata$Wilderness_Area == 4] = "Cache la Po
 
 ### Data Exploration
 
-Name                                | Measurement                   |    Description
+Name                                | Measurement                   |  Description
 ------------------------------------|-------------------------------|----------------------------------------------------
 Elevation                           |    meters                     |  Elevation in meters
 Aspect                              |    azimuth                    |  Aspect in degrees azimuth
@@ -379,12 +379,12 @@ Hillshade 3pm                       |    0 to 255 index             |  Hillshade
 Horizontal Distance To Fire Points  |    meters                     |  Horz Dist to nearest wildfire ignition points
 Wilderness Area (4 binary columns)  |    0 (absence) or 1 (presence)|  Wilderness area designation
 Soil Type (40 binary columns)       |    0 (absence) or 1 (presence)|  Soil Type designation
-Cover Type                          |    Classes 1 to 7             |  Forest Cover Type designation - Response Variable
+Cover Type                          |    Classes 1 to 7             |  Forest Cover Type designation - *Response Variable*
 
 
 
-The Kaggle training data was not a simple random sample of the entire dataset, but a stratified sample of the seven forest classes. The class distribution of the training data was equally distributed among the seven classes. 
-</br>
+The Kaggle training data was not a simple random sample of the entire dataset, but a stratified sample of the seven forest classes. The training data was equally distributed among the seven classes. 
+</br></br>
 Some class seperation is clearly visible in the following plots of elevation.
 <center>
 <img src="images/ggplot_elevation_histogram.jpeg", width="1200px", height="800px" />
@@ -742,13 +742,13 @@ The forest cover dataset is an extremely rich dataset for anyone who wishes to i
 
 
 ## Appendix
-
+Models in bold denote highest test set accuracy for a specific model type
 
 Classifier                        | Feature Engineering  | Parameters               | Accuracy | Rank
 ----------------------------------|-----|-------------------------------------------|----------|-------------------------------------------------
 Logistic Regression - Ridge       | No  | 70-30 split                               | 0.55696  | 1,489 
 Logistic Regression - Ridge       | No  | 85-15 split                               | 0.59550  | 1,414
-Logistic Regression - Lasso       | No  | 70-30 split best lambda                   | **0.59594**  | **1,411**
+**Logistic Regression - Lasso**   | **No**| **70-30 split best lambda**             | **0.59594**  | **1,411**
 Logistic Regression - Lasso       | No  | 85-15 split best lambda                   | 0.59526  | 1,415
 Logistic Regression - Lasso       | No  | 85-15 split,lowest 50 percintile of lambdas and calculated the mode of the predictions | 0.59443 | 1,418
 Logistic Regression - Elastic-net | No  | 70-30 split                               | 0.59588  | 1,412
@@ -757,7 +757,7 @@ Logistic Regression - Elastic-net | No  | using whole training set              
 Random Forest                     | No  | 80-20 split                               | 0.68932  | 1,286
 Random Forest                     | No  | using whole training set                  | 0.70748  | 1,210
 Random Forest                     | No  | ntree=500, mtry=13                        | 0.75168  |   792
-Random Forest                     | No  | ntree=500, mtry=17                        | **0.754**|   672
+**Random Forest**                 | **No**  | **ntree=500, mtry=17**                | **0.754**| **672**
 Random Forest                     | Yes | ntree=500, mtry=13                        | 0.69115  | 1,282
 Random Forest                     | Yes | ntree=500, mtry=20                        | 0.71929  | 1,221
 Random Forest                     | Yes | ntree=500, mtry=30                        | 0.71831  | 
@@ -768,29 +768,31 @@ Neural Network                    | No  | nnet package, 80% training set, maxit=
 Neural Network - Deep Learning    | No  | H2o package,                              | 0.5946   |
 Neural Network - Deep Learning    | No  | H2o package, 54-100-120-7                 | 0.60186  |
 Neural Network - Deep Learning    | No  | H2o package, 54-120-150-7                 | 0.60186  |
-Neural Network - Deep Learning    | No  | H2o package, 54-500-800-7, rate=0.02, rate-annealing=1e-05, rate-decay=1 |**0.67428**|
+**Neural Network - Deep Learning**| **No**| **H2o package, 54-500-800-7, rate=0.02, rate-annealing=1e-05, rate-decay=1** |**0.67428**|
 XGBoost                           | No  | nround=50                                 | 0.70033  | 1,258
 XGBoost                           | No  | nround=104                                | 0.73438  | 991
-XGBoost                           | Yes | after 800 run                             | **0.72949**  | 
+**XGBoost**                       |**Yes**| **after 800 run**                       | **0.72949**  | 
 XGBoost    | Yes | cv run by sequentially choosing the 62 variables based on importance and chose the optimal set of parameters | 0.72656 | 
 GBM - H2o                         | No  | ntrees=250, max_depth=18, min_rows=10, learn_rate=.1 | 0.76640  | 467
 GBM - H2o                         | No  | ntrees=200, max_depth=20, min_rows=10, learn_rate=.1 | 0.76119 | 521
 GBM - H2o                         | No  | ntrees=200, max_depth=20, min_rows=10, learn_rate=.1, cv 80/20 | 0.74509 | 911
 GBM - H2o                         | No  | w/o stopping_rounds=2, stopping_tolerance=0.01, score_each_iteration=T, 10-fold | 0.76586 | 479
 GBM - H2o                         | No  | w/o stopping_rounds=2, stopping_tolerance=0.01, score_each_iteration=T, 15-fold | 0.78052 | 356
-GBM - H2o                         | No  | after reducing row sampling rate=0.4, column sampling rate=0.3 (roughly sqrt(n)/n), 9-fold | **0.78052** | 
+**GBM - H2o**                     | **No**| **after reducing row sampling rate=0.4, column sampling rate=0.3 (roughly sqrt(n)/n), 9-fold** | **0.78052** | 
 ExtraTrees                        | No  | mtry=13, numRandomCuts = 2, nodesize = 3, numThreads = 3, ntree=50  | 0.79220 | 224
-ExtraTrees                        | No  | mtry=10, numRandomCuts = 5, nodesize = 2, numThreads = 3, ntree=200 | **0.79247** | 224
+**ExtraTrees**                    | **No**| **mtry=10, numRandomCuts = 5, nodesize = 2, numThreads = 3, ntree=200** | **0.79247** | **224**
 ExtraTrees                        | Yes | mtry=13, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=700 | 0.78739 | 308
 ExtraTrees                        | Yes | tuned: mtry=56, numRandomCuts = 4, nodesize = 3, numThreads = 3, ntree=200 | 0.757000 | 613
 **Ensembles**                     |     |                                            |        | 
 ensemble1 | No | basic voting of RF, GBM, ExtraTrees and XGBoost | 0.76 | 
-ensemble2 | No | Feeding ExtraTrees to H2o XGB | 0.79182 | 
-ensemble3 | No | Feeding ExtraTrees to H2o GBM then to XGB | 0.79182 | 
+**ensemble2** | **No** | **Feeding ExtraTrees to H2o XGB** | **0.79182** | 
+**ensemble3** | **No** | **Feeding ExtraTrees to H2o GBM then to XGB** | **0.79182** | 
 
 
 
 
+## GitHub Repository
+[https://github.com/nycdatasci/bootcamp004_project/tree/master/Project4-Machinelearning/Aravind_thomas]()
 
 ## References:
 
