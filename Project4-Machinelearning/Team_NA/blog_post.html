@@ -1,0 +1,1739 @@
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>1. Overview</h2>
+<h3>1.1. BNP's Overall Goal: To accelerate their claims management process</h3>
+In this challenge, BNP Paribas Cardif is providing an anonymized database with two categories of claims:
+<ol>
+	<li>claims for which approval could be accelerated leading to faster payments</li>
+	<li>claims for which additional information is required before approval</li>
+</ol>
+<h3>1.2. Our Goal (Operation): To predict the category of a claim</h3>
+Prediction of a claim category based on features available early in the process, helping BNP Paribas Cardif accelerate its claims process and therefore provide a better service to its customers.
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>2. Exploratory Data Analysis</h2>
+</div>
+<h3>2.1. Summary</h3>
+<ul>
+	<li>Total: 111,432 rows x 133 columns<b> </b></li>
+	<li>Data Types: float, integer, string</li>
+	<li>Column "ID": the ID of each row, not being used as predictor</li>
+	<li>Column "target": the target of each row, not being used as predictor</li>
+	<li>Numbers of Text-based Predictors: 112</li>
+	<li>Numbers of Numeric Predictors: 19</li>
+	<li>Numbers of Columns with missing value: 119</li>
+	<li>Numbers of columns highly correlated: There are 123 pairs with absolute correlation &gt; 0.8; there are 63  pairs with absolute correlation &gt; 0.9.</li>
+</ul>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3>2.2. Challenges:</h3>
+<ul>
+	<li><strong>Anonymized Data</strong>: All data (both categorical and continuous) is anonymized without any description</li>
+	<li><strong>Many Missing Value</strong>: Approximately 40% of data is missing</li>
+	<li><strong>Manny correlated variables
+</strong></li>
+</ul>
+Table: Data Audit
+<table border="1">
+<thead>
+<tr style="text-align: right">
+<th>_a_variable</th>
+<th>_b_data_type</th>
+<th>_c_cardinality</th>
+<th>_d_missings</th>
+<th>_e_sample_values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>ID</td>
+<td>int64</td>
+<td>114321</td>
+<td>0</td>
+<td>[3, 4]</td>
+</tr>
+<tr>
+<th>1</th>
+<td>target</td>
+<td>int64</td>
+<td>2</td>
+<td>0</td>
+<td>[1, 0]</td>
+</tr>
+<tr>
+<th>2</th>
+<td>v1</td>
+<td>float64</td>
+<td>64488</td>
+<td>49832</td>
+<td>[1.33573941541, nan]</td>
+</tr>
+<tr>
+<th>3</th>
+<td>v2</td>
+<td>float64</td>
+<td>64525</td>
+<td>49796</td>
+<td>[8.72747443554, nan]</td>
+</tr>
+<tr>
+<th>4</th>
+<td>v3</td>
+<td>object</td>
+<td>4</td>
+<td>3457</td>
+<td>[C, nan]</td>
+</tr>
+<tr>
+<th>5</th>
+<td>v4</td>
+<td>float64</td>
+<td>64525</td>
+<td>49796</td>
+<td>[3.9210257481, nan]</td>
+</tr>
+<tr>
+<th>6</th>
+<td>v5</td>
+<td>float64</td>
+<td>65672</td>
+<td>48624</td>
+<td>[7.91526571423, 9.19126518062]</td>
+</tr>
+<tr>
+<th>7</th>
+<td>v6</td>
+<td>float64</td>
+<td>64488</td>
+<td>49832</td>
+<td>[2.59927780824, nan]</td>
+</tr>
+<tr>
+<th>8</th>
+<td>v7</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[3.17689497363, nan]</td>
+</tr>
+<tr>
+<th>9</th>
+<td>v8</td>
+<td>float64</td>
+<td>65689</td>
+<td>48619</td>
+<td>[0.012941465862, 2.30163049167]</td>
+</tr>
+<tr>
+<th>10</th>
+<td>v9</td>
+<td>float64</td>
+<td>64452</td>
+<td>49851</td>
+<td>[9.99999947099, nan]</td>
+</tr>
+<tr>
+<th>11</th>
+<td>v10</td>
+<td>float64</td>
+<td>112486</td>
+<td>84</td>
+<td>[0.503281467753, 1.31290991714]</td>
+</tr>
+<tr>
+<th>12</th>
+<td>v11</td>
+<td>float64</td>
+<td>64478</td>
+<td>49836</td>
+<td>[16.4341080862, nan]</td>
+</tr>
+<tr>
+<th>13</th>
+<td>v12</td>
+<td>float64</td>
+<td>114234</td>
+<td>86</td>
+<td>[6.08571076128, 6.50764677834]</td>
+</tr>
+<tr>
+<th>14</th>
+<td>v13</td>
+<td>float64</td>
+<td>64489</td>
+<td>49832</td>
+<td>[2.86682950383, nan]</td>
+</tr>
+<tr>
+<th>15</th>
+<td>v14</td>
+<td>float64</td>
+<td>110473</td>
+<td>4</td>
+<td>[11.6363868896, 11.6363858116]</td>
+</tr>
+<tr>
+<th>16</th>
+<td>v15</td>
+<td>float64</td>
+<td>64482</td>
+<td>49836</td>
+<td>[1.35501321371, nan]</td>
+</tr>
+<tr>
+<th>17</th>
+<td>v16</td>
+<td>float64</td>
+<td>64415</td>
+<td>49895</td>
+<td>[8.57142854392, nan]</td>
+</tr>
+<tr>
+<th>18</th>
+<td>v17</td>
+<td>float64</td>
+<td>64526</td>
+<td>49796</td>
+<td>[3.67035019539, nan]</td>
+</tr>
+<tr>
+<th>19</th>
+<td>v18</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[0.106720429743, nan]</td>
+</tr>
+<tr>
+<th>20</th>
+<td>v19</td>
+<td>float64</td>
+<td>64479</td>
+<td>49843</td>
+<td>[0.14888314104, nan]</td>
+</tr>
+<tr>
+<th>21</th>
+<td>v20</td>
+<td>float64</td>
+<td>64470</td>
+<td>49840</td>
+<td>[18.8692829411, nan]</td>
+</tr>
+<tr>
+<th>22</th>
+<td>v21</td>
+<td>float64</td>
+<td>113710</td>
+<td>611</td>
+<td>[7.73092330797, 6.76310950301]</td>
+</tr>
+<tr>
+<th>23</th>
+<td>v22</td>
+<td>object</td>
+<td>18211</td>
+<td>500</td>
+<td>[XDX, GUV]</td>
+</tr>
+<tr>
+<th>24</th>
+<td>v23</td>
+<td>float64</td>
+<td>63639</td>
+<td>50675</td>
+<td>[-1.71613069776e-08, nan]</td>
+</tr>
+<tr>
+<th>25</th>
+<td>v24</td>
+<td>object</td>
+<td>5</td>
+<td>0</td>
+<td>[C, E]</td>
+</tr>
+<tr>
+<th>26</th>
+<td>v25</td>
+<td>float64</td>
+<td>65680</td>
+<td>48619</td>
+<td>[0.139411580932, 3.05614400295]</td>
+</tr>
+<tr>
+<th>27</th>
+<td>v26</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[1.72081822724, nan]</td>
+</tr>
+<tr>
+<th>28</th>
+<td>v27</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[3.3935027632, nan]</td>
+</tr>
+<tr>
+<th>29</th>
+<td>v28</td>
+<td>float64</td>
+<td>64483</td>
+<td>49832</td>
+<td>[0.590121939566, nan]</td>
+</tr>
+<tr>
+<th>30</th>
+<td>v29</td>
+<td>float64</td>
+<td>64488</td>
+<td>49832</td>
+<td>[8.88086701416, nan]</td>
+</tr>
+<tr>
+<th>31</th>
+<td>v30</td>
+<td>object</td>
+<td>8</td>
+<td>60110</td>
+<td>[C, nan]</td>
+</tr>
+<tr>
+<th>32</th>
+<td>v31</td>
+<td>object</td>
+<td>4</td>
+<td>3457</td>
+<td>[A, B]</td>
+</tr>
+<tr>
+<th>33</th>
+<td>v32</td>
+<td>float64</td>
+<td>64489</td>
+<td>49832</td>
+<td>[1.08303338528, nan]</td>
+</tr>
+<tr>
+<th>34</th>
+<td>v33</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[1.01082941196, nan]</td>
+</tr>
+<tr>
+<th>35</th>
+<td>v34</td>
+<td>float64</td>
+<td>114210</td>
+<td>111</td>
+<td>[7.2701466347, 3.61507749877]</td>
+</tr>
+<tr>
+<th>36</th>
+<td>v35</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[8.37545196217, nan]</td>
+</tr>
+<tr>
+<th>37</th>
+<td>v36</td>
+<td>float64</td>
+<td>65610</td>
+<td>48624</td>
+<td>[11.3265915991, 14.5794790997]</td>
+</tr>
+<tr>
+<th>38</th>
+<td>v37</td>
+<td>float64</td>
+<td>64475</td>
+<td>49843</td>
+<td>[0.454545677382, nan]</td>
+</tr>
+<tr>
+<th>39</th>
+<td>v38</td>
+<td>int64</td>
+<td>12</td>
+<td>0</td>
+<td>[0, 4]</td>
+</tr>
+<tr>
+<th>40</th>
+<td>v39</td>
+<td>float64</td>
+<td>64485</td>
+<td>49836</td>
+<td>[4.01208777281, nan]</td>
+</tr>
+<tr>
+<th>41</th>
+<td>v40</td>
+<td>float64</td>
+<td>114193</td>
+<td>111</td>
+<td>[7.71145325051, 14.3057660695]</td>
+</tr>
+<tr>
+<th>42</th>
+<td>v41</td>
+<td>float64</td>
+<td>64489</td>
+<td>49832</td>
+<td>[7.65342888696, nan]</td>
+</tr>
+<tr>
+<th>43</th>
+<td>v42</td>
+<td>float64</td>
+<td>64473</td>
+<td>49832</td>
+<td>[12.7075805065, nan]</td>
+</tr>
+<tr>
+<th>44</th>
+<td>v43</td>
+<td>float64</td>
+<td>64485</td>
+<td>49836</td>
+<td>[2.01550470836, nan]</td>
+</tr>
+<tr>
+<th>45</th>
+<td>v44</td>
+<td>float64</td>
+<td>64521</td>
+<td>49796</td>
+<td>[10.4983376798, nan]</td>
+</tr>
+<tr>
+<th>46</th>
+<td>v45</td>
+<td>float64</td>
+<td>64487</td>
+<td>49832</td>
+<td>[9.84867187112, nan]</td>
+</tr>
+<tr>
+<th>47</th>
+<td>v46</td>
+<td>float64</td>
+<td>65698</td>
+<td>48619</td>
+<td>[0.113560642201, 2.44995891398]</td>
+</tr>
+<tr>
+<th>48</th>
+<td>v47</td>
+<td>object</td>
+<td>10</td>
+<td>0</td>
+<td>[C, E]</td>
+</tr>
+<tr>
+<th>49</th>
+<td>v48</td>
+<td>float64</td>
+<td>64520</td>
+<td>49796</td>
+<td>[12.1717333877, nan]</td>
+</tr>
+<tr>
+<th>50</th>
+<td>v49</td>
+<td>float64</td>
+<td>64488</td>
+<td>49832</td>
+<td>[8.08664273703, nan]</td>
+</tr>
+<tr>
+<th>51</th>
+<td>v50</td>
+<td>float64</td>
+<td>114225</td>
+<td>86</td>
+<td>[0.899420004327, 1.37921006565]</td>
+</tr>
+<tr>
+<th>52</th>
+<td>v51</td>
+<td>float64</td>
+<td>63638</td>
+<td>50678</td>
+<td>[7.27779242121, nan]</td>
+</tr>
+<tr>
+<th>53</th>
+<td>v52</td>
+<td>object</td>
+<td>13</td>
+<td>3</td>
+<td>[G, F]</td>
+</tr>
+<tr>
+<th>54</th>
+<td>v53</td>
+<td>float64</td>
+<td>64470</td>
+<td>49836</td>
+<td>[16.7479682989, nan]</td>
+</tr>
+<tr>
+<th>55</th>
+<td>v54</td>
+<td>float64</td>
+<td>65695</td>
+<td>48619</td>
+<td>[0.0370963267851, 1.12946854702]</td>
+</tr>
+<tr>
+<th>56</th>
+<td>v55</td>
+<td>float64</td>
+<td>64489</td>
+<td>49832</td>
+<td>[1.29963825969, nan]</td>
+</tr>
+<tr>
+<th>57</th>
+<td>v56</td>
+<td>object</td>
+<td>123</td>
+<td>6882</td>
+<td>[DI, DY]</td>
+</tr>
+<tr>
+<th>58</th>
+<td>v57</td>
+<td>float64</td>
+<td>64489</td>
+<td>49832</td>
+<td>[3.97111848021, nan]</td>
+</tr>
+<tr>
+<th>59</th>
+<td>v58</td>
+<td>float64</td>
+<td>64483</td>
+<td>49836</td>
+<td>[0.529802240876, nan]</td>
+</tr>
+<tr>
+<th>60</th>
+<td>v59</td>
+<td>float64</td>
+<td>64525</td>
+<td>49796</td>
+<td>[10.8909835264, nan]</td>
+</tr>
+<tr>
+<th>61</th>
+<td>v60</td>
+<td>float64</td>
+<td>64489</td>
+<td>49832</td>
+<td>[1.58844803814, nan]</td>
+</tr>
+<tr>
+<th>62</th>
+<td>v61</td>
+<td>float64</td>
+<td>64520</td>
+<td>49796</td>
+<td>[15.8581516012, nan]</td>
+</tr>
+<tr>
+<th>63</th>
+<td>v62</td>
+<td>int64</td>
+<td>8</td>
+<td>0</td>
+<td>[1, 2]</td>
+</tr>
+<tr>
+<th>64</th>
+<td>v63</td>
+<td>float64</td>
+<td>65682</td>
+<td>48619</td>
+<td>[0.153461079024, 2.54473645861]</td>
+</tr>
+<tr>
+<th>65</th>
+<td>v64</td>
+<td>float64</td>
+<td>64525</td>
+<td>49796</td>
+<td>[6.36318946738, nan]</td>
+</tr>
+<tr>
+<th>66</th>
+<td>v65</td>
+<td>float64</td>
+<td>64473</td>
+<td>49840</td>
+<td>[18.3039250056, nan]</td>
+</tr>
+<tr>
+<th>67</th>
+<td>v66</td>
+<td>object</td>
+<td>3</td>
+<td>0</td>
+<td>[C, A]</td>
+</tr>
+<tr>
+<th>68</th>
+<td>v67</td>
+<td>float64</td>
+<td>64488</td>
+<td>49832</td>
+<td>[9.31407880467, nan]</td>
+</tr>
+<tr>
+<th>69</th>
+<td>v68</td>
+<td>float64</td>
+<td>64475</td>
+<td>49836</td>
+<td>[15.231788691, nan]</td>
+</tr>
+<tr>
+<th>70</th>
+<td>v69</td>
+<td>float64</td>
+<td>64333</td>
+<td>49895</td>
+<td>[17.1428574251, nan]</td>
+</tr>
+<tr>
+<th>71</th>
+<td>v70</td>
+<td>float64</td>
+<td>65632</td>
+<td>48636</td>
+<td>[11.784548964, 12.0533533464]</td>
+</tr>
+<tr>
+<th>72</th>
+<td>v71</td>
+<td>object</td>
+<td>9</td>
+<td>0</td>
+<td>[F, B]</td>
+</tr>
+<tr>
+<th>73</th>
+<td>v72</td>
+<td>int64</td>
+<td>13</td>
+<td>0</td>
+<td>[1, 2]</td>
+</tr>
+<tr>
+<th>74</th>
+<td>v73</td>
+<td>float64</td>
+<td>64485</td>
+<td>49836</td>
+<td>[1.61498798446, nan]</td>
+</tr>
+<tr>
+<th>75</th>
+<td>v74</td>
+<td>object</td>
+<td>3</td>
+<td>0</td>
+<td>[B, C]</td>
+</tr>
+<tr>
+<th>76</th>
+<td>v75</td>
+<td>object</td>
+<td>4</td>
+<td>0</td>
+<td>[D, B]</td>
+</tr>
+<tr>
+<th>77</th>
+<td>v76</td>
+<td>float64</td>
+<td>64526</td>
+<td>49796</td>
+<td>[2.23093963012, nan]</td>
+</tr>
+<tr>
+<th>78</th>
+<td>v77</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[7.29241830268, nan]</td>
+</tr>
+<tr>
+<th>79</th>
+<td>v78</td>
+<td>float64</td>
+<td>64266</td>
+<td>49895</td>
+<td>[8.57142890455, nan]</td>
+</tr>
+<tr>
+<th>80</th>
+<td>v79</td>
+<td>object</td>
+<td>18</td>
+<td>0</td>
+<td>[E, D]</td>
+</tr>
+<tr>
+<th>81</th>
+<td>v80</td>
+<td>float64</td>
+<td>64467</td>
+<td>49851</td>
+<td>[3.00000025246, nan]</td>
+</tr>
+<tr>
+<th>82</th>
+<td>v81</td>
+<td>float64</td>
+<td>65686</td>
+<td>48624</td>
+<td>[7.52832574522, 7.277654881]</td>
+</tr>
+<tr>
+<th>83</th>
+<td>v82</td>
+<td>float64</td>
+<td>65664</td>
+<td>48624</td>
+<td>[8.86164670767, 3.43069147778]</td>
+</tr>
+<tr>
+<th>84</th>
+<td>v83</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[0.649819922639, nan]</td>
+</tr>
+<tr>
+<th>85</th>
+<td>v84</td>
+<td>float64</td>
+<td>64488</td>
+<td>49832</td>
+<td>[1.29963839277, nan]</td>
+</tr>
+<tr>
+<th>86</th>
+<td>v85</td>
+<td>float64</td>
+<td>63638</td>
+<td>50682</td>
+<td>[1.70731688035, nan]</td>
+</tr>
+<tr>
+<th>87</th>
+<td>v86</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[0.866426226093, nan]</td>
+</tr>
+<tr>
+<th>88</th>
+<td>v87</td>
+<td>float64</td>
+<td>65631</td>
+<td>48663</td>
+<td>[9.55183632401, 9.84800355465]</td>
+</tr>
+<tr>
+<th>89</th>
+<td>v88</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[3.32129979102, nan]</td>
+</tr>
+<tr>
+<th>90</th>
+<td>v89</td>
+<td>float64</td>
+<td>65687</td>
+<td>48619</td>
+<td>[0.0956783635519, 2.67858428749]</td>
+</tr>
+<tr>
+<th>91</th>
+<td>v90</td>
+<td>float64</td>
+<td>64485</td>
+<td>49836</td>
+<td>[0.905342303211, nan]</td>
+</tr>
+<tr>
+<th>92</th>
+<td>v91</td>
+<td>object</td>
+<td>8</td>
+<td>3</td>
+<td>[A, B]</td>
+</tr>
+<tr>
+<th>93</th>
+<td>v92</td>
+<td>float64</td>
+<td>64479</td>
+<td>49843</td>
+<td>[0.442251719136, nan]</td>
+</tr>
+<tr>
+<th>94</th>
+<td>v93</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[5.81401771065, nan]</td>
+</tr>
+<tr>
+<th>95</th>
+<td>v94</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[3.51772042641, nan]</td>
+</tr>
+<tr>
+<th>96</th>
+<td>v95</td>
+<td>float64</td>
+<td>64479</td>
+<td>49843</td>
+<td>[0.462018705378, nan]</td>
+</tr>
+<tr>
+<th>97</th>
+<td>v96</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[7.43682361621, nan]</td>
+</tr>
+<tr>
+<th>98</th>
+<td>v97</td>
+<td>float64</td>
+<td>64471</td>
+<td>49843</td>
+<td>[5.45454545153, nan]</td>
+</tr>
+<tr>
+<th>99</th>
+<td>v98</td>
+<td>float64</td>
+<td>65657</td>
+<td>48654</td>
+<td>[8.87741409628, 8.30396698186]</td>
+</tr>
+<tr>
+<th>100</th>
+<td>v99</td>
+<td>float64</td>
+<td>64489</td>
+<td>49832</td>
+<td>[1.19133666077, nan]</td>
+</tr>
+<tr>
+<th>101</th>
+<td>v100</td>
+<td>float64</td>
+<td>64472</td>
+<td>49836</td>
+<td>[19.4701993581, nan]</td>
+</tr>
+<tr>
+<th>102</th>
+<td>v101</td>
+<td>float64</td>
+<td>64526</td>
+<td>49796</td>
+<td>[8.3892368941, nan]</td>
+</tr>
+<tr>
+<th>103</th>
+<td>v102</td>
+<td>float64</td>
+<td>62987</td>
+<td>51316</td>
+<td>[2.7573751178, nan]</td>
+</tr>
+<tr>
+<th>104</th>
+<td>v103</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[4.37429613813, nan]</td>
+</tr>
+<tr>
+<th>105</th>
+<td>v104</td>
+<td>float64</td>
+<td>64490</td>
+<td>49832</td>
+<td>[1.57403918955, nan]</td>
+</tr>
+<tr>
+<th>106</th>
+<td>v105</td>
+<td>float64</td>
+<td>65659</td>
+<td>48658</td>
+<td>[0.00729381570294, 1.50533466054]</td>
+</tr>
+<tr>
+<th>107</th>
+<td>v106</td>
+<td>float64</td>
+<td>64522</td>
+<td>49796</td>
+<td>[12.5791841154, nan]</td>
+</tr>
+<tr>
+<th>108</th>
+<td>v107</td>
+<td>object</td>
+<td>8</td>
+<td>3</td>
+<td>[E, B]</td>
+</tr>
+<tr>
+<th>109</th>
+<td>v108</td>
+<td>float64</td>
+<td>65688</td>
+<td>48624</td>
+<td>[2.38269187952, 1.82536061827]</td>
+</tr>
+<tr>
+<th>110</th>
+<td>v109</td>
+<td>float64</td>
+<td>65674</td>
+<td>48624</td>
+<td>[3.93092197313, 4.24785787293]</td>
+</tr>
+<tr>
+<th>111</th>
+<td>v110</td>
+<td>object</td>
+<td>3</td>
+<td>0</td>
+<td>[B, A]</td>
+</tr>
+<tr>
+<th>112</th>
+<td>v111</td>
+<td>float64</td>
+<td>64487</td>
+<td>49832</td>
+<td>[0.433212908896, nan]</td>
+</tr>
+<tr>
+<th>113</th>
+<td>v112</td>
+<td>object</td>
+<td>23</td>
+<td>382</td>
+<td>[O, U]</td>
+</tr>
+<tr>
+<th>114</th>
+<td>v113</td>
+<td>object</td>
+<td>37</td>
+<td>55304</td>
+<td>[nan, G]</td>
+</tr>
+<tr>
+<th>115</th>
+<td>v114</td>
+<td>float64</td>
+<td>114268</td>
+<td>30</td>
+<td>[15.6349073965, 10.3080435124]</td>
+</tr>
+<tr>
+<th>116</th>
+<td>v115</td>
+<td>float64</td>
+<td>64254</td>
+<td>49895</td>
+<td>[2.85714382626, nan]</td>
+</tr>
+<tr>
+<th>117</th>
+<td>v116</td>
+<td>float64</td>
+<td>64486</td>
+<td>49836</td>
+<td>[1.95121981409, nan]</td>
+</tr>
+<tr>
+<th>118</th>
+<td>v117</td>
+<td>float64</td>
+<td>65663</td>
+<td>48624</td>
+<td>[6.59201218656, 10.5953571881]</td>
+</tr>
+<tr>
+<th>119</th>
+<td>v118</td>
+<td>float64</td>
+<td>64471</td>
+<td>49843</td>
+<td>[5.90909118516, nan]</td>
+</tr>
+<tr>
+<th>120</th>
+<td>v119</td>
+<td>float64</td>
+<td>63639</td>
+<td>50680</td>
+<td>[-6.29742333974e-07, nan]</td>
+</tr>
+<tr>
+<th>121</th>
+<td>v120</td>
+<td>float64</td>
+<td>64485</td>
+<td>49836</td>
+<td>[1.05960261631, nan]</td>
+</tr>
+<tr>
+<th>122</th>
+<td>v121</td>
+<td>float64</td>
+<td>64481</td>
+<td>49840</td>
+<td>[0.803571856245, nan]</td>
+</tr>
+<tr>
+<th>123</th>
+<td>v122</td>
+<td>float64</td>
+<td>64462</td>
+<td>49851</td>
+<td>[8.00000009011, nan]</td>
+</tr>
+<tr>
+<th>124</th>
+<td>v123</td>
+<td>float64</td>
+<td>63642</td>
+<td>50678</td>
+<td>[1.98978020257, nan]</td>
+</tr>
+<tr>
+<th>125</th>
+<td>v124</td>
+<td>float64</td>
+<td>65692</td>
+<td>48619</td>
+<td>[0.0357536852518, 0.598895645966]</td>
+</tr>
+<tr>
+<th>126</th>
+<td>v125</td>
+<td>object</td>
+<td>91</td>
+<td>77</td>
+<td>[AU, AF]</td>
+</tr>
+<tr>
+<th>127</th>
+<td>v126</td>
+<td>float64</td>
+<td>64488</td>
+<td>49832</td>
+<td>[1.80412570107, nan]</td>
+</tr>
+<tr>
+<th>128</th>
+<td>v127</td>
+<td>float64</td>
+<td>64489</td>
+<td>49832</td>
+<td>[3.11371907882, nan]</td>
+</tr>
+<tr>
+<th>129</th>
+<td>v128</td>
+<td>float64</td>
+<td>65688</td>
+<td>48624</td>
+<td>[2.02428537747, 1.95782501113]</td>
+</tr>
+<tr>
+<th>130</th>
+<td>v129</td>
+<td>int64</td>
+<td>10</td>
+<td>0</td>
+<td>[0, 2]</td>
+</tr>
+<tr>
+<th>131</th>
+<td>v130</td>
+<td>float64</td>
+<td>64477</td>
+<td>49843</td>
+<td>[0.636364508524, nan]</td>
+</tr>
+<tr>
+<th>132</th>
+<td>v131</td>
+<td>float64</td>
+<td>64415</td>
+<td>49895</td>
+<td>[2.85714373637, nan]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="inner_cell">Figure: Missing Data Pattern</div>
+</div>
+<div class="inner_cell"><a href="http://blog.nycdatascience.com/wp-content/uploads/2016/03/NAsPatternEq.png" rel="attachment wp-att-9697"><img class="alignnone wp-image-9697 size-large" src="http://blog.nycdatascience.com/wp-content/uploads/2016/03/NAsPatternEq-1024x555.png" alt="NAsPatternEq" width="1024" height="555" /></a></div>
+<div class="inner_cell">Figure: Correlation Tile Map</div>
+<div class="inner_cell"><a href="http://blog.nycdatascience.com/wp-content/uploads/2016/03/correlation.png" rel="attachment wp-att-9698"><img class="alignnone wp-image-9698 size-large" src="http://blog.nycdatascience.com/wp-content/uploads/2016/03/correlation-1024x912.png" alt="correlation" width="1024" height="912" /></a></div>
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2>3. Data Cleaning</h2>
+<strong>3.1. Treatment of Integer Variables with Low Numbers of Unique Values</strong>
+
+There are four of the integer variables with low numbers of unique values: v38, v62, v72, v129. These will be treated as categorical variables. These variables would be factorized using binary dummies.
+
+Table: Integer Variables with Low Cardinality
+<table border="1">
+<thead>
+<tr style="text-align: right">
+<th>index</th>
+<th>_a_variable</th>
+<th>_b_data_type</th>
+<th>_c_cardinality</th>
+<th>_d_missings</th>
+<th>_e_sample_values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>39</th>
+<td>v38</td>
+<td>int64</td>
+<td>12</td>
+<td>0</td>
+<td>[0, 4]</td>
+</tr>
+<tr>
+<th>63</th>
+<td>v62</td>
+<td>int64</td>
+<td>8</td>
+<td>0</td>
+<td>[1, 2]</td>
+</tr>
+<tr>
+<th>73</th>
+<td>v72</td>
+<td>int64</td>
+<td>13</td>
+<td>0</td>
+<td>[1, 2]</td>
+</tr>
+<tr>
+<th>130</th>
+<td>v129</td>
+<td>int64</td>
+<td>10</td>
+<td>0</td>
+<td>[0, 2]</td>
+</tr>
+</tbody>
+</table>
+<h3>3.2. Remove Highly Correlated Variables</h3>
+</div>
+As mentioned earlier, there are 63 variable pairs with absolute correlation &gt; 0.9. Between the two variables in a pair, the one with  higher missingness would be removed from the training model.
+
+</div>
+Table: Highly Correlated Variables
+<table class="dataframe" border="1">
+<thead>
+<tr style="text-align: right">
+<th>index</th>
+<th>_var1</th>
+<th>_var2</th>
+<th>_var_corr</th>
+<th>var1_na</th>
+<th>var2_na</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>v12</td>
+<td>v10</td>
+<td>0.912</td>
+<td>49851</td>
+<td>84</td>
+</tr>
+<tr>
+<th>1</th>
+<td>v25</td>
+<td>v8</td>
+<td>0.943</td>
+<td>49840</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>2</th>
+<td>v32</td>
+<td>v15</td>
+<td>0.908</td>
+<td>48619</td>
+<td>49836</td>
+</tr>
+<tr>
+<th>3</th>
+<td>v40</td>
+<td>v34</td>
+<td>-0.903</td>
+<td>49832</td>
+<td>111</td>
+</tr>
+<tr>
+<th>4</th>
+<td>v41</td>
+<td>v29</td>
+<td>0.904</td>
+<td>49832</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>5</th>
+<td>v43</td>
+<td>v26</td>
+<td>0.903</td>
+<td>49832</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>6</th>
+<td>v46</td>
+<td>v8</td>
+<td>0.975</td>
+<td>0</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>7</th>
+<td>v46</td>
+<td>v25</td>
+<td>0.982</td>
+<td>0</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>8</th>
+<td>v48</td>
+<td>v17</td>
+<td>-0.910</td>
+<td>49836</td>
+<td>49796</td>
+</tr>
+<tr>
+<th>9</th>
+<td>v49</td>
+<td>v41</td>
+<td>0.904</td>
+<td>111</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>10</th>
+<td>v53</td>
+<td>v11</td>
+<td>0.956</td>
+<td>49836</td>
+<td>49836</td>
+</tr>
+<tr>
+<th>11</th>
+<td>v54</td>
+<td>v25</td>
+<td>0.968</td>
+<td>49796</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>12</th>
+<td>v54</td>
+<td>v46</td>
+<td>0.919</td>
+<td>49796</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>13</th>
+<td>v55</td>
+<td>v33</td>
+<td>0.943</td>
+<td>49832</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>14</th>
+<td>v60</td>
+<td>v26</td>
+<td>0.981</td>
+<td>49832</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>15</th>
+<td>v63</td>
+<td>v8</td>
+<td>0.976</td>
+<td>50678</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>16</th>
+<td>v63</td>
+<td>v25</td>
+<td>0.981</td>
+<td>50678</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>17</th>
+<td>v63</td>
+<td>v46</td>
+<td>0.992</td>
+<td>50678</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>18</th>
+<td>v63</td>
+<td>v54</td>
+<td>0.919</td>
+<td>50678</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>19</th>
+<td>v64</td>
+<td>v17</td>
+<td>0.983</td>
+<td>3</td>
+<td>49796</td>
+</tr>
+<tr>
+<th>20</th>
+<td>v64</td>
+<td>v48</td>
+<td>-0.963</td>
+<td>3</td>
+<td>49796</td>
+</tr>
+<tr>
+<th>21</th>
+<td>v65</td>
+<td>v20</td>
+<td>0.911</td>
+<td>49836</td>
+<td>49840</td>
+</tr>
+<tr>
+<th>22</th>
+<td>v67</td>
+<td>v29</td>
+<td>0.925</td>
+<td>48619</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>23</th>
+<td>v67</td>
+<td>v41</td>
+<td>0.933</td>
+<td>48619</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>24</th>
+<td>v68</td>
+<td>v39</td>
+<td>-0.947</td>
+<td>49832</td>
+<td>49836</td>
+</tr>
+<tr>
+<th>25</th>
+<td>v73</td>
+<td>v15</td>
+<td>0.946</td>
+<td>49836</td>
+<td>49836</td>
+</tr>
+<tr>
+<th>26</th>
+<td>v73</td>
+<td>v32</td>
+<td>0.913</td>
+<td>49836</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>27</th>
+<td>v76</td>
+<td>v17</td>
+<td>0.993</td>
+<td>49796</td>
+<td>49796</td>
+</tr>
+<tr>
+<th>28</th>
+<td>v76</td>
+<td>v64</td>
+<td>0.954</td>
+<td>49796</td>
+<td>49796</td>
+</tr>
+<tr>
+<th>29</th>
+<td>v77</td>
+<td>v29</td>
+<td>0.920</td>
+<td>49832</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>30</th>
+<td>v77</td>
+<td>v67</td>
+<td>0.909</td>
+<td>49832</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>31</th>
+<td>v81</td>
+<td>v5</td>
+<td>-0.906</td>
+<td>48619</td>
+<td>48624</td>
+</tr>
+<tr>
+<th>32</th>
+<td>v83</td>
+<td>v33</td>
+<td>0.964</td>
+<td>49840</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>33</th>
+<td>v83</td>
+<td>v55</td>
+<td>0.902</td>
+<td>49840</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>34</th>
+<td>v86</td>
+<td>v32</td>
+<td>0.913</td>
+<td>49836</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>35</th>
+<td>v89</td>
+<td>v25</td>
+<td>0.965</td>
+<td>0</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>36</th>
+<td>v89</td>
+<td>v46</td>
+<td>0.932</td>
+<td>0</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>37</th>
+<td>v89</td>
+<td>v54</td>
+<td>0.956</td>
+<td>0</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>38</th>
+<td>v89</td>
+<td>v63</td>
+<td>0.931</td>
+<td>0</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>39</th>
+<td>v95</td>
+<td>v92</td>
+<td>0.977</td>
+<td>49796</td>
+<td>49843</td>
+</tr>
+<tr>
+<th>40</th>
+<td>v96</td>
+<td>v29</td>
+<td>0.957</td>
+<td>49832</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>41</th>
+<td>v96</td>
+<td>v41</td>
+<td>0.950</td>
+<td>49832</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>42</th>
+<td>v100</td>
+<td>v58</td>
+<td>-0.998</td>
+<td>48624</td>
+<td>49836</td>
+</tr>
+<tr>
+<th>43</th>
+<td>v104</td>
+<td>v13</td>
+<td>0.924</td>
+<td>50682</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>44</th>
+<td>v105</td>
+<td>v8</td>
+<td>0.917</td>
+<td>49832</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>45</th>
+<td>v105</td>
+<td>v25</td>
+<td>0.962</td>
+<td>49832</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>46</th>
+<td>v105</td>
+<td>v46</td>
+<td>0.946</td>
+<td>49832</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>47</th>
+<td>v105</td>
+<td>v54</td>
+<td>0.939</td>
+<td>49832</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>48</th>
+<td>v105</td>
+<td>v63</td>
+<td>0.940</td>
+<td>49832</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>49</th>
+<td>v105</td>
+<td>v89</td>
+<td>0.923</td>
+<td>49832</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>50</th>
+<td>v106</td>
+<td>v48</td>
+<td>-0.981</td>
+<td>48663</td>
+<td>49796</td>
+</tr>
+<tr>
+<th>51</th>
+<td>v106</td>
+<td>v64</td>
+<td>0.933</td>
+<td>48663</td>
+<td>49796</td>
+</tr>
+<tr>
+<th>52</th>
+<td>v111</td>
+<td>v33</td>
+<td>0.928</td>
+<td>49836</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>53</th>
+<td>v111</td>
+<td>v83</td>
+<td>0.904</td>
+<td>49836</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>54</th>
+<td>v114</td>
+<td>v34</td>
+<td>0.912</td>
+<td>3</td>
+<td>111</td>
+</tr>
+<tr>
+<th>55</th>
+<td>v114</td>
+<td>v40</td>
+<td>-0.967</td>
+<td>3</td>
+<td>111</td>
+</tr>
+<tr>
+<th>56</th>
+<td>v115</td>
+<td>v69</td>
+<td>-0.994</td>
+<td>49843</td>
+<td>49895</td>
+</tr>
+<tr>
+<th>57</th>
+<td>v116</td>
+<td>v43</td>
+<td>0.978</td>
+<td>49832</td>
+<td>49836</td>
+</tr>
+<tr>
+<th>58</th>
+<td>v118</td>
+<td>v97</td>
+<td>0.962</td>
+<td>49843</td>
+<td>49843</td>
+</tr>
+<tr>
+<th>59</th>
+<td>v121</td>
+<td>v33</td>
+<td>0.949</td>
+<td>48654</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>60</th>
+<td>v121</td>
+<td>v83</td>
+<td>0.966</td>
+<td>48654</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>61</th>
+<td>v128</td>
+<td>v108</td>
+<td>0.957</td>
+<td>49832</td>
+<td>48624</td>
+</tr>
+<tr>
+<th>62</th>
+<td>v128</td>
+<td>v109</td>
+<td>0.903</td>
+<td>49832</td>
+<td>48624</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>3.2. Imputation</h3>
+Due to the high missingess in the dataset, we have sent a lot of time on data exploratory and figuring out the best imputation methods. The following are the methods we have tried.
+<h3>Numeric Imputation with Mean</h3>
+We chose to imputed the numeric variables with mean to start with our data training.
+<h3>Numeric Imputation with Interpolate Linear</h3>
+<h3>Numeric Imputation with -999</h3>
+<h3>Categorical Imputation with "NA"</h3>
+</div>
+<h3>3.3. Transfer Categorical to Numeric</h3>
+<div class="inner_cell">
+
+Many machine learning tool, including Python, will only accept numbers as input. This was a problem as Python was being used in our project. Fortunately, the Pandas package has <a href="http://pandas.pydata.org/pandas-docs/version/0.13.1/generated/pandas.get_dummies.html">get_dummies()</a> function, which converts categorical variable into dummy/indicator variables.
+
+Sample code: convert categorical data into binary dummy variables
+<pre>        dummies = pd.get_dummies(df[var_name], prefix=var_name)
+</pre>
+&nbsp;
+
+test test
+<h2>4. Machine Learning Models</h2>
+<h3>4.1. Random Forest</h3>
+<h3>4.2. Xgboost</h3>
+&nbsp;
+
+</div>
+</div>
+</div>
+</div>
