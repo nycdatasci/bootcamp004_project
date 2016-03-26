@@ -1,0 +1,320 @@
+---
+title: "Santander Customer Satisfaction"
+author: "Sri, Mike, Wendy, Matt"
+date: "March 15, 2016"
+output: 
+  ioslides_presentation: 
+    highlight: tango
+    logo: ~/Downloads/data-science-logos-final-trans.png
+    smaller: yes
+---
+
+## Goal
+
+The bank provided both a training and test dataset. The training dataset provided an indicator of client satisfaction labeled 'TARGET'. 
+
+Competition participants were asked to use this set to formulate and tune a model to successfully predict satisfaction of clients in a test dataset for which a satisfaction indicator was not provided.
+
+We observed that the data was largely imbalanced by group.  The training set contained approximately ~73,000 satisfied customers and approximately ~3,000 dissatisfied clients.
+
+<center><img src="0129-15 Don't Trust Banks.png" alt="output_option" height="250" width="600"></center>
+
+
+## Results
+
+```{r echo=FALSE, cache=TRUE}
+library(ggplot2)
+modelperf<-data.frame(model=c("xgboost","gradient boosting-bernoulli","gradient boosting-adaboost","random forest","neural network"),
+                     auc=c(0.8408,0.8209,0.8392,0.787,0.821))
+modelperf<-modelperf[order(modelperf$auc,decreasing =T),]
+modelperf$model<-factor(modelperf$model,levels=modelperf$model)
+ggplot(modelperf,aes(x=model, y=auc, fill=model, label=auc))+geom_bar(stat="identity")+
+ geom_text(hjust=0.3, vjust=-0.5)+
+ theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+ coord_cartesian(ylim=c(0.75, 0.85))
+```
+
+
+## Data
+
+Read in the training and test data from kaggle and do some early exploratory analysis.
+```{r, cache = TRUE, echo=FALSE}
+train = read.csv('train.csv')
+test = read.csv('test.csv')
+```
+
+```{r}
+dim(train)
+dim(test)
+```
+The training data has 371 variables and over 76k observations
+
+The testing data has 370 variables (TARGET left off) and nearly the same amount of observations as as the training data
+
+## Missing Data
+
+Check to see if there is any missing data
+```{r}
+sum(is.na(train))
+sum(is.na(test))
+```
+There are no missing values that need to be imputed which makes things easier.
+
+Let's reduce the number of variables in the dataset to make fitting a model more manageable.
+
+
+## Reduced variables based on the dataiku lecture
+Now only 26 variables in training dataset
+```{r}
+var_names = c('var3','var15','imp_op_var39_comer_ult3', 'imp_op_var40_ult1', 
+              'ind_var1_0', 'ind_var8', 'ind_var26_0', 'ind_var30_0', 
+              'ind_var30', 'ind_var40_0', 'num_var1_0','num_var5', 'num_var42',
+              'saldo_var1', 'saldo_var5', 'var36',
+              'delta_imp_reemb_var17_1y3','ind_var43_recib_ult1', 
+              'num_ent_var16_ult1', 'num_meses_var5_ult3',
+              'num_meses_var8_ult3','num_meses_var39_vig_ult3',
+              'num_reemb_var17_ult1', 'num_var43_recib_ult1', 'var38', 'TARGET')
+
+reduced_train = train[, var_names]
+dim(reduced_train)
+```
+With less variables, the Gradient Boosted Model can be fit on the training data
+
+##
+<h2>Pro's of GBM:</h2>
+  - Typically uses decision trees as its basis and can be used for classification or regression\
+  - It is a boosted method so it "cheats" by iteratively solving residuals\
+  - Competitive with other high end algorithms and its performance is reliable\
+  - Robust in that it can handle a large number of predictors, handles NA's, and scaling is unnecessary\
+  - Has many loss functions that it can adopt
+  
+<h2>Con's of GBM:</h2>
+  - Several parameters to tune\
+  - Has the capacity to overfit\
+  - Because of its complexity, not easy to interpret results
+
+## ADAboost
+```{r, eval=FALSE}
+xlearn = reduced_train[,1:25]
+ylearn = reduced_train[,26]
+
+gbmFit.ada = gbm(formula = ylearn ~.,
+             distribution = 'adaboost',
+             data = xlearn,
+             n.trees = 10000,        #the number of trees in the model
+             interaction.depth = 5,  #each tree will evaluate five decisions
+             n.minobsinnode = 2,     #the number of obs present to yield a terminal node, higher means more conservative fit
+             shrinkage = .01,        #the learning rate, dictates how fast the algorithm moves across the loss gradient
+             bag.fraction = 0.5,     #subsampling fraction, 0.5 is best
+             train.fraction = 0.8,   #fraction of data for training
+             cv.folds = 5)           #running five-fold cross-validation
+```
+<h3>AUC = 0.839205</h3>
+<center><img src="ada_best_iter.pdf" alt="output_option" height="175" width="250"></center>
+
+## Bernoulli loss function
+
+```{r, eval=FALSE}
+gbmFit.bern = gbm(formula = ylearn ~.,
+                 distribution = 'bernoulli',
+                 data = xlearn,
+                 n.trees = 10000,        #the number of trees in the model
+                 interaction.depth = 5,  #each tree will evaluate five decisions
+                 n.minobsinnode = 2,     #the number of obs present to yield a terminal node, higher means more conservative fit
+                 shrinkage = .01,        #the learning rate, dictates how fast the algorithm moves across the loss gradient
+                 bag.fraction = 0.5,     #subsampling fraction, 0.5 is best
+                 train.fraction = 0.8,   #fraction of data for training
+                 cv.folds = 5)           #running five-fold cross-validation
+```
+<h3>AUC = 0.820872</h3>
+<center><img src="bern_best_iter.pdf" alt="output_option" height="250" width="400"></center>
+
+## Data PreProcessing
+
+```{r, eval=FALSE}
+train = read.csv("train.csv", header = TRUE)
+
+response <- train$TARGET
+train <-train[-c(1,371)]
+
+#Remove no variance predictors
+
+zero_var = nearZeroVar(train, names=TRUE, freqCut = 95/5,uniqueCut = 10,saveMetrics = TRUE)
+train = train[,-which(zero_var$zeroVar)]
+
+train_cat_names = list()
+train_num_names = list()
+
+#loop through training data by column / predictor variable
+
+for (i in (1:length(train))){
+  if (all(train[,c(i)] == floor(train[,c(i)]))){
+    train_cat_names[length(train_cat_names)+1]=(names(train[c(i)]))
+  }else{
+    train_num_names[length(train_num_names)+1]=(names(train[c(i)]))
+  }
+}
+
+idx <- match(train_cat_names, names(train))
+train_cat = train[,idx]
+train_num = train[,-idx]
+```
+## Continued
+
+```{r, eval=FALSE}
+#change categorical variables to factors
+
+for (j in (1:length(train_cat))){
+  train_cat[,c(j)] = as.factor(train_cat[,c(j)])
+}
+
+#normalize continuous variables
+
+preproc = preProcess(train_num,method = c("center", "scale"))
+train_standardized <- predict(preproc, train_num)
+
+
+train_standardized = cbind(train_num,train_cat,response)
+```
+
+## Random Forest Code
+```{r, eval=FALSE}
+library(ranger)
+
+params = expand.grid(eta = seq(0.5,1,.1), colsample_bytree= seq(0,1,.5),
+                     nrounds=seq(500,1000,250), max_depth = seq(5,10,1),
+                     min_child_weight=1,gamma=0)
+
+train.RF = train(x=train_standardized[,-length(train_standardized)],
+                 y=train_standardized$response,
+                    method = "ranger",
+                    metric = "ROC",
+                    maximize = FALSE,
+                    tuneGrid= params,
+                    trControl = trainControl(method="cv",
+                                            number=5,
+                                            classProbs = TRUE, 
+                                            verboseIter = TRUE, 
+                                            summaryFunction = twoClassSummary,
+                                            savePredictions = TRUE))
+```
+<h3>AUC = .787</h3>
+
+
+## Neural Network
+Random Hyper Parameter Search Random Parameters:
+
+- Activation function to be used in the hidden layers
+- The number and size of each hidden layer in the model
+- L1 Regularization: constrains the absolute value of the weights and has the net effect of dropping some weights (setting them to zero) from a model to reduce complexity and avoid overfitting.
+- L2 Regulation: constrains the sum of the squared weights. This method introduces bias into parameter estimates, but frequently produces substantial gains in modeling as estimate variance is reduced.
+- Input Dropout Ratio: A fraction of the features for each training row to be omitted from training in order to improve generalization
+- Hidden Dropout Ratios: A fraction of the inputs for each hidden layer to be omitted from training in order to improve generalization.
+
+## Neural Net Code
+```{r eval=FALSE, message=FALSE, error=FALSE}
+#Random hyper parameter search
+models <- c()
+for (i in 1:20) {
+  rand_activation <- c("TanhWithDropout", "RectifierWithDropout")[sample(1:2,1)]
+  rand_numlayers <- sample(2:5,1)
+  rand_hidden <- c(sample(10:50,rand_numlayers,T))
+  rand_l1 <- runif(1, 0, 1e-3)
+  rand_l2 <- runif(1, 0, 1e-3)
+  rand_dropout <- c(runif(rand_numlayers, 0, 0.6))
+  rand_input_dropout <- runif(1, 0, 0.5)
+  dlmodel <- h2o.deeplearning(
+    x = 1:369, y = 371, 
+    training_frame = train_holdout.hex,
+    validation_frame = valid_holdout.hex, 
+    epochs=1,
+    stopping_metric="misclassification",
+    stopping_tolerance=1e-2,        ## stop when logloss does not improve by >=1% for 2 scoring events
+    stopping_rounds=2,
+    score_validation_samples=10000, ## downsample validation set for faster scoring
+    score_duty_cycle=0.025,         ## don't score more than 2.5% of the wall time
+    max_w2=10,                      ## can help improve stability for Rectifier
+    ### Random parameters
+    activation=rand_activation, 
+    hidden=rand_hidden, 
+    l1=rand_l1, l2=rand_l2,
+    input_dropout_ratio=rand_input_dropout, 
+    hidden_dropout_ratios=rand_dropout
+  )                                
+  models <- c(models, dlmodel)
+}
+```
+## Continued
+```{r eval=FALSE}
+# Find the best model (lowest mse on the validation holdout set)
+base_auc <- 0.5
+for (i in 1:length(models)) {
+  auc <- h2o.auc( h2o.performance(models[[i]], valid_holdout.hex))
+  if (auc > base_auc) {
+    base_auc <- auc
+    best_model <- models[[i]]
+  }
+}
+```
+<h3>AUC = 0.821</h3>
+
+  
+## Xgboost
+XGBoost is an extreme gradient boosting algorithm. It is often described as a blackbox because it works well but is not easily interpretable. XGBoost is known for its speed and accurate predictive power. 
+
+<h3>Advantages:</h3>
+
+- Speed - fast iterations & fast tuning.
+- In-build penalty for complexity. Heavily reduces overfitting.
+
+Not all splits are equally important. The first split of a tree will have more impact on the purity than the deepest split. 
+
+Intuitively, we understand that the first split does most of the work, and the following splits focus on smaller parts of the dataset which have been missclassified by the first tree.
+
+## Xgboost Code
+```{r, cache=TRUE, eval=FALSE}
+train.y <- train$TARGET
+train_new <- sparse.model.matrix(TARGET ~ ., data = train)
+# Creating sparse model matrix because most of the elements are zero. 
+dtrain <- xgb.DMatrix(data=train_new, label=train.y)
+watchlist <- list(train=dtrain)
+
+param <- list(  objective           = "binary:logistic", 
+                booster             = "gbtree",
+                eval_metric         = "auc",  # maximizing for auc
+                eta                 = 0.02,   # learning rate - Number of Trees
+                max_depth           = 5.5,    # maximum depth of a tree
+                subsample           = .9,     # subsample ratio of the training instance
+                colsample_bytree    = .87,    # subsample ratio of columns 
+                min_child_weight    = 1,      # minimum sum of instance weight (defualt)
+                scale_pos_weight    = 1       # helps convergance bc dataset is unbalanced
+                )      
+xgb <- xgb.train(   params              = param, 
+                    data                = dtrain, 
+                    nrounds             = 750, 
+                    verbose             = 1,
+                    watchlist           = watchlist,
+                    maximize            = FALSE
+                    )
+```
+<h3>AUC = .840771</h3>
+
+
+## Under the Hood Feature Importance from Xgboost
+
+```{r, eval=FALSE}
+bst <- xgb.train(data=dtrain, max.depth=5.5, eta=.02, nthread = 2, nround=5,
+                 watchlist=watchlist, objective = "binary:logistic")
+importance_matrix <- xgb.importance(model = bst)
+xgb.plot.importance(importance_matrix = importance_matrix)
+
+```
+
+<center><img src="sant.png" alt="output_option" height="350" width="600"></center>
+
+## Placement as of 3/16
+
+<center><img src="62.png" alt="output_option" height="150" width="800"></center>
+<center><h2>Top 4%</h2></center>
+<center><img src="rocky.gif" alt="output_option" height="250" width="600"></center>
+

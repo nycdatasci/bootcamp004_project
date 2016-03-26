@@ -1,0 +1,192 @@
+---
+title: "Santander Customer Satisfaction Kaggle Competition"
+author: "Wendy Yu"
+date: "March 16, 2016"
+output: html_document
+---
+
+<h2>Initial Data Cleaning</h2>
+
+1. Replace '99999' and '-99999' with NA
+2. Remove variables with zero variance 
+3. Change categorical variables to factors 
+
+```{r eval=FALSE, message=FALSE, error=FALSE, warning=FALSE}
+library(ggplot2)
+#read in data 
+setwd("~/Documents/wendy/Kaggle/Santander")
+train<-read.csv("train 2.csv",header=T)
+test<-read.csv("test 2.csv",header=T)
+all<-rbind(train[,-371],test)
+#put NA back in 
+for(i in 1:length(all)){
+  if(min(all[,i], na.rm=T)<=-99999){
+    all[,i][which(all[,i]<=-99999)]<-NA
+  }
+  if(max(all[,i], na.rm=T)>=1e+9-1){
+    all[,i][which(all[,i]>=1e+9-1)]<-NA
+  }
+}
+#remove zero variance 
+xvar<-apply(all,2,function(x){var(x,na.rm=T)})
+all2<-all[,xvar>0]
+#set as factor
+for(i in 1:length(all2)){
+  if(length(unique(all2[,i]))==2){
+    all2[,i]<-as.factor(all2[,i])
+  }
+}
+#split into train and test
+train2<-all2[1:nrow(train),]
+train2$TARGET<-train$TARGET
+test2<-all2[(nrow(train)+1):nrow(all2),]
+
+write.csv(train2, file="new_train.csv", row.names=F, quote=F)
+write.csv(test2, file="new_test.csv",row.names=F,quote=F)
+```
+
+<h2>Neural Network with h2o in R</h2>
+
+1. Installation
+```{r eval=FALSE, message=FALSE, error=FALSE, warning=FALSE}
+# The following two commands remove any previously installed H2O packages for R.
+if ("package:h2o" %in% search()) { detach("package:h2o", unload=TRUE) }
+if ("h2o" %in% rownames(installed.packages())) { remove.packages("h2o") }
+
+# Next, we download, install and initialize the H2O package for R.
+install.packages("h2o", repos=(c("http://s3.amazonaws.com/h2o-release/h2o/master/1497/R", getOption("repos"))))
+library(h2o)
+# Launch h2o on localhost, using all cores
+localH2O <- h2o.init(ip = 'localhost', port = 54321, max_mem_size = '4g', nthreads = -1)
+```
+
+2. Import Files
+```{r eval=FALSE, message=FALSE, error=FALSE, warning=FALSE}
+### load data sets and create train/validation split
+train.hex <- h2o.importFile(path = "/Users/Wendy/Documents/wendy/Kaggle/Santander/train_norm.csv", destination_frame="train.hex")
+train.hex[,371]<-as.factor(train.hex[,371])
+test.hex <- h2o.importFile(path = "/Users/Wendy/Documents/wendy/Kaggle/Santander/test_norm.csv", destination_frame="test.hex")
+
+# Split into 80/20 Train/Validation
+row<-sample(nrow(train.hex))[1:round(nrow(train.hex)*0.8)]
+train_holdout.hex <- h2o.assign(train.hex[row,], "train_holdout.hex")
+dim(train_holdout.hex)
+valid_holdout.hex <- h2o.assign(train.hex[-row,], "valid_holdout.hex")
+dim(valid_holdout.hex)
+```
+
+3. Random Hyper Parameter Search 
+Random Parameters:
+
+- Activation function to be used in the hidden layers
+- The number and size of each hidden layer in the model
+- L1 Regularization: constrains the absolute value of the weights and has the net effect of dropping some weights (setting them to zero) from a model to reduce complexity and avoid overfitting.
+- L2 Regulation: constrains the sum of the squared weights. This method introduces bias into parameter estimates, but frequently produces substantial gains in modeling as estimate variance is reduced.
+- Input Dropout Ratio: A fraction of the features for each training row to be omitted from training in order to improve generalization
+- Hidden Dropout Ratios: A fraction of the inputs for each hidden layer to be omitted from training in order to improve generalization.
+
+```{r eval=FALSE, message=FALSE, error=FALSE, warning=FALSE}
+models <- c()
+for (i in 1:20) {
+  rand_activation <- c("TanhWithDropout", "RectifierWithDropout")[sample(1:2,1)]
+  rand_numlayers <- sample(2:5,1)
+  rand_hidden <- c(sample(10:50,rand_numlayers,T))
+  rand_l1 <- runif(1, 0, 1e-3)
+  rand_l2 <- runif(1, 0, 1e-3)
+  rand_dropout <- c(runif(rand_numlayers, 0, 0.6))
+  rand_input_dropout <- runif(1, 0, 0.5)
+  dlmodel <- h2o.deeplearning(
+    x = 1:325, y = 326,
+    training_frame = train_holdout.hex,
+    validation_frame = valid_holdout.hex, 
+    epochs=1,
+    stopping_metric="misclassification",
+    stopping_tolerance=1e-2,        ## stop when logloss does not improve by >=1% for 2 scoring events
+    stopping_rounds=2,
+    score_validation_samples=10000, ## downsample validation set for faster scoring
+    score_duty_cycle=0.025,         ## don't score more than 2.5% of the wall time
+    max_w2=10,                      ## can help improve stability for Rectifier
+    
+    ### Random parameters
+    activation=rand_activation, 
+    hidden=rand_hidden, 
+    l1=rand_l1, 
+    l2=rand_l2,
+    input_dropout_ratio=rand_input_dropout, 
+    hidden_dropout_ratios=rand_dropout
+  )                                
+  models <- c(models, dlmodel)
+}
+```
+
+4. Find the best model with the highest AUC
+```{r eval=FALSE, message=FALSE, error=FALSE, warning=FALSE}
+base_auc <- 0.5
+for (i in 1:length(models)) {
+  auc <- h2o.auc( h2o.performance(models[[i]], valid_holdout.hex))
+  if (auc > base_auc) {
+    base_auc <- auc
+    best_model <- models[[i]]
+  }
+}
+```
+
+5. Tune model in cross validation
+```{r eval=FALSE, message=FALSE, error=FALSE, warning=FALSE}
+#Cross validation
+dlmodelBaseFinalCV<-h2o.deeplearning(x = 1:325, y = 326,
+                                   training_frame = train.hex,
+                                   #validation_frame = valid_holdout.hex,
+                                   hidden=c(411, 432),
+                                   epochs = 20,
+                                   activation = "RectifierWithDropout",
+                                   variable_importances=T,
+                                   score_validation_samples=10000, ## downsample validation set for faster scoring
+                                   score_duty_cycle=0.025,         ## don't score more than 2.5% of the wall time
+                                   adaptive_rate=F,                ## manually tuned learning rate
+                                   rate=0.01, 
+                                   rate_annealing=2e-6,            
+                                   momentum_start=0.2,             ## manually tuned momentum
+                                   momentum_stable=0.4, 
+                                   momentum_ramp=1e7, 
+                                   l1=1e-5,                        ## add some L1/L2 regularization
+                                   l2=1e-5,
+                                   max_w2=10,
+                                   nfolds=5,
+                                   fold_assignment="Modulo"
+)
+
+h2o.performance(dlmodelBaseFinalCV, train=T) 
+```
+
+```{r echo=FALSE}
+print(paste0("AUC = 0.819"))
+```
+
+6. Look at Variable Importance
+```{r eval=FALSE, message=FALSE, error=FALSE, warning=FALSE}
+#var importance
+varimp<-as.data.frame(h2o.varimp(dlmodelBaseFinalCV))
+write.table(varimp, file="variable importance NN.csv", row.names=F, quote=F)
+```
+
+```{r echo=FALSE}
+varimp<-read.csv("variable importance NN.csv",header=T,sep=" ")
+print(varimp[1:10,1:2])
+```
+
+7. Make prediction on test set and save the output file 
+```{r eval=FALSE,message=FALSE, error=FALSE, warning=FALSE}
+#apply the CV model on test set
+pred <- predict(dlmodelBaseFinalCV, test.hex[,1:369])
+submission <- h2o.cbind(test.hex[,370], pred)
+h2o.exportFile(submission[,c(1,4)], path=paste0("/Users/Wendy/Documents/wendy/Kaggle/Santander/h2o.NN-pred-test.csv"))
+testPred<-read.csv("h2o.NN-pred-test.csv",header=T)
+colnames(testPred)[2]<-c("TARGET")
+write.csv(testPred,file="h2o.NN-pred-test.csv",row.names=F,quote=F)
+```
+
+```{r echo=FALSE}
+print(paste0("AUC = 0.821 on Kaggle"))
+```
+

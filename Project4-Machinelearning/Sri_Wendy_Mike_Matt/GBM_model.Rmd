@@ -1,0 +1,158 @@
+---
+title: "Santander Kaggle Competition: GBM Models"
+author: "Michael Todisco"
+date: "March 17, 2016"
+output: html_document
+---
+
+Read in the training and test data from kaggle and do some early exploratory analysis.
+
+```{r}
+train_data = read.csv('train.csv')
+test_data = read.csv('test.csv')
+
+dim(train_data)
+dim(test_data)
+```
+
+The training data has 371 variables and over 76k observations
+
+The testing data has 370 variables (TARGET left off) and nearly the same amount of observations as as the training data
+
+Check to see if there is any missing data
+```{r}
+sum(is.na(train_data))
+sum(is.na(test_data))
+```
+There are no missing values that need to be imputed which makes things easier
+
+Let's reduce the number of variables in the dataset to make fitting a model more manageable
+
+The ID column should not be evaluated in the model so it is removed
+```{r}
+train_data$ID = NULL
+test_data$ID = NULL
+```
+
+Columns are reduced further based on the dataiku lecture
+```{r}
+var_names = c('var3','var15','imp_op_var39_comer_ult3', 'imp_op_var40_ult1', 'ind_var1_0',
+              'ind_var8', 'ind_var26_0', 'ind_var30_0', 'ind_var30', 'ind_var40_0', 'num_var1_0',
+              'num_var5', 'num_var42', 'saldo_var1', 'saldo_var5', 'var36', 'delta_imp_reemb_var17_1y3',
+              'ind_var43_recib_ult1', 'num_ent_var16_ult1', 'num_meses_var5_ult3', 'num_meses_var8_ult3',
+              'num_meses_var39_vig_ult3', 'num_reemb_var17_ult1', 'num_var43_recib_ult1', 'var38', 'TARGET')
+
+reduced_train = train_data[, var_names]
+dim(reduced_train)
+```
+Now there are only 26 variables in the training dataset
+
+With less variables, the Gradient Boosted Model can be fit on the training data
+
+**Pro's of GBM:**\
+  - Typically uses decision trees as its basis and can be used for classification or regression\
+  - It is a boosted method so it "cheats" by iteratively solving residuals\
+  - Competitive with other high end algorithms and its performance is reliable\
+  - Robust in that it can handle a large number of predictors, handles NA's, and scaling is unnecessary\
+  - Has many loss functions that it can adopt
+  
+**Con's of GBM:**\
+  - Several parameters to tune\
+  - Has the capacity to overfit\
+  - Because of its complexity, not easy to interpret results
+  
+  
+The first model fit with GBM is with the ADAboost: exponential loss for 0-1 outcomes
+```{r, eval=FALSE}
+xlearn = reduced_train[,1:25]
+ylearn = reduced_train[,26]
+
+library(gbm) #Using the gbm library
+
+gbmFit.ada = gbm(formula = ylearn ~.,
+             distribution = 'adaboost',
+             data = xlearn,
+             n.trees = 10000,        #the number of trees in the model
+             interaction.depth = 5,  #each tree will evaluate five decisions
+             n.minobsinnode = 2,     #the number of obs present to yield a terminal node, higher means more conservative fit
+             shrinkage = .01,        #the learning rate, dictates how fast the algorithm moves across the loss gradient
+             bag.fraction = 0.5,     #subsampling fraction, 0.5 is best
+             train.fraction = 0.8,   #fraction of data for training
+             cv.folds = 5)           #running five-fold cross-validation
+```
+
+Show the relative influence of each variable.  var38 is by far the most influencial
+```{r, eval=FALSE}
+summary(gbmFit.ada)
+```
+
+Find the estimated best number of trees using cross-validation
+```{r, eval=FALSE}
+best.cv.ada = gbm.perf(gbmFit.ada, method = 'cv')
+best.cv.ada #1,927
+```
+
+Prediction on the training data
+```{r, eval=FALSE}
+train_data$preds_ada = predict(gbmFit.ada, train_data, n.trees = best.cv.ada, type = 'response')
+```
+
+Comparing model performance with mean squared error
+```{r, eval=FALSE}
+library(Metrics)
+rmse(train_data$TARGET, train_data$preds_ada)
+#0.1859
+```
+
+Prediction on the test data
+```{r, eval=FALSE}
+test_data$preds_ada = predict(gbmFit.ada, test_data, n.trees = best.cv.ada, type = 'response')
+```
+
+KAGGLE RESULTS = 0.839205
+_________________________________________________________________________________________________________________________________________
+
+Now fitting a model with the bernoulli loss function: logistic regression for 0-1 outcomes
+```{r, eval=FALSE}
+gbmFit.bern = gbm(formula = ylearn ~.,
+                 distribution = 'bernoulli',
+                 data = xlearn,
+                 n.trees = 10000,        #the number of trees in the model
+                 interaction.depth = 5,  #each tree will evaluate five decisions
+                 n.minobsinnode = 2,     #the number of obs present to yield a terminal node, higher means more conservative fit
+                 shrinkage = .01,        #the learning rate, dictates how fast the algorithm moves across the loss gradient
+                 bag.fraction = 0.5,     #subsampling fraction, 0.5 is best
+                 train.fraction = 0.8,   #fraction of data for training
+                 cv.folds = 5)           #running five-fold cross-validation
+
+gbmFit.bern
+```
+
+Show the relative influence of each variable.  var38 is by far the most influencial
+```{r, eval=FALSE}
+summary(gbmFit.bern)
+```
+
+Find the estimated best number of trees using cross-validation
+```{r, eval=FALSE}
+best.cv.bern = gbm.perf(gbmFit.bern, method = 'cv')
+best.cv.bern #2,546
+```
+
+Prediction on the training data
+```{r, eval=FALSE}
+train_data$preds_bern = predict(gbmFit.bern, train_data, n.trees = best.cv.bern, type = 'response')
+```
+
+Comparing model performance with mean squared error
+```{r, eval=FALSE}
+rmse(train_data$TARGET, train_data$preds_bern)
+#0.1829
+```
+
+Prediction on the test data
+```{r, eval=FALSE}
+test_data$preds_bern = predict(gbmFit.bern, test_data, n.trees = best.cv.bern, type = 'response')
+```
+
+KAGGLE RESULTS = 0.820872
