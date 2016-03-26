@@ -109,3 +109,5 @@ submission19 <- data.frame(ID=test.id, TARGET=preds)
 
 write.csv(submission19, "ens_13_test.csv", row.names=F, quote=F)
 
+#### AUC: .840771 ####
+
