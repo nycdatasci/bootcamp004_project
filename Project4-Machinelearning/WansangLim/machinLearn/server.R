@@ -204,6 +204,10 @@ shinyServer(function(input, output) {
     ypred = predict(svm.mmc.linear, linearly.separable[test.index, ])
     predicTable01 <<- table("Predicted Values" = ypred, "True Values" = linearly.separable[test.index, "PopuNY"])
     print(predicTable01)
+    ###########################
+    client.index = all.samples[1:(num.all*0.15)]
+    #for (k in 1: length(client.index)) {
+    customerRes <<- predict(svm.mmc.linear, linearly.separable[client.index,])
     ####################################################################
     predicTable01 <- as.data.frame(predicTable01)
     predictedValues01 <- levels(predicTable01[, 1])
@@ -317,6 +321,20 @@ shinyServer(function(input, output) {
       summary01
     }
     
+  })
+  
+  output$customerMol <- renderPrint({
+    inFile <- input$customer
+    
+    if (is.null(inFile))
+      return(NULL)
+    
+    molData <- read.csv(inFile$datapath, header = TRUE,
+                        sep = ',', quote = '"')
+    
+    customerRes
+    #molData <- 'asdfadsfadfasdfasd'
+    #molData
   })
   
   aa <<- function(x) {

@@ -49,7 +49,17 @@ shinyUI(
                       c("Best10" = "Best10", "Whole" = "Whole"), selected = "Whole"),
          
          numericInput("randomSet", "Set set.seed:", 0),
-         numericInput("svmCost", "Set cost:", 1, min = 0.0001, max = 1000000)
+         numericInput("svmCost", "Set cost:", 1, min = 0.0001, max = 1000000),
+         fileInput('customer', 'Choose file to upload',
+                   accept = c(
+                     'text/csv',
+                     'text/comma-separated-values',
+                     'text/tab-separated-values',
+                     'text/plain',
+                     '.csv',
+                     '.tsv'
+                   )
+         )
     ) 
   ),
   mainPanel(
@@ -104,7 +114,8 @@ shinyUI(
                fluidRow(
                  column(width = 8,
                         dataTableOutput("bestVector"),
-                        dataTableOutput("vecFirstTable")
+                        dataTableOutput("vecFirstTable"),
+                        textOutput("customerMol")
                  ),
                  column(width = 3, #offset = 2,
                         "Percent of Correctly Predict",
