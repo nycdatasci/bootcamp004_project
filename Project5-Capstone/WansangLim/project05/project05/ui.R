@@ -21,6 +21,8 @@ shinyUI(fluidPage(
                      helpText("Content Panel 3")
     ), 
     conditionalPanel(condition="input.conditionedPanels==4",
+                     textInput("inputLocation", label = h5("Compare Location"), value = ""),
+                     actionButton("goLocation", "Enter"),
                      helpText("Content Panel 4")
     ),
     conditionalPanel(condition="input.conditionedPanels==5",
@@ -33,7 +35,7 @@ shinyUI(fluidPage(
       tabPanel("Panel 1", value=1, dataTableOutput("twitSearch")), 
       tabPanel("Panel 2", value=2, textOutput("classify")),
       tabPanel("Panel 3", value=3, textOutput("senti")),
-      tabPanel("Panel 4", value=4, textOutput("")),
+      tabPanel("Panel 4", value=4, textOutput("BigCity")),
       tabPanel("Panel 5", value=5, textOutput("")),
       id = "conditionedPanels"
     )

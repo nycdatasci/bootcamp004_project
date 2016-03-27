@@ -14,6 +14,8 @@ shinyServer(function(input, output) {
   locationRange <- reactive(input$locationRange)
   NumberTwitts <- reactive(input$NumberTwitts)
   
+  locationCity <- reactive(input$inputLocation)
+  
   tweetData <- read.csv("/media/ubun10/64GB1/NYC/project05/project05/Data/tweetData500a.csv", comment.char="#", stringsAsFactors=FALSE)
   
   output$twitSearch <- renderDataTable({
@@ -181,4 +183,20 @@ shinyServer(function(input, output) {
     analysis <- score.sentiment(tweets.text, pos, neg)
     analysis$score
   })# end of semtiment
+  
+  output$BigCity <- renderPrint({
+    numCity <- c()
+    input$goLocation
+    isolate({
+      locationCity <- locationCity()
+      print("dddddddddddddddddddddd")
+      if (length(numCity) <= 2) {
+        numCity <- c(numCity, c(locationCity))
+        print(numCity)
+      }
+      
+      out01 <- c("aa", "bb")
+    })
+    out01
+  })#End of big city
 })#End of Function, shinyServer

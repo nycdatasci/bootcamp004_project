@@ -28,13 +28,7 @@ score.sentiment = function(sentences, pos.words, neg.words, .progress='none')
   
   require(stringr)
   
-  # we got a vector of sentences. plyr will handle a list
-  
-  # or a vector as an "l" for us
-  
-  # we want a simple array ("a") of scores back, so we use
-  
-  # "l" + "a" + "ply" = "laply":
+
   
   scores = laply(sentences, function(sentence, pos.words, neg.words) {
     
@@ -90,5 +84,5 @@ score.sentiment = function(sentences, pos.words, neg.words, .progress='none')
 ###############################################
 targets <- "I am a boy and a girl or an adult"
 
-analysis = score.sentiment(tweets.text, pos, neg)
+analysis <- score.sentiment(tweets.text, pos, neg)
 analysis
