@@ -184,19 +184,45 @@ shinyServer(function(input, output) {
     analysis$score
   })# end of semtiment
   
+  numCity <- reactiveValues(val=c())
+  
   output$BigCity <- renderPrint({
-    numCity <- c()
     input$goLocation
     isolate({
       locationCity <- locationCity()
-      print("dddddddddddddddddddddd")
-      if (length(numCity) <= 2) {
-        numCity <- c(numCity, c(locationCity))
-        print(numCity)
-      }
+      numCity$val <- c(numCity$val, locationCity)
+      print(length(numCity$val))
       
-      out01 <- c("aa", "bb")
+      ####Twitt Search Begin//////////////////////////////////////////////////////////////////
+      if (length(numCity$val) == 6) {
+        CityList <- numCity$val[2:length(numCity$val)+1]
+        
+        #Address to location
+        corrdiVec <- 
+        for (i in 1: length(CityList)) {
+          geoWeb <- paste("https://maps.googleapis.com/maps/api/geocode/json?address=", CityList[i], "&key=AIzaSyANifkybPlJWYynG_FSwzwSn-CunJTE4N0", sep = "")
+          geoAPI <- fromJSON(geoWeb)
+          latt <- geoAPI$results$geometry$location$lat
+          lont <- geoAPI$results$geometry$location$lng
+          coordiVec <- c()
+          
+        }
+        out01 <- CityList
+        
+        
+      } else {
+        out01 <- "Type more cities"
+      }
+      #Twitt End %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        out01 <- numCity$val
+      
     })
     out01
   })#End of big city
+  
+  output$top10city <- renderPrint({
+    
+    top10 <- "asdfasdf"
+    top10
+  })
 })#End of Function, shinyServer

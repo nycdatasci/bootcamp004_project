@@ -1,5 +1,5 @@
 library(shiny)
-
+city <- read.csv("/media/ubun10/64GB1/NYC/bootcamp004_project/Project5-Capstone/WansangLim/project05/project05/Data/city.csv")
 
 shinyUI(fluidPage(
   headerPanel("Conditional Panels"),
@@ -27,6 +27,9 @@ shinyUI(fluidPage(
     ),
     conditionalPanel(condition="input.conditionedPanels==5",
                      helpText("Content Panel 5")
+    ),
+    conditionalPanel(condition="input.conditionedPanels==6",
+                     helpText("Content Panel 6")
     )
   ),
   
@@ -36,7 +39,8 @@ shinyUI(fluidPage(
       tabPanel("Panel 2", value=2, textOutput("classify")),
       tabPanel("Panel 3", value=3, textOutput("senti")),
       tabPanel("Panel 4", value=4, textOutput("BigCity")),
-      tabPanel("Panel 5", value=5, textOutput("")),
+      tabPanel("Panel 5 Top 10", value=5, textOutput("top10city")),
+      tabPanel("Panel 6", value=5, textOutput("")),
       id = "conditionedPanels"
     )
   )
