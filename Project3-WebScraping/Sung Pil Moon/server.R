@@ -1,5 +1,5 @@
 
-
+load('proj3_indeedUnsupervised.RData')
 
 server <- function(input, output) { 
   
@@ -534,13 +534,13 @@ server <- function(input, output) {
 } # end of Server
 
 
-app = shinyApp(
-  ui <- ui,
-  server <- server
-)
-
-# shiny::runApp(host="192.168.2.179",port=3168)
-runApp(app, host = '0.0.0.0', port = 3168)
+# app = shinyApp(
+#   ui <- ui,
+#   server <- server
+# )
+# 
+# # shiny::runApp(host="192.168.2.179",port=3168)
+# runApp(app, host = '0.0.0.0', port = 3168)
 
 # 192.168.2.178:3168
 
