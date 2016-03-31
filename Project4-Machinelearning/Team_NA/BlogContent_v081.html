@@ -1,0 +1,409 @@
+<div id="stcpDiv">
+
+Contributed by Ablat, Bin Lin, Claudia Huang and Sung Pil Moon. They took <em><a href="http://nycdatascience.com/" target="_blank">NYC Data Science Academy</a> <a href="http://nycdatascience.com/data-science-bootcamp/" target="_blank">12 week full time Data Science Bootcamp</a></em> program between Jan. 11 to April 1, 2016. The post was based on their<em> fourth class project (Machine Learning project, due at 10th week of the program).</em>
+
+&nbsp;
+<h2>1. Overview</h2>
+As part of a Kaggle competition, we were challenged by BNP cardis <span style="color: #999999">Rossmann, the second largest chain of German drug stores</span>, to predict the claims... <span style="color: #999999">daily sales for 6 weeks into the future for more than 1,000 stores</span>.  Exploratory data analysis revealed ... . We also engineered several novel features by the inclusion of .... We then used <span style="color: #999999">H20, a fast, scalable parallel-processing engine for machine learning, to build predictive models utilizing random forests, gradient boosting machines, as well as deep learning</span>. Lastly, we combined these models using different ensemble methods to obtain better predictive performance.
+
+&nbsp;
+<h2>2. The Data set</h2>
+The data set contains three set of data:
+<ul>
+	<li>TRAIN.CSV</li>
+	<li>TEST.CSV: Total</li>
+	<li style="text-align: left">SAMPLE_SUBMISSION.CSV:</li>
+</ul>
+These are the basic description of the data sets
+<ul>
+	<li><strong>Total:</strong> 111,432 observations (rows) x 133 features (columns)</li>
+	<li><strong>Data Types</strong>: float, integer, string</li>
+	<li><strong>Column "ID"</strong>: the ID of each row, not being used as predictor</li>
+	<li><strong>Column "target"</strong>: the target of each row, not being used as predictor</li>
+	<li><strong>Numbers of Text-based Predictors</strong>: 112</li>
+	<li><strong>Numbers of Numeric Predictors:</strong> 19</li>
+	<li><strong>Numbers of Columns with missing value:</strong> 119</li>
+	<li><strong>Numbers of columns highly correlated</strong>: There are 123 pairs with absolute correlation &gt; 0.8; there are 63 pairs with absolute correlation &gt; 0.9.</li>
+</ul>
+&nbsp;
+
+&nbsp;
+<h3>2.1. Exploratory Data Analysis</h3>
+As the first step, we performed exploratory data analysis to better understand the data. These are the initial findings throughout the EDA process.
+
+&nbsp;
+
+</div>
+<ol>
+	<li><strong>Anonymized Data:</strong> All data (both categorical and continuous) is anonymized without any description (Figure 1)<a href="http://blog.nycdatascience.com/wp-content/uploads/2016/03/BNP_anonymizedData.png" rel="attachment wp-att-9922">
+</a>
+
+[caption id="attachment_9922" align="alignnone" width="1013"]<a href="http://blog.nycdatascience.com/wp-content/uploads/2016/03/BNP_anonymizedData.png" rel="attachment wp-att-9922"><img class="wp-image-9922 size-full" src="http://blog.nycdatascience.com/wp-content/uploads/2016/03/BNP_anonymizedData.png" alt="BNP_anonymizedData" width="1013" height="594" /></a> Figure 1: Anonymized data[/caption]
+
+&nbsp;</li>
+	<li><strong>Too Many Missing Value</strong>: Approximately 40% of data is missing as you can see in the Figure 2.
+
+[caption id="attachment_9921" align="aligncenter" width="3600"]<a href="http://blog.nycdatascience.com/wp-content/uploads/2016/03/NAsPatternEq-1.png" rel="attachment wp-att-9921"><img class="wp-image-9921 size-full" src="http://blog.nycdatascience.com/wp-content/uploads/2016/03/NAsPatternEq-1.png" alt="NAsPatternEq" width="3600" height="1950" /></a> Figure 2: Missingness in the BNP data set[/caption]
+
+&nbsp;</li>
+	<li><strong>High correlations</strong>:  As shown in the correlation matrix plot (Figure 3), some variables are highly correlated (not just 1-to-many but also many-to-many). Correlation values are between -1 and 1. Red color means positive correlation while blue color means negative correlation.
+
+[caption id="attachment_9923" align="aligncenter" width="1149"]<a href="http://blog.nycdatascience.com/wp-content/uploads/2016/03/hicorrelationmat.png" rel="attachment wp-att-9923"><img class="wp-image-9923 size-full" src="http://blog.nycdatascience.com/wp-content/uploads/2016/03/hicorrelationmat.png" alt="hicorrelationmat" width="1149" height="1023" /></a> Figure 3: Correlation Matrix Plot[/caption]
+
+&nbsp;</li>
+</ol>
+<div id="stcpDiv">
+<h3>2.2. Data Cleaning</h3>
+&nbsp;
+<h4>2.2.1. Treatment of Integer Variables with Low Numbers of Unique Values</h4>
+There are four of the integer variables with low numbers of unique values: v38, v62, v72, v129. These will be treated as categorical variables. These variables would be factorized using binary dummies.
+<table border="1">
+<thead>
+<tr style="text-align: right">
+<th>index</th>
+<th>_a_variable</th>
+<th>_b_data_type</th>
+<th>_c_cardinality</th>
+<th>_d_missings</th>
+<th>_e_sample_values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>39</th>
+<td>v38</td>
+<td>int64</td>
+<td>12</td>
+<td>0</td>
+<td>[0, 4]</td>
+</tr>
+<tr>
+<th>63</th>
+<td>v62</td>
+<td>int64</td>
+<td>8</td>
+<td>0</td>
+<td>[1, 2]</td>
+</tr>
+<tr>
+<th>73</th>
+<td>v72</td>
+<td>int64</td>
+<td>13</td>
+<td>0</td>
+<td>[1, 2]</td>
+</tr>
+<tr>
+<th>130</th>
+<td>v129</td>
+<td>int64</td>
+<td>10</td>
+<td>0</td>
+<td>[0, 2]</td>
+</tr>
+</tbody>
+</table>
+<h6>Table 1: Integer Variables with Low Cardinality</h6>
+<h3></h3>
+&nbsp;
+<h4>2.2.2. Remove Highly Correlated Variables</h4>
+</div>
+As mentioned earlier, there are 63 variable pairs with absolute correlation &gt; 0.9. Between the two variables in a pair, the one with higher missingness would be removed from the training model.
+
+&nbsp;
+<table class="dataframe" border="1">
+<thead>
+<tr style="text-align: right">
+<th>index</th>
+<th>_var1</th>
+<th>_var2</th>
+<th>_var_corr</th>
+<th>var1_na</th>
+<th>var2_na</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>v12</td>
+<td>v10</td>
+<td>0.912</td>
+<td>49851</td>
+<td>84</td>
+</tr>
+<tr>
+<th>1</th>
+<td>v25</td>
+<td>v8</td>
+<td>0.943</td>
+<td>49840</td>
+<td>48619</td>
+</tr>
+<tr>
+<th>2</th>
+<td>v32</td>
+<td>v15</td>
+<td>0.908</td>
+<td>48619</td>
+<td>49836</td>
+</tr>
+<tr>
+<th>3</th>
+<td>v40</td>
+<td>v34</td>
+<td>-0.903</td>
+<td>49832</td>
+<td>111</td>
+</tr>
+<tr>
+<th>4</th>
+<td>v41</td>
+<td>v29</td>
+<td>0.904</td>
+<td>49832</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>5</th>
+<td>v43</td>
+<td>v26</td>
+<td>0.903</td>
+<td>49832</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>...</th>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr>
+<th>56</th>
+<td>v115</td>
+<td>v69</td>
+<td>-0.994</td>
+<td>49843</td>
+<td>49895</td>
+</tr>
+<tr>
+<th>57</th>
+<td>v116</td>
+<td>v43</td>
+<td>0.978</td>
+<td>49832</td>
+<td>49836</td>
+</tr>
+<tr>
+<th>58</th>
+<td>v118</td>
+<td>v97</td>
+<td>0.962</td>
+<td>49843</td>
+<td>49843</td>
+</tr>
+<tr>
+<th>59</th>
+<td>v121</td>
+<td>v33</td>
+<td>0.949</td>
+<td>48654</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>60</th>
+<td>v121</td>
+<td>v83</td>
+<td>0.966</td>
+<td>48654</td>
+<td>49832</td>
+</tr>
+<tr>
+<th>61</th>
+<td>v128</td>
+<td>v108</td>
+<td>0.957</td>
+<td>49832</td>
+<td>48624</td>
+</tr>
+<tr>
+<th>62</th>
+<td>v128</td>
+<td>v109</td>
+<td>0.903</td>
+<td>49832</td>
+<td>48624</td>
+</tr>
+</tbody>
+</table>
+<h6>Table 2: Highly Correlated Variables</h6>
+<h3></h3>
+&nbsp;
+<h4>2.2.3. Imputation</h4>
+Due to the high missingess in the dataset, we have sent a lot of time on data exploratory and figuring out the best imputation methods. The following are the methods we have tried.
+<ul>
+	<li><strong>Numeric Imputation with Mean</strong>: We chose to imputed the numeric variables with mean to start with our data training.</li>
+	<li><strong>Numeric Imputation with Interpolate Linear</strong></li>
+	<li><strong>Numeric Imputation with -999</strong>: impute with extreme numbers</li>
+	<li><strong>Categorical Imputation with "NA"</strong>: Dropping all missing value in the categorical values does not help increasing the higher predictability. Some missingness itself can provide information, such as for the question like "How long have been in a marriage?", NA means 0 years of marriage.</li>
+</ul>
+Although we didn't use, there is also '<strong>imputation with "Prediction Model"'</strong> which uses supervised algorithms (Linear regression, KNN, Tree-based, etc) to predict the variables with missingness based on other variables.
+<h3></h3>
+
+<br>
+
+<h4>2.2.4. Transfer Categorical to Numeric</h4>
+<div class="inner_cell">
+
+Many machine learning tool, including Python, will only accept numbers as input. This was a problem as Python was being used in our project. Fortunately, the Pandas package has <a href="http://pandas.pydata.org/pandas-docs/version/0.13.1/generated/pandas.get_dummies.html">get_dummies()</a> function, which converts categorical variable into dummy/indicator variables.
+
+Sample code: convert categorical data into binary dummy variables
+<pre>        dummies = pd.get_dummies(df[var_name], prefix=var_name)</pre>
+</div>
+&nbsp;
+
+&nbsp;
+<div id="stcpDiv">
+<div id="data-cleaning-and-munching-steps-below" class="section level2">
+<h2>3. ML Methods</h2>
+&nbsp;
+
+This is the list of the machine learning methods that we have considered to train the data set for prediction. We described the general description, pros and cons of each method.
+
+&nbsp;
+<h3>3.1. Linear regression</h3>
+<strong>Description</strong>: Logistic regression is appropriate when the response variable is categorical with  two possible outcomes (i.e.,  binary outcomes).  By fitting a sigmoid function to binary categorical data, we can get S-shaped line (= sigmoidal curve) so that we can model the probability of categories that observations belong to.
+
+<strong>Pros:</strong>
+<ul>
+	<li><span class="inline_editor_value"><span class="rendered_qtext">Intrinsically simple and fast </span></span></li>
+	<li><span class="inline_editor_value"><span class="rendered_qtext">Low variance </span></span></li>
+	<li><span class="inline_editor_value"><span class="rendered_qtext">Less prone to overfitting</span></span></li>
+</ul>
+<strong>Cons:</strong>
+<ul>
+	<li><span style="color: #ff0000">Low interpretability of the model when facing multicollinearity . (?)
+</span></li>
+	<li><span style="color: #ff0000">Lack of flexibility: linear decision boundary is not valid  (?)</span></li>
+</ul>
+&nbsp;
+
+</div>
+<div id="data-cleaning-and-munching-steps-below" class="section level2">
+<h3> 3.2. Decision Tree Model</h3>
+<strong>Description:</strong> Decision Tree is a supervised learning method used both for classification and regression. Regression tree is used to predict a quantitative (numerical) response while the classification tree is used to predict qualitative (categorical) response. The goal of decision tree is to create a model that can predict the value of a target variable by learning simple decision rules inferred from the input variables.
+
+<strong>Pros:</strong>
+<ul>
+	<li>Easy to understand and interpret</li>
+	<li>Easy to visualize higher dimensionality, as compared to linear regression</li>
+	<li>Does not require much data preparation, such as normalization and dummy variables (But, it does not deal with missing values)</li>
+	<li>Ready to human-decision making</li>
+</ul>
+<strong>Cons:</strong>
+<ul>
+	<li>Lower predictability</li>
+	<li>Complex trees can overfitt</li>
+	<li>Unstable (small variations in the data may generate a completely different tree)</li>
+</ul>
+&nbsp;
+
+</div>
+<div id="data-cleaning-and-munching-steps-below" class="section level2">
+<h3>3.3. Random Forest</h3>
+<strong>Description:</strong> Random forest model uses the random subsets of observations and features from the training data to create multiple decision trees. Then, those separate decision trees fit the data separately. Finally, random forest classifier chooses the classification by voting the better class. The assumptions of the random forest model are that trees can make mistake at different place (wrong classification), but most of the tree can provide correct prediction of class for most part of the data.
+
+<strong>Pros:</strong>
+<ul>
+	<li>Prevent from overfiting  (by random subset of trees)</li>
+	<li>Good with very large data set (also due to random subset of trees)</li>
+	<li>No transformation needed</li>
+	<li>Robust against outliers</li>
+</ul>
+<strong>Cons:</strong>
+<ul>
+	<li>Slow due to construction of multiple classifier for subset trees.</li>
+	<li>Low interpretability</li>
+	<li>Less accurate than boosted / GBM model</li>
+	<li>Not incremental (Random forest model can't learn from the previous trees)</li>
+</ul>
+&nbsp;
+
+</div>
+<div id="data-cleaning-and-munching-steps-below" class="section level2">
+<h3>3.4. GBM (Gradient Boosting Model)</h3>
+<strong>Description:</strong> Gradient Boosting model is a model which trains trees sequentially, uses the information from the previous trees, then combined the whole set and averaging to provide a higher prediction. This model uses the entire features, and does not ignore 'weak' learners. The assumptions of these model is that additions of trees improves upon the prediction accuracy (= sum of prediction is increasingly accurate) and having less errors. But, the predictive function gets complex.
+
+<strong>Pros:</strong>
+<ul>
+	<li>Use all features (with 'weak' learners meaning that it does not ignore less important features)</li>
+	<li>Better predictability (= higher accuracy)</li>
+	<li>Lower possibility of overfitting with more trees</li>
+</ul>
+<strong>Cons:</strong>
+<ul>
+	<li>Susceptible to outliers since the model uses all the features</li>
+	<li>Lack of interpretability and higher complexity, compared to linear classifiers.</li>
+	<li>Harder to tune hyperparameters than other models
+<ul>
+	<li>Slow to train or score.</li>
+</ul>
+</li>
+</ul>
+&nbsp;
+
+</div>
+<h3>3.5.  XGBoost (Extreme Gradient Boost)</h3>
+</div>
+<strong>Description:</strong> XGBoost (eXtreme Gradient Boosting) is an advanced implementation of gradient boosting algorithm. It has definitely boosting capabilities and additional components overcoming the weakness of GBM.
+
+<strong>Pros (compared to GBM):</strong>
+<ul>
+	<li>Regularization: it reduces overfitting (Standard GBM has no regularization)</li>
+	<li>Parallel processing: XGBoost is also said a parallelized gradient boosting model. This makes the model faster than GBM (sequential)</li>
+	<li>Handling missing data: XGBoost has an in-built routine to handle missing values.</li>
+	<li>Tree pruning: A GBM would stop splitting a node when it encounters a negative loss in the split. XGBoost on the other hand make splits upto the max_depth specified and then start pruning the tree backwards and remove splits beyond which there is no positive gain.</li>
+	<li>Built-in Cross Validation: XGBoost runs a cross-validation at each iteration of the boosting process. GBM should run a grid-search where only limited number of variables can be tested</li>
+</ul>
+<span style="color: #808080">* Note that this XGBoost section is mostly based on the '<em>Complete Guide to Parameter Tuning in XGBoost (with codes in Python)'</em> (<span style="color: #333399"><a style="color: #333399" href="http://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/">link</a></span>).</span>
+
+&nbsp;
+<h2>4. Results</h2>
+After considering several options, ...
+
+&nbsp;
+<h3>4.1. Linear Regression</h3>
+...
+
+&nbsp;
+<h3>4.2. Random Forest</h3>
+aaa
+
+https://gist.github.com/monspo1/85170fc26448901c0f0569d2ef8ffc27
+
+...
+
+&nbsp;
+<h3>4.3. XGBoost</h3>
+aaa
+
+https://gist.github.com/monspo1/717b28e9f5a88b7fce6b0ad09124566a
+<ul>
+	<li>We followed the same steps to tune the parameters provided i<span style="color: #000000">n the '<em>Complete Guide to Parameter Tuning in XGBoost (with codes in Python)'</em> (<span style="color: #333399"><a style="color: #333399" href="http://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/">link</a></span>).</span></li>
+</ul>
+...
+
+&nbsp;
+<div id="stcpDiv">
+<div id="data-cleaning-and-munching-steps-below" class="section level2">
+<h2>5. Conclusion</h2>
+</div>
+</div>
+...
+
+...
+
+&nbsp;
+
+&nbsp;
