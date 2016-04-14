@@ -1,4 +1,3 @@
-
 library(dplyr)
 library(ggplot2)
 library(reshape)
@@ -7,39 +6,48 @@ library(googleVis)
 library(gcookbook)
 library(RColorBrewer)
 library(Quandl)
-library(plyr)
+library(stringr)
 
 ##-----------------------------------------------------
 #Load and prepare line chart of venture capital by year
 ##-----------------------------------------------------
 
-startup_data = read.csv('Desktop/Data Science/Crunchbase/funding rounds.csv',header = TRUE) %>%
-  filter(., country_code == "USA", funded_year > 2004 & funded_year <= 2012)
+#EDA......
+startup_data = read.csv('Data/Crunchbase/funding rounds.csv',header = TRUE) 
+summary(startup_data)
+str(startup_data)
 
-rounds = as.data.frame(group_by(startup_data, round_code, funded_year) %>%
+#This analysis will focus on USA-only and the years 2004 to 2012 because of sparse data <2004 and >2012 
+startupUSA = filter(startup_data, country_code == "USA", funded_year > 2004 & funded_year <= 2012)
+
+#group the fundings transactions by type (round_code) and year
+rounds = as.data.frame(group_by(startupUSA, round_code, funded_year) %>%
   summarise(., count = n(), sum = sum(raised_amount)) %>%
   arrange(.,desc(sum)))
 
+#Personal preference--clean up the column names for later use in graphs
 colnames(rounds) = c("Funding_Round", "Funding_Year", "Transactions", "Capital_Invested")
-head(rounds_all)
-rounds_all = mutate(rounds, Capital = round(Capital_Invested/1000000,2)) %>%
-  filter(., Funding_Round %in% c("a","b","c","d","e","f","g","debt_round","private equity")) %>%
-  arrange(., Funding_Year, Funding_Round, Capital)
 
-View(startup_data)
-##too much missing data in "unattributed" and "angel" -- Filtered out 
+## missing data in grant, post_ipo_debt, post_ipo_equity, unattributed, angel, seed and those 
+# variables outside the scope of this analysis. Those are largely different markets.
+# Filter and massage data.....
+
+rounds_all = mutate(rounds, Capital_millions = round(Capital_Invested/1000000,2)) %>%
+  filter(., Funding_Round %in% c("a","b","c","d","e","f","g","debt_round","private equity")) %>%
+  arrange(., Funding_Year, Funding_Round, Capital_millions)
 
 #----------------
 #Graph by Capital
 #----------------
 
-ggplot(rounds_all, aes(x=Funding_Year, y=Capital, fill=Funding_Round, fontSize = 15)) +
+ggplot(rounds_all, aes(x=Funding_Year, y=Capital_millions, fill=Funding_Round, fontSize = 15)) +
   geom_area(colour="grey", size = .2, alpha=.8) +
   scale_fill_brewer(palette = "Greens",breaks=rev(levels(rounds_all$Funding_Round)))
 
 #---------------------
 #Graph by Transactions
 #---------------------
+
 ggplot(rounds_all, aes(x=Funding_Year, y=Transactions, fill=Funding_Round)) +
   geom_area(colour="grey", size = .3, alpha=.8) +
   scale_fill_brewer(palette = "Greens",breaks=rev(levels(rounds_all$Funding_Round)))
@@ -48,13 +56,12 @@ ggplot(rounds_all, aes(x=Funding_Year, y=Transactions, fill=Funding_Round)) +
 #Graph startups by industry
 #--------------------------
 
-####  Yes, I know this is WILDLY INEFFICIENT!!! ......but, I was tired and it was late, so lots of copy&paste seemed like a good solution
-
+#Pull from industry VC from Quandl
 startup_ind = as.data.frame(Quandl("NVCA/VENTURE_3_18") %>%
-  filter(., Date > "2004/12/31" & Date < "2013/12/31")) %>%
-  rename(., c("Business Products and Services"="Business_Products_and_Services","Computers and Peripherals"="Computers_and_Peripherals","Consumer Products and Services"="Consumer_Products_and_Services",
-              "Financial Services"="Financial_Services","Healthcare Services"="Healthcare_Services","IT Services"="IT_Services","Media and Entertainment"="Media_and_Entertainment","Medical Devices and Equipment"="Medical_Devices_and_Equipment",
-              "Networking and Equipment"="Networking_and_Equipment","Electronics/Instrumentation"="Electronics_Instrumentation","Industrial/Energy"="Industrial_Energy","Retailing/Distribution"="Retailing_Distribution"))
+  filter(., Date > "2004/12/31" & Date < "2015/12/31"))
+
+#easier to work with titles when they're complete strings  
+names(startup_ind) = str_replace_all(names(startup_ind),"[\\s+/]","_")
 
 st_bio = select(startup_ind, Date, Biotechnology) %>%
   mutate(., Industry= "Biotech") %>%
@@ -122,36 +129,34 @@ st_tele = select(startup_ind, Date, Telecommunications) %>%
 
 st_industry = rbind(st_bio, st_cp, st_cps,st_elect, st_fin, st_health, st_ind, st_it, st_me, st_med, st_net, st_other, st_retail,st_semi, st_soft,st_tele)
 
-#transform for % and limite to 8 industries because of graph limitations
+#transform for % and limit to 8 industries because of graph limitations
+st_indust_transform = group_by(st_industry, Date, Industry, Amount) %>%
+  transform(., Percent = Amount / sum(Amount) * 100)
 
-st_indust_transform = ddply(st_industry, "Date", transform,Percent = Amount / sum(Amount) * 100)
-
+#More data manipulation.....filtering, ranking, sorting, etc.
 top_8 = group_by(st_indust_transform, Industry) %>%
   summarise(., sum = sum(Amount)) %>%
   arrange(., desc(sum)) %>%
-  top_n(., 9) %>%
+  top_n(., 8) %>%
   select(., Industry)
 
-st_industry_top = as.data.frame(filter(st_industry, Industry %in% c("Software","Biotech","Industrial_Energy","Media_and_Entertainment",
-                                                              "Medical_Devices_and_Equipment","IT_Services","Telecommunications","Consumer_Products_and_Services","Financial_Services")))
-
-st_indust_top_transform =  ddply(st_industry_top, "Date", transform,Percent = Amount / sum(Amount) * 100) %>%
+st_industry_top = as.data.frame(filter(st_industry, Industry %in% unlist(top_8))) %>%
+  group_by(., Date) %>%
+  transform(., Percent = Amount ) %>%
   arrange(., Industry, Percent)
 
-st_indust_top_transform$Industry = as.factor(st_indust_top_transform$Industry)
-
-ggplot(st_indust_top_transform, aes(x=Date, y=Percent, fill=Industry)) +
+ggplot(st_industry_top, aes(x=Date, y=Percent, fill=Industry)) +
   geom_area(colour="black", size=.2, alpha=.4) +
-  scale_fill_brewer(palette="Blues", breaks=rev(levels(st_indust_top_transform$Industry))) 
+  scale_fill_brewer(palette="Blues", breaks=rev(levels(st_industry_top$Industry)))
 
 #--------------------
 #Google Vis Data Prep
 #--------------------
-raise_per_comp = group_by(recent_data, funding_rounds) %>%
+raise_per_comp = group_by(startup_data, funding_rounds) %>%
   summarise(., Rounds = n(), sum = round(sum(raised_amount)/1000000,2)) %>%
   arrange(.,desc(sum)) 
 
-maps_data = recent_data[ ! duplicated(recent_data[c("funding_rounds")]), ] %>%
+maps_data = startup_data[ ! duplicated(startup_data[c("funding_rounds")]), ] %>%
   select(., funding_rounds,zip_code,city,state_code,latitude,longitude) 
 
 maps_df = na.omit(left_join(maps_data, raise_per_comp , by = "funding_rounds"))
@@ -171,11 +176,14 @@ Geo_city = gvisGeoChart(maps_state, "state_code", colorvar = "sum",
                                        width=1000, height=600))
 plot(Geo_city)
 
+Geo_city$html$chart
+cat(Geo_city$html$chart, file = "Geo_city.html")
+
 #--------------------------------------------
 #Capital raised by state from Angel, Seed, a
 #--------------------------------------------
 
-raise_per_e = group_by(recent_data, funding_rounds) %>%
+raise_per_e = group_by(startup_data, funding_rounds) %>%
   filter(., round_code %in% c("a","angel", "seed")) %>%
   summarise(., Rounds = n(), sum = round(sum(raised_amount)/1000000,2)) %>%
   arrange(.,desc(sum))
@@ -194,12 +202,14 @@ Geo_city_e = gvisGeoChart(maps_state_e, "state_code", colorvar = "sum",
 
 plot(Geo_city_e)
 
+cat(Geo_city_e$html$chart, file = "Geo_city_e.html")
 
 #----------
 # VC funds
 #----------
 
-vc_a = as.data.frame(read.csv('Desktop/Data Science/Crunchbase/venture fund locations.csv',header = TRUE) %>%
+#Need to stitch (join) together some tables from Enigma database
+vc_a = as.data.frame(read.csv('Data/Crunchbase/venture fund locations.csv',header = TRUE) %>%
   select(., -serialid) %>%
   mutate(., uniqueid = paste(name, city)))
 
@@ -211,7 +221,7 @@ vc_offices = group_by(vc_b, name) %>%
 
 vc_local = left_join(vc_b, vc_offices, by = "name")
 
-vc_funds = na.omit(read.csv('Desktop/Data Science/Crunchbase/VC fund size.csv',header = TRUE) %>%
+vc_funds = na.omit(read.csv('Data/Crunchbase/VC fund size.csv',header = TRUE) %>%
   mutate(., uniqueid = paste(name,funded_year,funded_month,funded_day)) %>%
   filter(., funded_year > 2004 & funded_year <= 2014)) %>%
   filter(., raised_currency_code == "USD") %>%
@@ -223,34 +233,24 @@ vc_funds = na.omit(read.csv('Desktop/Data Science/Crunchbase/VC fund size.csv',h
 vc_df = vc_funds[ ! duplicated(vc_funds[c("id")]), ] %>%
   mutate(., capital_per_office = round(Capital_Invested/n_offices,2))
 
-View(vc_df)
-#-------------------
-# VC Funds Annually
-#-------------------
-
-vc_funds_annual = group_by(vc_df, Year, State) %>%
-  summarise(., count = n(), sum = round(sum(capital_per_office)/1000,2)) %>%
-  arrange(.,desc(sum))
-
-colnames(vc_funds_annual) = c("Year", "State", "Offices", "Capital_Invested","Log_Capital")
-
 #---------------
 # VC Tree Graph
 #---------------
 
+#need to do some data manipulation to setup the matrix including creating idvar and parentvar for each data layer
+#and null top layer.  Sums of each layer must add up too!
 vc_fund_names = group_by(vc_df, State, VC_Office) %>%
   summarise(., sum = sum(capital_per_office/1000)) %>%
   mutate(., log_sum = log(sum)) %>%
   arrange(., desc(sum))
-vc_fund_CA = filter(vc_fund_names, State == "CA")
-View(vc_fund_CA)
-vc_fund_states = group_by(vc_fund_names[16:613, ], State) %>%
-  summarise(., count = n(), sum = sum(sum), log_sum = sum(log_sum)) 
+
+vc_fund_states = group_by(vc_fund_names[16:nrow(vc_fund_names), ], State) %>%
+  summarise(., sum = sum(sum), log_sum = sum(log_sum)) 
 
 vc_fund_states2 = cbind(root = "USA", vc_fund_states) %>%
   rename(., c("State" = "ID_var"))
 
-vc_fund_names2 = rbind(c(NA,"USA",sum(vc_fund_names$count), sum(vc_fund_names$sum),sum(vc_fund_names$log_sum)),vc_fund_names[16:613, ]) %>%
+vc_fund_names2 = rbind(c(NA,"USA", sum(vc_fund_names$sum),sum(vc_fund_names$log_sum)),vc_fund_names[16:nrow(vc_fund_names), ]) %>%
   rename(., c("State" = "root", "VC_Office"="ID_var"))
 
 vc_fund_names3 = rbind(vc_fund_states2, vc_fund_names2)
@@ -259,7 +259,6 @@ Tree1 <- gvisTreeMap(vc_fund_names3, idvar = "ID_var",
                      parentvar = "root", 
                      sizevar = "sum", 
                      colorvar = "log_sum",
-                     width = 1000,
                      options = list(
                        minColor='white',
                        maxColor='green',
@@ -268,31 +267,34 @@ Tree1 <- gvisTreeMap(vc_fund_names3, idvar = "ID_var",
                        showScale=TRUE))
 plot(Tree1)
 
+#save html for inclusion in blog post
+cat(Tree1$html$chart, file = "VC_Tree.html")
+
 #-------------------
 # VC Funds US Graph
 #-------------------
 
 vc_funds_geo = group_by(vc_fund_names, State) %>%
-  summarise(., count = n(States))
+  summarise(., count = n())
 
-Geo_vc = gvisGeoChart(vc_fund_states, "State", colorvar = "count", 
+Geo_vc = gvisGeoChart(vc_funds_geo, "State", colorvar = "count", 
                           options=list(region="US", 
                                        displayMode="regions", 
                                        resolution="provinces",
                                        width=1000, height=600))
 plot(Geo_vc)
 
+#save html for inclusion in blog post
+cat(Geo_vc$html$chart, file = "VC_count_map.html")
+
 #-----------------------
 # Engineers in US
 #-----------------------
 
-class(engineers_data$OCC_GROUP)
-
-engineers_data = read.csv('Desktop/Data Science/engineer_labor_state.csv',header = TRUE) %>%
+engineers_data = read.csv('Data/engineer_labor_state.csv',header = TRUE) %>%
   filter(., grepl('major', OCC_GROUP)) %>%
   filter(., grepl('Computer|Engineer', OCC_TITLE))
 
-View(engineers_data)
 #convert factor to numeric through "seq_along"
 engineers_data$A_MEAN=seq_along(levels(engineers_data$A_MEAN))[engineers_data$A_MEAN]
 
@@ -308,7 +310,7 @@ Geo_state_eng = gvisGeoChart(engineers_df, "STATE", colorvar = "mean",
                                        resolution="provinces",
                                        colors="['white','darkblue']",
                                        width=600, height=925))
-plot(Geo_city_eng)
+plot(Geo_state_eng)
 
 bar_state_eng = gvisBarChart(engineers_df,
                              options=list(legend ="none",
@@ -318,3 +320,22 @@ bar_state_eng = gvisBarChart(engineers_df,
 
 gvis_eng = gvisMerge(Geo_state_eng, bar_state_eng, horizontal = TRUE)
 plot(gvis_eng)
+
+#save html for link in blog post
+cat(gvis_eng$html$chart, file = "engineers_maps.html")
+
+########################################################################
+
+# LEFTOVERS
+
+#-------------------
+# VC Funds Annually
+#-------------------
+
+vc_funds_annual = group_by(vc_df, Year, State) %>%
+  summarise(., count = n(), sum = round(sum(capital_per_office)/1000,2)) %>%
+  arrange(.,desc(sum))
+
+# Funds in Cali
+vc_fund_CA = filter(vc_fund_names, State == "CA")
+colnames(vc_funds_annual) = c("Year", "State", "Offices", "Capital_Invested","Log_Capital")
